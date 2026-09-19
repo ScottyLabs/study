@@ -18,10 +18,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
       - name: Deploy to Railway Dev
-        run: railway up --ci --service "CMU Study" --environment dev
+        run: npm exec --yes --package=@railway/cli -- railway up --ci --service "CMU Study" --environment dev
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_DEV }}
