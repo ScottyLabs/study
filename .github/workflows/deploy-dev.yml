@@ -12,7 +12,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy to Dev
-    runs-on: ubuntu-latest
+    runs-on: native
 
     steps:
       - name: Checkout branch
@@ -24,4 +24,4 @@ jobs:
       - name: Deploy to Railway Dev
         run: railway up --ci --service "CMU Study" --environment dev
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_DEV }}
