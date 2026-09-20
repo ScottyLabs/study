@@ -12,7 +12,6 @@ Find and manage CMU study groups.
 - PostgreSQL is configured through `DATABASE_URL`; use `npm run db:generate` to create a migration after changing the Prisma schema.
 - To connect to the Railway Postgres-dev database, create a local SSH key, upload to Railway, install the railway CLI, and run `railway connect Postgres-dev --tunnel-only`. Copy the given URL into the .env and .env.local DATABASE_URL before starting the app. You will need to be a member of the Railway project (if you have not been added yet, proceed with creating a local Postgress database).
 - To create a local Postgres database with Docker, run:
-<<<<<<< HEAD
   ```bash
   docker run --name studystarter-postgres \
     -e POSTGRES_USER=studystarter \
@@ -26,21 +25,6 @@ Find and manage CMU study groups.
   DATABASE_URL="postgresql://studystarter:studystarter@localhost:5433/studystarter?schema=public"
   ```
   Prisma CLI reads `.env`, while the Next.js app reads `.env.local`. After setting the URL, run `npx prisma migrate dev`, then start the app with `npm run dev`. Use `docker stop studystarter-postgres` and `docker start studystarter-postgres` to stop or restart the local database.
-=======
-  ```bash
-  docker run --name studystarter-postgres \
-    -e POSTGRES_USER=studystarter \
-    -e POSTGRES_PASSWORD=studystarter \
-    -e POSTGRES_DB=studystarter \
-    -p 5433:5432 \
-    -d postgres:17
-  ```
-  Then add this value to both `.env` and `.env.local`:
-  ```env
-  DATABASE_URL="postgresql://studystarter:studystarter@localhost:5433/studystarter?schema=public"
-  ```
-  Prisma CLI reads `.env`, while the Next.js app reads `.env.local`. After setting the URL, run `npx prisma migrate dev`, then start the app with `npm run dev`. Use `docker stop studystarter-postgres` and `docker start studystarter-postgres` to stop or restart the local database.
->>>>>>> 255528a2fb47db716a92981d47094892d13429d3
 
 ## Project Structure
 
