@@ -10,12 +10,37 @@ import { attachPendingBlocks } from "~/server/api/profile";
 
 const baseURL = env.BETTER_AUTH_URL ?? env.SERVER_URL;
 const fallbackSecret = "development-secret-change-me-1234567890";
+const keycloakConfig = {
+  ...keycloak({
+    clientId: env.AUTH_CLIENT_ID,
+    clientSecret: env.AUTH_CLIENT_SECRET,
+    issuer: env.AUTH_ISSUER,
+    redirectURI: `${baseURL}/api/auth/oauth2/callback/keycloak`,
+    overrideUserInfo: true,
+  }),
+  mapProfileToUser: (profile: Record<string, unknown>) => {
+    const andrewID = profile.preferred_username;
+
+    return typeof andrewID === "string"
+      ? ({ andrewID } as never)
+      : {};
+  },
+};
 
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
   baseURL,
   secret: env.BETTER_AUTH_SECRET ?? fallbackSecret,
   trustedOrigins: [baseURL],
+  user: {
+    additionalFields: {
+      andrewID: {
+        type: "string",
+        required: false,
+        input: false,
+      },
+    },
+  },
   databaseHooks: {
     user: {
       create: {
@@ -28,14 +53,7 @@ export const auth = betterAuth({
   plugins: [
     nextCookies(),
     genericOAuth({
-      config: [
-        keycloak({
-          clientId: env.AUTH_CLIENT_ID,
-          clientSecret: env.AUTH_CLIENT_SECRET,
-          issuer: env.AUTH_ISSUER,
-          redirectURI: `${baseURL}/api/auth/oauth2/callback/keycloak`,
-        }),
-      ],
+      config: [keycloakConfig],
     }),
   ],
 });

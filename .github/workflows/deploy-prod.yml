@@ -1,0 +1,24 @@
+name: Deploy to Railway Production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: railway-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: native
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Deploy to Railway Production
+        run: npm exec --yes --package=@railway/cli -- railway up --ci --service "CMU Study" --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PROD }}

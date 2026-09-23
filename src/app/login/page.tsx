@@ -1,10 +1,8 @@
 import { redirect } from "next/navigation";
 
-import {
-  checkFacultyStatus,
-  userHasCreatedProfile,
-} from "~/features/profile/services/serverAccountService";
+import { userHasCreatedProfile } from "~/features/profile/services/serverAccountService";
 import { requireServerSession } from "~/lib/auth";
+import { getUserEligibility } from "~/server/eligibility/service";
 
 export const dynamic = "force-dynamic";
 
@@ -21,16 +19,17 @@ export default async function LoginPage() {
     redirect("/");
   }
 
-  const isFaculty = await checkFacultyStatus(
-    email,
-    session.user.name ?? "User",
-  );
+  const eligibility = await getUserEligibility(session.user.id, session.user.andrewID);
 
-  if (isFaculty) {
+  if (eligibility === "INELIGIBLE") {
     redirect("/access-restricted");
   }
 
-  if (!(await userHasCreatedProfile(email))) {
+  if (eligibility === "UNAVAILABLE") {
+    redirect("/eligibility-unavailable");
+  }
+
+  if (!(await userHasCreatedProfile(session.user.id))) {
     redirect("/create-account");
   }
   redirect("/feed");

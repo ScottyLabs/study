@@ -3,7 +3,10 @@
 import type { ReactElement, ReactNode } from "react";
 import { cloneElement, isValidElement, useMemo, useState } from "react";
 import { createAuthClient } from "better-auth/react";
-import { genericOAuthClient } from "better-auth/client/plugins";
+import {
+  genericOAuthClient,
+  inferAdditionalFields,
+} from "better-auth/client/plugins";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -13,6 +16,7 @@ type CompatUser = {
   fullName: string;
   id: string;
   imageUrl?: string;
+  andrewID?: string;
   username?: string;
 };
 
@@ -37,7 +41,17 @@ export const authClient = createAuthClient({
     typeof window !== "undefined"
       ? `${window.location.origin}/api/auth`
       : `${process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? process.env.BETTER_AUTH_URL ?? "http://localhost:3000"}/api/auth`,
-  plugins: [genericOAuthClient()],
+  plugins: [
+    genericOAuthClient(),
+    inferAdditionalFields({
+      user: {
+        andrewID: {
+          type: "string",
+          required: false,
+        },
+      },
+    }),
+  ],
 });
 
 function getCompatUser(
@@ -49,12 +63,14 @@ function getCompatUser(
 
   const name = session.user.name ?? "";
   const firstName = name.split(" ").filter(Boolean)[0];
+  const andrewID = session.user.andrewID ?? undefined;
 
   return {
     id: session.user.id,
     fullName: name,
     firstName,
-    username: undefined,
+    andrewID,
+    username: andrewID,
     imageUrl: session.user.image ?? undefined,
     emailAddresses: [{ emailAddress: session.user.email }],
   };

@@ -8,23 +8,27 @@ datasource db {
 }
 
 model User {
-  id             String            @id
-  name           String
-  email          String            @unique @db.Citext
-  emailVerified  Boolean           @default(false)
-  image          String?
-  academicYear   String?
-  majors         String?
-  minors         String?
-  theme          ThemePreference   @default(LIGHT)
-  courseCodes    String[]          @default([])
-  createdAt      DateTime          @default(now()) @db.Timestamptz(3)
-  updatedAt      DateTime          @updatedAt @db.Timestamptz(3)
-  accounts       Account[]
-  sessions       Session[]
-  memberships    GroupMembership[]
-  blocksCreated  Block[]           @relation("Blocker")
-  blocksReceived Block[]           @relation("Blocked")
+  id                      String               @id
+  name                    String
+  email                   String               @unique @db.Citext
+  emailVerified           Boolean              @default(false)
+  directoryEligibility    DirectoryEligibility @default(UNCHECKED)
+  directoryCheckedAt      DateTime?
+  directoryCheckExpiresAt DateTime?
+  andrewID                String?              @map("andrew_id")
+  image                   String?
+  academicYear            String?
+  majors                  String?
+  minors                  String?
+  theme                   ThemePreference      @default(LIGHT)
+  courseCodes             String[]             @default([])
+  createdAt               DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime             @updatedAt @db.Timestamptz(3)
+  accounts                Account[]
+  sessions                Session[]
+  memberships             GroupMembership[]
+  blocksCreated           Block[]              @relation("Blocker")
+  blocksReceived          Block[]              @relation("Blocked")
 }
 
 model StudyGroup {
@@ -57,12 +61,12 @@ model GroupMembership {
 }
 
 model Block {
-  blockerId   String
-  blockedEmail String @db.Citext
-  blockedId   String?
-  createdAt   DateTime @default(now()) @db.Timestamptz(3)
-  blocker     User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
-  blocked     User?    @relation("Blocked", fields: [blockedId], references: [id], onDelete: SetNull)
+  blockerId    String
+  blockedEmail String   @db.Citext
+  blockedId    String?
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  blocker      User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked      User?    @relation("Blocked", fields: [blockedId], references: [id], onDelete: SetNull)
 
   @@id([blockerId, blockedEmail])
   @@index([blockedId])
@@ -119,4 +123,11 @@ model Verification {
 enum ThemePreference {
   LIGHT
   DARK
+}
+
+enum DirectoryEligibility {
+  UNCHECKED
+  ELIGIBLE
+  INELIGIBLE
+  UNAVAILABLE
 }
