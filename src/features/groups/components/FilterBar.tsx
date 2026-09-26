@@ -19,8 +19,8 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
     height: "44px",
     minHeight: "44px",
     backgroundColor: "var(--filter-input-background)",
-    borderColor: state.isFocused ? "#B91C1C" : "rgb(0 0 0 / 0.15)",
-    boxShadow: state.isFocused ? "0 0 0 2px rgb(185 28 28 / 0.2)" : "none",
+    borderColor: state.isFocused ? "#B91C1C" : "var(--filter-border-color)",
+    boxShadow: state.isFocused ? "0 0 0 2px rgb(28 28 28 / 0.00001)" : "none",
     borderRadius: "8px",
     padding: "0 4px",
     color: "inherit",
@@ -45,7 +45,8 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
   }),
   placeholder: (provided) => ({
     ...provided,
-    color: "rgb(0 0 0 / 0.4)",
+    color: "inherit",
+    opacity: 0.4,
   }),
 };
 
