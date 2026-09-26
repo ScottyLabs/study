@@ -829,7 +829,7 @@
 }
 
 .sidebar-logout {
-  @apply flex min-h-11 w-full items-center gap-3 rounded-md border-t border-black/10 px-3 pt-3 text-sm font-semibold text-lightSelected transition hover:bg-lightAccent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:text-darkSelected dark:hover:bg-darkAccent;
+  @apply flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold text-lightSelected transition hover:bg-lightAccent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected dark:hover:bg-darkAccent;
 }
 
 .mobile-nav-bar {
