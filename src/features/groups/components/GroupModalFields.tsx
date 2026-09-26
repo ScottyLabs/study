@@ -73,16 +73,21 @@ export function GroupModalFields({
           </option>
         ))}
       </select>
-      <input
+      <select
         className="form-control"
-        type="text"
         aria-label="Purpose"
-        placeholder="Purpose"
         value={purpose}
         onChange={(event) => setPurpose(event.target.value)}
         required
-        maxLength={50}
-      />
+      >
+        <option value="" disabled>
+          Select a purpose
+        </option>
+        <option value="Exam Review">Exam Review</option>
+        <option value="Homework">Homework</option>
+        <option value="Lecture Review">Lecture Review</option>
+        <option value="Miscellaneous">Miscellaneous</option>
+      </select>
       <DatePicker
         selected={date}
         onChange={(selectedDate) => setDate(selectedDate)}
