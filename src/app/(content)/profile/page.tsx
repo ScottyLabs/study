@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { ConfirmProvider } from "~/components/ui/ConfirmContext";
 import { useUser } from "~/lib/auth-client";
@@ -15,25 +15,11 @@ export default function ProfilePage() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
   const [activeTab, setActiveTab] = useState<ProfileTab>("courses");
-  const accountRef = useRef<HTMLDivElement>(null);
-
-  const openAccountEditor = () => {
-    setActiveTab("account");
-    window.setTimeout(
-      () =>
-        accountRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        }),
-      0,
-    );
-  };
-
   return (
     <main className="profile-page">
       <ConfirmProvider>
         <h1 className="workspace-title profile-page-title">Profile</h1>
-        <ProfileHeader user={user} onEdit={openAccountEditor} />
+        <ProfileHeader user={user} />
 
         <div
           className="profile-tabs"
@@ -84,7 +70,6 @@ export default function ProfilePage() {
             <BlockList />
           </section>
           <section
-            ref={accountRef}
             className={`settings-panel profile-section profile-section-account ${activeTab === "account" ? "profile-section-active" : ""}`}
           >
             <div className="settings-panel-heading">
