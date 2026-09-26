@@ -1178,7 +1178,7 @@
 }
 
 .course-search-wrap .course-search-input {
-  @apply border-0 px-0 focus:ring-0;
+  @apply border-0 px-0 focus:ring-0 bg-transparent;
 }
 
 .course-search-result {
