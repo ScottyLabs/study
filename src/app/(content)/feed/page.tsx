@@ -11,7 +11,6 @@ import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
 import { usePostHog } from "posthog-js/react";
 
 import Card from "~/features/groups/components/Card";
-import { groupCardColors } from "~/features/groups/constants";
 import { useStudyGroups } from "~/features/groups/hooks/useStudyGroups";
 import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
 import { shouldHideFeedGroup } from "~/features/groups/utils/groupFilters";
