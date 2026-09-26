@@ -79,10 +79,7 @@ export default function FeedPage() {
   const displayScheduled = visibleGroups.map((group) => {
     const [formattedDate, formattedTime] = formatDateTime(group.startTime);
     const isInGroup = joinedGroups ? joinedGroups.includes(group.id) : false;
-    const cardColors =
-      group.id === selectedGroup
-        ? groupCardColors.selected
-        : groupCardColors.default;
+    const selected = group.id === selectedGroup;
 
     return (
       <Card
@@ -92,8 +89,7 @@ export default function FeedPage() {
         time={formattedTime}
         date={formattedDate}
         isInGroup={isInGroup}
-        lightColor={cardColors.light}
-        darkColor={cardColors.dark}
+        selected={selected}
       />
     );
   });
