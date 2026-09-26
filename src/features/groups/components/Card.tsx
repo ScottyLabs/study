@@ -10,8 +10,7 @@ interface Props {
   time: string | null;
   date: string | null;
   isInGroup: boolean;
-  lightColor: string;
-  darkColor: string;
+  selected: boolean;
 }
 
 const Card = ({
@@ -20,10 +19,8 @@ const Card = ({
   time,
   date,
   isInGroup,
-  lightColor,
-  darkColor,
+  selected
 }: Props) => {
-  const selected = lightColor === "lightAccent" && darkColor === "darkAccent";
   const visibleParticipants = group.participantDetails.slice(0, 4);
   const remainingParticipants = Math.max(
     group.participantDetails.length - visibleParticipants.length,
