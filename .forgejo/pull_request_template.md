@@ -9,11 +9,7 @@ Closes #
 
 ## Type of change
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Refactor / code improvement
-- [ ] Test coverage
-- [ ] Documentation
+**Type:** <!-- Bug fix / New feature / Refactor / Test coverage / Documentation -->
 
 ## Testing
 
