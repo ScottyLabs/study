@@ -15,7 +15,7 @@ const keycloakConfig = {
     clientId: env.AUTH_CLIENT_ID,
     clientSecret: env.AUTH_CLIENT_SECRET,
     issuer: env.AUTH_ISSUER,
-    redirectURI: `${baseURL}/api/auth/oauth2/callback/keycloak`,
+    redirectURI: env.OAUTH_RELAY_URL,
     overrideUserInfo: true,
   }),
   mapProfileToUser: (profile: Record<string, unknown>) => {
