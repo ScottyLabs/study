@@ -10,6 +10,15 @@ import { attachPendingBlocks } from "~/server/api/profile";
 
 const baseURL = env.BETTER_AUTH_URL ?? env.SERVER_URL;
 const fallbackSecret = "development-secret-change-me-1234567890";
+const keycloakCallbackURL = `${baseURL}/api/auth/oauth2/callback/keycloak`;
+
+// Ricochet relays the IdP callback to the URL embedded in OAuth state. Better
+// Auth stores its own state in an encrypted cookie by default, so this relay
+// envelope can be forwarded unchanged without weakening its state validation.
+const oauthRelayState = Buffer.from(
+  JSON.stringify({ return_to: keycloakCallbackURL }),
+).toString("base64url");
+
 const keycloakConfig = {
   ...keycloak({
     clientId: env.AUTH_CLIENT_ID,
@@ -18,6 +27,9 @@ const keycloakConfig = {
     redirectURI: env.OAUTH_RELAY_URL,
     overrideUserInfo: true,
   }),
+  authorizationUrlParams: {
+    state: oauthRelayState,
+  },
   mapProfileToUser: (profile: Record<string, unknown>) => {
     const andrewID = profile.preferred_username;
 
