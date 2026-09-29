@@ -38,11 +38,11 @@ export function ProfileHeader({
               <GraduationCap size={17} /> {profile.majors}
             </span>
           )}
-          {profile.year && (
+          {profile.year && profile.year != "default" && (
             <span>
               <CalendarDays size={17} />{" "}
               {profile.year === "Masters Student" ||
-              profile.year === "PhD Student"
+                profile.year === "PhD Student"
                 ? profile.year
                 : `Class of ${profile.year}`}
             </span>
