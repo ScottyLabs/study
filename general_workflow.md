@@ -18,7 +18,7 @@ You do not need to follow every step exactly. As you gain experience, you will d
 
 ### 1. Be assigned an issue
 
-Your Tech Lead will assign you an item from the backlog on the [CMU Study Project Board](https://git.cmu.dev/ScottyLabs/study/projects/5). Once it is assigned, move it to the **To Do** column.
+Your Tech Lead will assign you an item from the backlog on the [CMU Study Project Board](https://git.cmu.dev/ScottyLabs/study/projects/5). Once it is assigned, move it to the **To Do** column, even if you are not starting on it immediately.
 
 If you have no active assigned issues, ask a lead.
 
@@ -40,18 +40,20 @@ Most issues include a problem or feature description followed by **acceptance cr
 First, bring your local base branch up to date:
 
 ```bash
-git fetch
-git checkout <base-branch-name>
-git pull
+git fetch  # retrieves changes from the remote repo without updating your local branch
+git checkout <base-branch-name>  # switches your local repo to the base branch
+git pull  # updates your local base branch to the remote base branch
 ```
 
 Then create your feature branch:
 
 ```bash
-git checkout -b <your-branch-name>
+git checkout -b <your-branch-name>  # creates a new branch off of the current branch
 ```
 
 Use a short, feature-focused branch name of one to three words separated by dashes, such as `calendar-export`. Do not include your name or Andrew ID; the repository already records ownership.
+
+Move the issue to "In Progress" so we know you are starting on it and don't reassign it.
 
 ### 4. Write a high-level plan
 
@@ -70,7 +72,7 @@ This does not need to be formal prose. It may be a Markdown or text file, or a d
 
 Create a low-level implementation plan from the high-level plan. You may write it yourself or ask an agent to draft it; either way, make sure it includes verification steps.
 
-Plan mode (often `/plan`) is useful for this. It can be helpful to save the plan in a file so you can edit it, revisit it when bugs or requirements change, and share it across agent sessions or tools.
+Plan mode (often `/plan`) is useful for this. It can be helpful to save the plan in a file so you can edit it, revisit it when bugs or requirements change, and share it across agent sessions or tools. Planning should take multiple iterations and you should be able to explain trade-offs for your design decisions. Since AI can implement your plan quickly, it's expected that most of your time is spent creating a high-quality plan that you can explain and defend.
 
 Read and understand every planned step. AI-generated plans can suggest work that does not make sense in your project or make assumptions you did not intend. It is much faster to correct those gaps now than after implementation begins.
 
@@ -86,7 +88,7 @@ You can define these steps yourself or ask an agent to suggest them from your im
 
 ### 7. Execute the plan
 
-Implement each step, with or without AI assistance. If you use an agent, ask it to verify its work as well.
+Implement each step, with or without AI assistance. If you use an agent, ask it to verify its work as well by writing tests. "Test-driven development" is often helpful, which means writing the tests for the step first (based on the plan), which should fail with the current code, then implementing the code for that step until it passes the tests. This often results in better code that more closely matches the plan, since the tests aren't just written to match an existing (possibly buggy) implementation, as well as a better test suite.
 
 Run the application (see [`README.md`](README.md) for instructions) and fully test each step before committing it. Then repeat for the next step.
 
@@ -101,7 +103,7 @@ Use the project’s conventional-commit conventions where applicable.
 
 When all implementation steps are done, test the feature thoroughly yourself.
 
-Then write unit tests based on the **high-level plan**, not on the implementation. One useful approach is to start a separate agent session and ask it to reference only the plan. This helps expose cases where the implementation differs from the intended behavior.
+You should already have a lot of tests from the last step, but they are likely not exhaustive yet. Write additional unit tests based on the **high-level plan**, not on the implementation. One useful approach is to start a separate agent session and ask it to reference only the plan. This helps expose cases where the implementation differs from the intended behavior.
 
 Fix the code (or, occasionally, the test when the test is genuinely incorrect) until the feature’s unit tests pass. Also verify that all existing tests still pass. Repeat this process for integration tests.
 
@@ -113,7 +115,7 @@ In browser developer tools:
 
 1. Press <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> on macOS, or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> on Windows.
 2. Select the device-emulation button in the top toolbar (it looks like a laptop and phone).
-3. Use the first dropdown to select device sizes and shapes.
+3. Use the first dropdown ("Dimensions") to select device sizes and shapes.
 
 Try at least one laptop, phone, and tablet size. Make sure the UI remains usable and looks intentional in each.
 
@@ -132,15 +134,34 @@ git pull
 git checkout <your-branch-name>
 ```
 
-Then either rebase or merge the base branch:
+Choose whether to rebase or merge before updating your branch:
+
+- **Rebase** when you are the only person working on the feature branch and want a clean, linear commit history. This is usually best before opening a pull request, or when you have not shared the branch with others.
+- **Merge** when the branch is shared, someone else may have based work on it, or you do not want to rewrite published history. Merging adds a merge commit but is the safer choice for collaborative branches.
+
+Follow any repository- or lead-specific preference if one exists.
+
+To rebase, run:
 
 ```bash
 git rebase <base-branch-name>
-# or
+```
+
+If you have already pushed a branch that only you use, rebasing changes its commit history. Push the rewritten history with:
+
+```bash
+git push --force-with-lease
+```
+
+Use `--force-with-lease`, not `--force`: it refuses to overwrite remote commits you do not have locally.
+
+To merge, run:
+
+```bash
 git merge <base-branch-name>
 ```
 
-You may need to resolve merge conflicts. In VS Code, open the Source Control panel, select a conflicted file, and choose **Open in Merge Editor**. Once you resolve the conflicts, continue and commit the rebase or merge.
+You may need to resolve merge conflicts. In VS Code, open the Source Control panel, select a conflicted file, and choose **Open in Merge Editor**. Once you resolve the conflicts, continue with `git rebase --continue` or complete and commit the merge.
 
 Repeat [full-feature testing](#8-verify-the-complete-feature) and [responsive testing](#9-test-different-screen-sizes) afterwards. This matters: base-branch changes can break work that previously passed.
 
@@ -174,12 +195,13 @@ Once the feature works on the development app:
 4. Fill out the generated PR template.
 5. Add the issue number after `Closes #` so the issue is linked and automatically closed when the PR merges.
 6. Request review from the leads: `annadavi`, `cseluzhy`, and `mishag`.
+7. Move the issue to "In Review"
 
 ### 14. Respond to review comments
 
-Leads may ask questions, request code changes, or request additional tests. Reply to questions directly in the PR.
+Leads may ask questions, request code changes, or request additional tests. Reply to questions directly in the PR. You should not close and reopen the PR.
 
-For code changes, update your branch, test the changes thoroughly, and push again. This automatically updates the PR, reruns tests, and redeploys the branch to development. If the base branch changed, update your branch first; see [step 10](#10-update-from-the-base-branch).
+For code changes, update your branch, test the changes thoroughly, and push again. This automatically updates the PR, reruns tests, and redeploys the branch to development. If the base branch changed, update your branch first; see [step 10](#10-update-from-the-base-branch). Your new code will show in the PR. Re-request review from each lead so we know you have updates ready.
 
 ### 15. Merge the pull request
 
@@ -196,4 +218,4 @@ Monitor the deployment in the **Actions** tab. Once it completes, verify the fea
 
 ## 6. Done!
 
-Congratulations! You have implemented a feature and closed an issue for CMU Study. Let a lead know so they can assign your next task.
+Congratulations! You have implemented a feature and closed an issue for CMU Study. Move the issue to "Done". Let a lead know so they can assign your next task.
