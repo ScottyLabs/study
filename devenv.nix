@@ -23,7 +23,7 @@
       appUrl = "http://localhost:3000";
     };
 
-    kennel.services.study.customDomain = "cmustudy.com";
+    kennel.services.web.customDomain = "cmustudy.com";
   };
 
   languages.javascript = {

@@ -177,7 +177,7 @@ Monitor progress from the `kennel/build` and `kennel/deploy` statuses on your la
 
 ### 12. Test on the development app
 
-Kennel comments the deployment URL on the pull request, in the form `study-study-pr-<number>.scottylabs.net`. Test the feature there thoroughly, including on multiple screen sizes.
+Kennel comments the deployment URL on the pull request, in the form `study-web-pr-<number>.scottylabs.net`. Test the feature there thoroughly, including on multiple screen sizes.
 
 Each branch gets its own PostgreSQL database, provisioned by kennel and migrated when the service starts, making it closer to production than your local environment. It can reveal issues that local testing misses, such as changed environment variables or authentication configuration.
 

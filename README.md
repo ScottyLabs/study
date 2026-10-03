@@ -61,7 +61,7 @@ route handler is whatever it was during the build, not during the request.
 
 Pushing `main`, `staging`, or `dev` deploys that branch. Any other branch is
 deployed as a preview once a pull request is open, at
-`study-study-pr-<number>.scottylabs.net`. Progress shows up as the
+`study-web-pr-<number>.scottylabs.net`. Progress shows up as the
 `kennel/build` and `kennel/deploy` commit statuses, and production is served at
 `cmustudy.com`.
 
