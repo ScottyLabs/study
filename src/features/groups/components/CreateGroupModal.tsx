@@ -17,6 +17,7 @@ import { GroupModalFrame } from "./GroupModalFrame";
 import { GroupModalFields } from "./GroupModalFields";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { createGroup } from "../services/groupApi";
+import { LoaderCircle } from "lucide-react";
 
 export default function CreateGroupModal() {
   const { user } = useUser();
@@ -186,7 +187,11 @@ export default function CreateGroupModal() {
           className={`modal-submit-button ${disableSubmit ? "opacity-70":""}`}
           disabled={disableSubmit}
         >
-          Create Group
+          {
+            disableSubmit ? <LoaderCircle className="animate-spin" size={20}/>
+            : "Create Group"
+          }
+          
         </button>
       </form>
     </GroupModalFrame>
