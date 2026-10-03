@@ -7,12 +7,12 @@ You do not need to follow every step exactly. As you gain experience, you will d
 ## At a glance
 
 1. Understand the issue.
-2. Plan the feature.
-3. Implement and verify small, reviewable changes.
-4. Test the complete feature locally and on the development app.
-5. Open, address feedback on, and merge a pull request.
+1. Plan the feature.
+1. Implement and verify small, reviewable changes.
+1. Test the complete feature locally and on the development app.
+1. Open, address feedback on, and merge a pull request.
 
----
+______________________________________________________________________
 
 ## 1. Start with the issue
 
@@ -26,12 +26,12 @@ If you have no active assigned issues, ask a lead.
 
 Most issues include a problem or feature description followed by **acceptance criteria**, the conditions that must be true for the work to be considered done.
 
-- If either is missing, add it to the issue first. Ask the issue’s author what they intended if anything is unclear.
+- If either is missing, add it to the issue first. Ask the issue's author what they intended if anything is unclear.
 - Read the description and acceptance criteria carefully. Ask questions now, before implementation starts.
 - If the issue requires product or technical decisions, discuss and record them now.
 - Update the issue with any useful discoveries or decisions.
 
----
+______________________________________________________________________
 
 ## 2. Prepare and plan
 
@@ -82,7 +82,7 @@ Split the implementation into small, clear steps. Each step should be independen
 
 You can define these steps yourself or ask an agent to suggest them from your implementation plan.
 
----
+______________________________________________________________________
 
 ## 3. Implement and verify
 
@@ -97,7 +97,7 @@ git add <files>
 git commit -m "A concise, one-sentence description of this commit"
 ```
 
-Use the project’s conventional-commit conventions where applicable.
+Use the project's conventional-commit conventions where applicable.
 
 ### 8. Verify the complete feature
 
@@ -105,7 +105,7 @@ When all implementation steps are done, test the feature thoroughly yourself.
 
 You should already have a lot of tests from the last step, but they are likely not exhaustive yet. Write additional unit tests based on the **high-level plan**, not on the implementation. One useful approach is to start a separate agent session and ask it to reference only the plan. This helps expose cases where the implementation differs from the intended behavior.
 
-Fix the code (or, occasionally, the test when the test is genuinely incorrect) until the feature’s unit tests pass. Also verify that all existing tests still pass. Repeat this process for integration tests.
+Fix the code (or, occasionally, the test when the test is genuinely incorrect) until the feature's unit tests pass. Also verify that all existing tests still pass. Repeat this process for integration tests.
 
 ### 9. Test different screen sizes
 
@@ -114,12 +114,12 @@ Any UI change must work on laptop, mobile, and tablet screen sizes.
 In browser developer tools:
 
 1. Press <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> on macOS, or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> on Windows.
-2. Select the device-emulation button in the top toolbar (it looks like a laptop and phone).
-3. Use the first dropdown ("Dimensions") to select device sizes and shapes.
+1. Select the device-emulation button in the top toolbar (it looks like a laptop and phone).
+1. Use the first dropdown ("Dimensions") to select device sizes and shapes.
 
 Try at least one laptop, phone, and tablet size. Make sure the UI remains usable and looks intentional in each.
 
----
+______________________________________________________________________
 
 ## 4. Sync, deploy, and test the development app
 
@@ -171,17 +171,17 @@ Repeat [full-feature testing](#8-verify-the-complete-feature) and [responsive te
 git push -u origin <your-branch-name>
 ```
 
-CI will run on [git.cmu.dev/Scottylabs/study](https://git.cmu.dev/ScottyLabs/study): unit tests run first, followed by integration tests if they pass. If all tests pass, it deploys your branch to `dev.cmustudy.com`.
+CI will run on [git.cmu.dev/Scottylabs/study](https://git.cmu.dev/ScottyLabs/study): unit tests run first, followed by integration tests if they pass. Kennel builds for every push on open PRs. If your PR build successfully, it will comment a staging deployment url.
 
-Monitor progress from the repository’s **Actions** tab by finding your latest commit. A run usually takes about five minutes when no other jobs are queued, but may take longer during busy periods.
+Monitor progress from the `kennel/build` and `kennel/deploy` statuses on your latest commit.
 
 ### 12. Test on the development app
 
-After your branch deploys to `dev.cmustudy.com`, test the feature there thoroughly, including on multiple screen sizes.
+Kennel comments the deployment URL on the pull request, in the form `study-study-pr-<number>.scottylabs.net`. Test the feature there thoroughly, including on multiple screen sizes.
 
-The development app runs on Railway with a development PostgreSQL database, making it closer to production than your local environment. It can reveal issues that local testing misses, such as changed environment variables or authentication configuration.
+Each branch gets its own PostgreSQL database, provisioned by kennel and migrated when the service starts, making it closer to production than your local environment. It can reveal issues that local testing misses, such as changed environment variables or authentication configuration.
 
----
+______________________________________________________________________
 
 ## 5. Open, review, and merge the pull request
 
@@ -190,12 +190,12 @@ The development app runs on Railway with a development PostgreSQL database, maki
 Once the feature works on the development app:
 
 1. Open the repository at [git.cmu.dev/Scottylabs/study](https://git.cmu.dev/ScottyLabs/study) and select **Pull Requests**.
-2. Select **New pull request**.
-3. Choose `ScottyLabs:<base-branch-name>` as the base and `ScottyLabs:<your-branch-name>` as the compare branch.
-4. Fill out the generated PR template.
-5. Add the issue number after `Closes #` so the issue is linked and automatically closed when the PR merges.
-6. Request review from the leads: `annadavi`, `cseluzhy`, and `mishag`.
-7. Move the issue to "In Review"
+1. Select **New pull request**.
+1. Choose `ScottyLabs:<base-branch-name>` as the base and `ScottyLabs:<your-branch-name>` as the compare branch.
+1. Fill out the generated PR template.
+1. Add the issue number after `Closes #` so the issue is linked and automatically closed when the PR merges.
+1. Request review from the leads: `annadavi`, `cseluzhy`, and `mishag`.
+1. Move the issue to "In Review"
 
 ### 14. Respond to review comments
 
@@ -214,7 +214,7 @@ If the PR is out of date, update it from the base branch, test again, and push b
 
 Monitor the deployment in the **Actions** tab. Once it completes, verify the feature one final time. If anything breaks, revert the PR and contact the leads so the team can investigate; the problem may not be in your change.
 
----
+______________________________________________________________________
 
 ## 6. Done!
 

@@ -32,6 +32,15 @@
     npm.enable = true;
   };
 
+  # prisma messes up the user, so we inject manually
+  enterShell = ''
+    case "$DATABASE_URL" in
+      postgresql:///*)
+        export DATABASE_URL="postgresql://$(id -un)@localhost/''${DATABASE_URL#postgresql:///}"
+        ;;
+    esac
+  '';
+
   scripts = {
     migration.exec = "npx prisma migrate dev";
     migrate.exec = "npx prisma migrate deploy";
