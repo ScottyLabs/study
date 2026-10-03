@@ -26,8 +26,13 @@ const envSchema = z.object({
   SENTRY_DSN: z.string().optional(),
 });
 
-// Validate `process.env` against our schema and return the result
-const env = envSchema.parse(process.env);
+// kennel supplies these urls under seperate env var names
+const env = envSchema.parse({
+  SERVER_URL: process.env.APP_URL,
+  BETTER_AUTH_URL: process.env.APP_URL,
+  SERVER_PORT: process.env.PORT,
+  ...process.env,
+});
 
 // Export the result so we can use it in the project
 export { env };
