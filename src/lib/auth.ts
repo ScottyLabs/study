@@ -3,21 +3,19 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { genericOAuth, keycloak } from "better-auth/plugins";
 import { headers } from "next/headers";
+import { randomUUID } from "node:crypto";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
 import { attachPendingBlocks } from "~/server/api/profile";
 
 const baseURL = env.BETTER_AUTH_URL ?? env.SERVER_URL;
-const fallbackSecret = "development-secret-change-me-1234567890";
 const keycloakCallbackURL = `${baseURL}/api/auth/oauth2/callback/keycloak`;
 
-// Ricochet relays the IdP callback to the URL embedded in OAuth state. Better
-// Auth stores its own state in an encrypted cookie by default, so this relay
-// envelope can be forwarded unchanged without weakening its state validation.
-const oauthRelayState = Buffer.from(
-  JSON.stringify({ return_to: keycloakCallbackURL }),
-).toString("base64url");
+const relayState = () =>
+  Buffer.from(
+    JSON.stringify({ return_to: keycloakCallbackURL, csrf: randomUUID() }),
+  ).toString("base64url");
 
 const keycloakConfig = {
   ...keycloak({
@@ -26,10 +24,11 @@ const keycloakConfig = {
     issuer: env.AUTH_ISSUER,
     redirectURI: env.OAUTH_RELAY_URL,
     overrideUserInfo: true,
+    pkce: true,
   }),
-  authorizationUrlParams: {
-    state: oauthRelayState,
-  },
+  authorizationUrlParams: () => ({
+    state: relayState(),
+  }),
   mapProfileToUser: (profile: Record<string, unknown>) => {
     const andrewID = profile.preferred_username;
 
@@ -42,8 +41,10 @@ const keycloakConfig = {
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
   baseURL,
-  secret: env.BETTER_AUTH_SECRET ?? fallbackSecret,
+  secret: env.BETTER_AUTH_SECRET,
   trustedOrigins: [baseURL],
+  // Needed for ricochet functionality, so betterauth doesn't rewrite cookie
+  account: { storeStateStrategy: "cookie" },
   user: {
     additionalFields: {
       andrewID: {

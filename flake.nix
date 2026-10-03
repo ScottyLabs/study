@@ -83,6 +83,27 @@
 
           queryEngineLibrary = "${prismaEngines}/lib/libquery_engine.node";
 
+          start = pkgs.writeShellScript "study-start" ''
+            set -eu
+
+            export HOSTNAME=127.0.0.1
+            export PRISMA_QUERY_ENGINE_LIBRARY=${queryEngineLibrary}
+            export PRISMA_SCHEMA_ENGINE_BINARY=${prismaEngines}/bin/schema-engine
+
+            # kennel's socket url names no role, leaving peer auth to map the
+            # unit's DynamicUser; prisma sends an empty user unless the url has one
+            case "''${DATABASE_URL:-}" in
+              postgresql:///*)
+                export DATABASE_URL="postgresql://$(${pkgs.coreutils}/bin/id -un)@localhost/''${DATABASE_URL#postgresql:///}"
+                ;;
+            esac
+
+            ${lib.getExe nodejs} "$1"/share/migrate/node_modules/prisma/build/index.js \
+              migrate deploy --schema "$1"/share/migrate/schema/schema.prisma
+
+            exec ${lib.getExe nodejs} "$1"/share/study/server.js
+          '';
+
           study = pkgs.buildNpmPackage {
             pname = "study";
             version = "0.1.0";
@@ -122,6 +143,7 @@
               PROJECT_ADMIN_GROUP = "build";
               ALLOWED_ORIGINS_REGEX = "^$";
               DATABASE_URL = "postgresql://localhost:5432/build";
+              BETTER_AUTH_SECRET = "build";
 
               # We need to find a general way to handle these kind of env vars, prolly hide them behind the backend
               NEXT_PUBLIC_POSTHOG_KEY = "phc_IJNs9U2sDlLIoQgfTC5sq2sCSXL4HB0Er9AmGG0Aoqi"; # gitleaks:allow
@@ -134,15 +156,15 @@
             installPhase = ''
               runHook preInstall
 
-              mkdir -p $out/share/study
+              mkdir -p $out/share/study $out/share/migrate/node_modules
               cp -r .next/standalone/. $out/share/study/
               cp -r .next/static $out/share/study/.next/static
               cp -r public $out/share/study/public
 
-              makeWrapper ${lib.getExe nodejs} $out/bin/study \
-                --add-flags $out/share/study/server.js \
-                --set HOSTNAME 127.0.0.1 \
-                --set PRISMA_QUERY_ENGINE_LIBRARY ${queryEngineLibrary}
+              cp -r prisma $out/share/migrate/schema
+              cp -r node_modules/prisma node_modules/@prisma $out/share/migrate/node_modules/
+
+              makeWrapper ${start} $out/bin/study --add-flags $out
 
               runHook postInstall
             '';
