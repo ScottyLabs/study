@@ -26,11 +26,18 @@ const envSchema = z.object({
   SENTRY_DSN: z.string().optional(),
 });
 
-// kennel supplies these urls under seperate env var names
+const realm = `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}`;
+
+// kennel and governance supply these under their own names
 const env = envSchema.parse({
   SERVER_URL: process.env.APP_URL,
   BETTER_AUTH_URL: process.env.APP_URL,
   SERVER_PORT: process.env.PORT,
+  AUTH_ISSUER: realm,
+  AUTH_JWKS_URI: `${realm}/protocol/openid-connect/certs`,
+  AUTH_CLIENT_ID: process.env.OIDC_CLIENT_ID,
+  AUTH_CLIENT_SECRET: process.env.OIDC_CLIENT_SECRET,
+  ADMIN_GROUP: process.env.PROJECT_ADMIN_GROUP,
   ...process.env,
 });
 

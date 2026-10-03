@@ -3,6 +3,15 @@
 {
   imports = [ inputs.scottylabs.devenvModules.default ];
 
+  # semgrep 1.172.0 pins pyjwt~=2.13 but nixpkgs ships 2.14
+  overlays = [
+    (_final: prev: {
+      semgrep = prev.semgrep.overridePythonAttrs (_: {
+        dontCheckRuntimeDeps = true;
+      });
+    })
+  ];
+
   scottylabs = {
     enable = true;
     project.name = "study";
@@ -14,7 +23,7 @@
       appUrl = "http://localhost:3000";
     };
 
-    kennel.services.study = { };
+    kennel.services.study.customDomain = "cmustudy.com";
   };
 
   languages.javascript = {

@@ -115,13 +115,19 @@
               SERVER_URL = "http://localhost:3000";
               BETTER_AUTH_URL = "http://localhost:3000";
               OAUTH_RELAY_URL = "http://localhost:3000/api/auth/callback";
-              AUTH_ISSUER = "http://localhost:8080/realms/build";
-              AUTH_JWKS_URI = "http://localhost:8080/realms/build/protocol/openid-connect/certs";
-              AUTH_CLIENT_ID = "build";
-              AUTH_CLIENT_SECRET = "build";
-              ADMIN_GROUP = "build";
+              KEYCLOAK_URL = "http://localhost:8080";
+              KEYCLOAK_REALM = "build";
+              OIDC_CLIENT_ID = "build";
+              OIDC_CLIENT_SECRET = "build";
+              PROJECT_ADMIN_GROUP = "build";
               ALLOWED_ORIGINS_REGEX = "^$";
               DATABASE_URL = "postgresql://localhost:5432/build";
+
+              # We need to find a general way to handle these kind of env vars, prolly hide them behind the backend
+              NEXT_PUBLIC_POSTHOG_KEY = "phc_IJNs9U2sDlLIoQgfTC5sq2sCSXL4HB0Er9AmGG0Aoqi"; # gitleaks:allow
+              NEXT_PUBLIC_POSTHOG_HOST = "https://us.i.posthog.com";
+              NEXT_PUBLIC_CALENDAR_CLIENT_ID = "588552119886-3ro6nh2vgjslui03i19lfo9i6dj8mv2n.apps.googleusercontent.com";
+
               NEXT_TELEMETRY_DISABLED = "1";
             };
 
