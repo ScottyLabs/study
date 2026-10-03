@@ -13,6 +13,9 @@ sign in to OpenBao so secretspec can resolve this project's secrets:
 nix run git+https://git.cmu.dev/ScottyLabs/kennel#login
 ```
 
+> **If working on Windows:**
+> Nix requires [WSL2, which you can install here](https://learn.microsoft.com/en-us/windows/wsl/install). Make sure you clone the repo in WSL. You can then perform all the following commands from the WSL terminal.
+
 ## Running the app
 
 Make sure you run `devenv allow` the first time you open the shell so the environment loads properly!
