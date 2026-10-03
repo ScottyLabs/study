@@ -44,7 +44,7 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
     },
   }),
   placeholder: (provided) => ({
-    ...provided,
+    ...provided, 
     color: "inherit",
     opacity: 0.4,
   }),
