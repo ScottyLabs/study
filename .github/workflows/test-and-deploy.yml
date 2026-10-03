@@ -1,0 +1,82 @@
+name: Test
+
+on:
+  push:
+
+concurrency:
+  group: native-postgres-tests
+  cancel-in-progress: false
+
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: native
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Inspect native runtime
+        run: |
+          uname -a
+          uname -m
+          cat /etc/os-release || true
+          command -v node
+          node --version
+          command -v npm
+          npm --version
+          ldd --version || true
+          command -v nix
+          nix --version
+          command -v nix-shell
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+  integration:
+    name: Integration tests
+    needs: unit
+    runs-on: native
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run PostgreSQL-backed tests with temporary Nix database
+        run: nix-shell --run "bash test/run-postgres-integration.sh"
+
+  deploy-dev:
+    name: Deploy to Dev
+    needs: integration
+    if: forgejo.ref != 'refs/heads/main'
+    runs-on: native
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Deploy to Railway Dev
+        run: npm exec --yes --package=@railway/cli -- railway up --ci --service "CMU Study" --environment dev
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_DEV }}
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: integration
+    if: forgejo.ref == 'refs/heads/main'
+    runs-on: native
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Deploy to Railway Production
+        run: npm exec --yes --package=@railway/cli -- railway up --ci --service "CMU Study" --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PROD }}
