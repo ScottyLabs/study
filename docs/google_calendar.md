@@ -6,6 +6,46 @@ Ricochet forwards it to the originating app's `/api/calendar/oauth/callback`.
 The app exchanges the code using the relay URL as its redirect URI. Google
 credentials are encrypted in PostgreSQL and never returned to the browser.
 
+### Why we switched from the browser token flow
+
+The original integration used Google Identity Services' `initTokenClient` to
+obtain an access token in the browser and call Calendar from the frontend. It
+worked on the registered production origin, but each new PR preview
+(`study-web-pr-<number>.scottylabs.net`) needed its own authorized JavaScript
+origin in Google Console. Google does not allow wildcard origins, so production
+working did not mean an arbitrary new preview would work.
+
+Authorization-code flow through Ricochet removes that per-preview configuration.
+Google redirects to one registered relay URL for deployed environments. Ricochet
+forwards the code and state to the app that started authorization; that app
+validates the session-bound, single-use state and exchanges the code with Google.
+Ricochet is a callback relay, not the component that stores or refreshes tokens.
+Switching to code flow alone would not solve the preview problem if every preview
+still used its own Google-registered redirect URI.
+
+The browser token model also provides no refresh token. Once its short-lived
+access token expired, the browser had to request another token. The new backend
+requests offline access and stores encrypted refresh credentials, allowing later
+group actions to refresh access tokens without opening another authorization
+popup while the connection remains valid. Calendar credentials no longer live
+in browser storage or frontend API calls. See Google's
+[token model](https://developers.google.com/identity/oauth2/web/guides/use-token-model)
+and [server authorization-code flow](https://developers.google.com/identity/protocols/oauth2/web-server).
+
+Future changes must preserve these properties:
+
+- New PR previews must work without adding their origins or callback URLs to
+  Google Console. Keep the shared relay and its host allowlist.
+- Exchange codes, store encrypted tokens, refresh credentials, and call Calendar
+  on the server. Do not restore `initTokenClient` or browser token storage.
+- Keep PKCE and session-bound, expiring, single-use state validation. A return
+  URL in state is not sufficient authorization or CSRF protection by itself.
+- Keep connections isolated by user and application origin. Reuse a valid
+  connection for later actions; request consent again only when connecting or
+  reconnecting, not for every group.
+
+### Configuration and rollout
+
 Before implementation or rollout, confirm that the deployed client belongs to
 the intended Google Cloud project. The reported production setup is **External,
 In Production**, with both current Calendar scopes approved; verify these exact
