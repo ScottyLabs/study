@@ -1,16 +1,73 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ClassList } from "~/features/profile/components/ClassList";
 import { ProfileDetailsForm } from "~/features/profile/components/ProfileDetailsForm";
 import { ProfileHeader } from "~/features/profile/components/ProfileHeader";
 import { useUserTheme } from "~/features/profile/hooks/useUserTheme";
+import { fetchCourseCodes } from "~/features/profile/services/profileApi";
 import { useUser } from "~/lib/auth-client";
 
-function ContinueButton() {
+function CourseRequiredPopup({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
-    <a href="/feed" className="button-primary">
+    <div className="confirm-overlay" onClick={onClose}>
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="course-required-message"
+        className="confirm-panel flex items-center gap-4"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <p
+          id="course-required-message"
+          className="confirm-message m-0 flex-1 text-left"
+        >
+          Add at least one course to continue.
+        </p>
+        <div className="confirm-actions m-0 shrink-0">
+          <button
+            type="button"
+            className="confirm-button-continue"
+            onClick={onClose}
+            autoFocus
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ContinueButton({ onNeedsCourse }: { onNeedsCourse: () => void }) {
+  const router = useRouter();
+
+  const handleContinue = async () => {
+    try {
+      const courseCodes = await fetchCourseCodes();
+      if (courseCodes.length === 0) {
+        onNeedsCourse();
+        return;
+      }
+      router.push("/feed");
+    } catch (error) {
+      console.error("Error checking saved courses:", error);
+    }
+  };
+
+  return (
+    <button type="button" className="button-primary" onClick={handleContinue}>
       Continue
-    </a>
+    </button>
   );
 }
 
@@ -18,6 +75,7 @@ export default function CreateAccountPage() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
   useUserTheme(userId);
+  const [showCoursePopup, setShowCoursePopup] = useState(false);
 
   return (
     <div className="profile-page-panel">
@@ -31,7 +89,7 @@ export default function CreateAccountPage() {
           </p>
         </div>
         <div className="workspace-actions">
-          <ContinueButton />
+          <ContinueButton onNeedsCourse={() => setShowCoursePopup(true)} />
         </div>
       </section>
       <div className="profile-workspace">
@@ -47,6 +105,9 @@ export default function CreateAccountPage() {
           </div>
         </div>
       </div>
+      {showCoursePopup && (
+        <CourseRequiredPopup onClose={() => setShowCoursePopup(false)} />
+      )}
     </div>
   );
 }
