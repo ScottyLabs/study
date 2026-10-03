@@ -2,33 +2,70 @@
 
 Find and manage CMU study groups.
 
-## Development
+A Next.js app deployed by [kennel](https://git.cmu.dev/ScottyLabs/kennel).
 
-- `npm run dev` starts the local Next.js app.
-- `npm run build` creates a production build.
-- `npx tsc --noEmit` runs TypeScript validation.
-- `GET /api/v1/health` verifies the Hono API boundary.
-- `GET /api/v1/groups` returns groups ordered by start time; pass `courseCode` to filter by course.
-- PostgreSQL is configured through `DATABASE_URL`; use `npm run db:generate` to create a migration after changing the Prisma schema.
-- To connect to the Railway Postgres-dev database, create a local SSH key, upload to Railway, install the railway CLI, and run `railway connect Postgres-dev --tunnel-only`. Copy the given URL into the .env and .env.local DATABASE_URL before starting the app. You will need to be a member of the Railway project (if you have not been added yet, proceed with creating a local Postgress database).
-- To create a local Postgres database with Docker, run:
+## One-time setup
 
-  ```bash
-  docker run --name studystarter-postgres \
-    -e POSTGRES_USER=studystarter \
-    -e POSTGRES_PASSWORD=studystarter \
-    -e POSTGRES_DB=studystarter \
-    -p 5433:5432 \
-    -d postgres:17
-  ```
-  Then add this value to both `.env` and `.env.local`:
-  
-  ```env
-  DATABASE_URL="postgresql://studystarter:studystarter@localhost:5433/studystarter?schema=public"
-  ```
-  Prisma CLI reads `.env`, while the Next.js app reads `.env.local`. After setting the URL, run `npx prisma migrate dev`, then start the app with `npm run dev`. Use `docker stop studystarter-postgres` and `docker start studystarter-postgres` to stop or restart the local database.
+Install [devenv](https://devenv.sh/getting-started/) and its shell hooks, then
+sign in to OpenBao so secretspec can resolve this project's secrets:
 
-## Project Structure
+```bash
+nix run git+https://git.cmu.dev/ScottyLabs/kennel#login
+```
+
+## Running the app
+
+Make sure you run `devenv allow` the first time you open the shell so the environment loads properly!
+
+Starting services (postgres, ricochet):
+
+```bash
+devenv up
+```
+
+Starting the app:
+
+```bash
+npm ci
+migrate               # applies prisma migrations
+npm run dev
+```
+
+Keep `devenv up` running in its own terminal.
+
+## Database
+
+`devenv up` runs PostgreSQL on a unix socket and exports `DATABASE_URL`. There
+is no password and no port to configure.
+
+| Command | Does |
+| --- | --- |
+| `migrate` | applies pending migrations (`prisma migrate deploy`) |
+| `migration` | creates a migration from schema changes (`prisma migrate dev`) |
+| `studio` | opens Prisma Studio |
+
+Deployed services migrate themselves on startup, so a migration ships with the
+commit that needs it.
+
+## Environment
+
+Secrets live in OpenBao, declared in `secretspec.toml` and resolved per
+environment by profile. Kennel supplies `DATABASE_URL`, `PORT`, and `APP_URL` at
+runtime, so none of those are declared as secrets.
+
+Only `src/env.js` may read the environment at runtime. Next inlines any direct
+`process.env.FOO` at build time, so a value read that way in a component or
+route handler is whatever it was during the build, not during the request.
+
+## Deployment
+
+Pushing `main`, `staging`, or `dev` deploys that branch. Any other branch is
+deployed as a preview once a pull request is open, at
+`study-web-pr-<number>.scottylabs.net`. Progress shows up as the
+`kennel/build` and `kennel/deploy` commit statuses, and production is served at
+`cmustudy.com`.
+
+## Project structure
 
 - `src/app` contains Next.js routes and route layouts.
 - `src/features/groups` contains study-group components, hooks, services, filters, and constants.
@@ -37,3 +74,5 @@ Find and manage CMU study groups.
 - `src/helpers` contains external integration helpers such as calendar/date utilities.
 - `src/server/api` contains the Hono API application and route composition.
 - `src/styles` contains global and component-level CSS.
+- `flake.nix` builds the deployable package
+- `devenv.nix` declares the development environment and what kennel deploys.

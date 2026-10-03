@@ -7,14 +7,9 @@ type ProfileResponse = {
 };
 
 export async function fetchProfile() {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ??
-    process.env.BETTER_AUTH_URL ??
-    "http://localhost:3000";
-  const response = await apiRequest<ProfileResponse>(
-    new URL("/api/v1/me/profile", baseUrl),
-    { cache: "no-store" },
-  );
+  const response = await apiRequest<ProfileResponse>("/api/v1/me/profile", {
+    cache: "no-store",
+  });
   return response.profile;
 }
 
