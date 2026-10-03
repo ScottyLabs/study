@@ -16,6 +16,7 @@ import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
 import { shouldHideFeedGroup } from "~/features/groups/utils/groupFilters";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { Plus, Search } from "lucide-react";
+import DisplayedSchedule from "./components/DisplayedSchedules";
 
 export default function FeedPage() {
   const { user } = useUser();
@@ -75,24 +76,6 @@ export default function FeedPage() {
   });
   const joinedCount = joinedGroups?.length ?? 0;
 
-  const displayScheduled = visibleGroups.map((group) => {
-    const [formattedDate, formattedTime] = formatDateTime(group.startTime);
-    const isInGroup = joinedGroups ? joinedGroups.includes(group.id) : false;
-    const selected = group.id === selectedGroup;
-
-    return (
-      <Card
-        key={group.id}
-        onClick={() => handleCardClick(group)}
-        group={group}
-        time={formattedTime}
-        date={formattedDate}
-        isInGroup={isInGroup}
-        selected={selected}
-      />
-    );
-  });
-
   return (
     <>
       <TopFilterBar
@@ -144,7 +127,7 @@ export default function FeedPage() {
               <div
                 className={`${showDetails ? "group-grid" : "group-grid-wide"}`}
               >
-                {displayScheduled}
+                <DisplayedSchedule {...{group:visibleGroups, handleCardClick, joinedGroups, selectedGroup}}/>
                 {visibleGroups.length === 0 && (
                   <div className="app-empty">
                     <Search className="h-6 w-6 text-black/35 dark:text-white/35" />
