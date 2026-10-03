@@ -25,7 +25,7 @@ export default {
       'darkText': '#FFFFFF', // white
 
       // light mode
-      'lightbg': '#f0f9fc',
+      'lightbg': '#FFEB00',
       'lightSidebar': '#DDEAF0', // sidebar, unselected cards
       'lightAccent': '#95d1f0',  // selected card, details, createGroup bg
       'lightSelected': '#0cacf0', // selected page, joined button
@@ -33,7 +33,7 @@ export default {
       'lightInput': '#f0f5f7', // profile input boxes
 
       //dark mode
-      'darkbg': '#171717',
+      'darkbg': '#FFEB00',
       'darkSidebar': '#2f3e45', // sidebar, unselected cards
       'darkAccent': '#326880', // selected card, details, profile create and logout buttons, createGroup bg
       'darkSelected': '#5ec6f2', // selected page, joined button
