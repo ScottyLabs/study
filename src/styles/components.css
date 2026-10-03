@@ -1210,7 +1210,7 @@
 }
 
 .unblock-text-button {
-  @apply flex min-h-10 flex-none items-center gap-2 rounded-md border border-[#16827D] px-3 text-xs font-semibold text-[#087B76] dark:border-[#71D4CF] dark:text-[#71D4CF];
+  @apply flex min-h-10 flex-none items-center gap-2 rounded-md px-3 text-xs font-semibold text-lightSelected dark:text-darkSelected;
 }
 
 .blocked-empty {
