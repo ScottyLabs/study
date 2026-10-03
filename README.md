@@ -6,7 +6,7 @@ A Next.js app deployed by [kennel](https://git.cmu.dev/ScottyLabs/kennel).
 
 ## One-time setup
 
-Install [devenv](https://devenv.sh/getting-started/) and its shell hooks, then
+Install [devenv](https://devenv.sh/getting-started/) and its shell hooks (stop before devenv init), then
 sign in to OpenBao so secretspec can resolve this project's secrets:
 
 ```bash
@@ -23,11 +23,17 @@ Starting services (postgres, ricochet):
 devenv up
 ```
 
-Starting the app:
+Once you see postgres ready and ricochet running, open a devenv shell:
 
 ```bash
+devenv shell
 npm ci
 migrate               # applies prisma migrations
+```
+
+Run the app in the same devenv shell:
+
+```bash
 npm run dev
 ```
 
@@ -56,6 +62,8 @@ runtime, so none of those are declared as secrets.
 Only `src/env.js` may read the environment at runtime. Next inlines any direct
 `process.env.FOO` at build time, so a value read that way in a component or
 route handler is whatever it was during the build, not during the request.
+
+You do not need a .env anymore, unless you are working on a feature that requires adding new environment variables that do not exist in OpenBao yet. You should delete your .env (or clear it) so it doesn't overwrite the OpenBao variables.
 
 ## Google Calendar
 
