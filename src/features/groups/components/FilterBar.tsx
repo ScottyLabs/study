@@ -48,6 +48,14 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
     color: "inherit",
     opacity: 0.4,
   }),
+  dropdownIndicator: (provided) => ({
+    ...provided,
+    color: "var(--filter-border-color)",
+  }),
+  indicatorSeparator: (provided) => ({
+    ...provided,
+    backgroundColor: "var(--filter-border-color)",
+  }),
 };
 
 interface TopFilterBarProps {
