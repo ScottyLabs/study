@@ -9,7 +9,6 @@ import { usePostHog } from "posthog-js/react";
 import {
   addToCal,
   setupGoogleApi,
-  isCalendarApiReady,
   requestCalendarAccessInteractive,
   deleteFromCal,
 } from "~/helpers/calendar_helper";
@@ -52,8 +51,7 @@ export default function CreateGroupModal() {
     const userEmail = user?.emailAddresses[0]?.emailAddress;
 
     if (!userEmail) {
-      toast("Error creating study group", {
-        icon: "❌",
+      toast.error("Error creating study group", {
         style: {
           borderRadius: "10px",
           background: "#333",
@@ -66,11 +64,9 @@ export default function CreateGroupModal() {
     let group;
     let eventId = "None";
     try {
-      if (isCalendarApiReady()) {
-        await requestCalendarAccessInteractive().catch((err) => {
-          console.warn("Calendar auth failed:", err);
-        });
-      }
+      await requestCalendarAccessInteractive().catch((err) => {
+        console.warn("Calendar auth failed:", err);
+      });
 
       eventId =
         (await addToCal(
