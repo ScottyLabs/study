@@ -177,7 +177,8 @@
           };
         in
         {
-          inherit study;
+          # hash collision prevention
+          web = study;
           default = study;
         }
       );
