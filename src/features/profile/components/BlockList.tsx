@@ -11,7 +11,6 @@ import type { BlockedUsers } from "~/features/profile/types";
 import {
   deleteFromCal,
   setupGoogleApi,
-  isCalendarApiReady,
   hasCalendarAccess,
   requestCalendarAccessInteractive,
 } from "~/helpers/calendar_helper";
@@ -88,18 +87,21 @@ export function BlockList() {
       const { sharedGroupCount: numShared } =
         await fetchBlockImpact(userToBlock);
       if (numShared > 0) {
+        const calendarAuthorization: { promise?: Promise<void> } = {};
         const ok = await confirm(
           `You are currently in ${numShared} group${numShared === 1 ? "" : "s"} with ${userToBlock}. You will be removed from ${numShared === 1 ? "this group" : "these groups"} if you continue.`,
+          () => {
+            if (!hasCalendarAccess()) {
+              calendarAuthorization.promise = requestCalendarAccessInteractive().catch((err) => {
+                console.warn("Calendar auth failed:", err);
+              });
+            }
+          },
         );
         if (!ok) {
           return;
         }
-        await setupGoogleApi();
-        if (isCalendarApiReady() && !hasCalendarAccess()) {
-          await requestCalendarAccessInteractive().catch((err) => {
-            console.warn("Calendar auth failed:", err);
-          });
-        }
+        if (calendarAuthorization.promise) await calendarAuthorization.promise;
       }
 
       const result = await blockEmail(userToBlock);

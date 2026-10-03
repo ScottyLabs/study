@@ -3,9 +3,10 @@ import React, { createContext, useContext, useState } from "react";
 type ConfirmOptions = {
   message: string;
   resolve: (value: boolean) => void;
+  onConfirm?: () => void;
 };
 
-const ConfirmContext = createContext<(msg: string) => Promise<boolean>>(
+const ConfirmContext = createContext<(msg: string, onConfirm?: () => void) => Promise<boolean>>(
   async () => false,
 );
 
@@ -14,13 +15,14 @@ export const useConfirm = () => useContext(ConfirmContext);
 export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   const [confirmState, setConfirmState] = useState<ConfirmOptions | null>(null);
 
-  const confirm = (message: string) => {
+  const confirm = (message: string, onConfirm?: () => void) => {
     return new Promise<boolean>((resolve) => {
-      setConfirmState({ message, resolve });
+      setConfirmState({ message, resolve, onConfirm });
     });
   };
 
   const handleYes = () => {
+    confirmState?.onConfirm?.();
     confirmState?.resolve(true);
     setConfirmState(null);
   };

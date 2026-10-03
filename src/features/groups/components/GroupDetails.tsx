@@ -14,7 +14,6 @@ import EditGroupModal from "./EditGroupModal";
 import {
   addToCal,
   deleteFromCal,
-  isCalendarApiReady,
   requestCalendarAccessInteractive,
   setupGoogleApi,
 } from "~/helpers/calendar_helper";
@@ -92,12 +91,9 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
   }, []);
 
   const joinGroup = async () => {
-    let calendarAuthPromise: Promise<void> | null = null;
-    if (isCalendarApiReady()) {
-      calendarAuthPromise = requestCalendarAccessInteractive().catch((err) => {
-        console.warn("Calendar auth failed:", err);
-      });
-    }
+    const calendarAuthPromise = requestCalendarAccessInteractive().catch((err) => {
+      console.warn("Calendar auth failed:", err);
+    });
     const userId = user?.emailAddresses[0]?.emailAddress;
     let eventId: string | undefined = undefined;
     if (!joinedState) {
@@ -116,9 +112,7 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
         return;
       }
       // add group to calendar
-      if (calendarAuthPromise) {
-        await calendarAuthPromise;
-      }
+      await calendarAuthPromise;
       eventId =
         (await addToCal(
           currentDetails.title,
@@ -181,9 +175,7 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
       });
       posthog.capture("group_left", { group: currentDetails });
 
-      if (calendarAuthPromise) {
-        await calendarAuthPromise;
-      }
+      await calendarAuthPromise;
 
       if (eventIdToDelete && eventIdToDelete !== "None") {
         const calendarDeleted = await deleteFromCal(eventIdToDelete);
@@ -201,8 +193,7 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
           );
         }
       } else {
-        toast("Could not delete from calendar", {
-          icon: "❌",
+        toast.error("Could not delete from calendar", {
           style: {
             borderRadius: "10px",
             background: "#333",

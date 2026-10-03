@@ -3,6 +3,8 @@
 {
   imports = [ inputs.scottylabs.devenvModules.default ];
 
+  packages = [ pkgs.git ];
+
   # semgrep 1.172.0 pins pyjwt~=2.13 but nixpkgs ships 2.14
   overlays = [
     (_final: prev: {

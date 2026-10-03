@@ -16,6 +16,7 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
+    "test:calendar": "node --test test/calendar-*.test.mjs",
     "start": "next start"
   },
   "dependencies": {
