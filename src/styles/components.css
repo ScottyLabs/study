@@ -586,7 +586,11 @@
 }
 
 .modal-submit-button {
-  @apply inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lightButton px-4 py-2 text-sm font-semibold text-white transition hover:bg-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:bg-darkButton dark:text-darkbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
+  @apply inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lightButton px-4 py-2 text-sm font-semibold text-white transition dark:bg-darkButton dark:text-darkbg;
+}
+
+.modal-submit-interactive {
+  @apply hover:bg-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
 }
 
 .confirm-overlay {

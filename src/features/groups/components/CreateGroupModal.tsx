@@ -184,7 +184,7 @@ export default function CreateGroupModal() {
         />
         <button
           type="submit"
-          className={`modal-submit-button ${disableSubmit ? "opacity-70":""}`}
+          className={`modal-submit-button ${disableSubmit ? "opacity-70":"modal-submit-interactive"}`}
           disabled={disableSubmit}
         >
           {
