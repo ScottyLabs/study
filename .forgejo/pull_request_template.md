@@ -5,6 +5,7 @@
 ## Related Issue
 
 <!-- Link the issue this PR addresses, if applicable. -->
+
 Closes #<!-- Add your issue number here -->
 
 ## Type of change
@@ -18,7 +19,7 @@ Closes #<!-- Add your issue number here -->
   - [ ] I tested my changes with a laptop-size screen.
   - [ ] I tested my changes with a phone-size screen.
   - [ ] I tested my changes with a tablet-size screen.
-- [ ] I tested on the dev app (dev.cmustudy.com)
+- [ ] I tested on the kennel preview deployment for this pull request.
 
 ## Screenshots/Recordings
 
