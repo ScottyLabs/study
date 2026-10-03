@@ -909,7 +909,7 @@
 }
 
 .top-bar {
-  @apply sticky top-16 z-20 desktop:top-0;
+  @apply relative z-20;
 }
 
 .filter-bar {
