@@ -165,11 +165,13 @@
 
 .filter-course-select {
   --filter-input-background: #ffffff;
+  --filter-border-color: rgb(0 0 0 / 0.15); 
   min-width: 0;
 }
 
 .dark .filter-course-select {
-  --filter-input-background: #181a1f;
+  --filter-input-background: #202328;
+  --filter-border-color: rgb(255 255 255 / 0.15); 
 }
 
 .filter-date-control {
