@@ -1648,6 +1648,39 @@
   overscroll-behavior: contain;
 }
 
+.react-datepicker__day--selected:not([aria-disabled="true"]):hover,
+.react-datepicker__day--in-selecting-range:not([aria-disabled="true"]):hover,
+.react-datepicker__day--in-range:not([aria-disabled="true"]):hover,
+.react-datepicker__day:not([aria-disabled="true"]):hover,
+.react-datepicker__time-list-item:not([aria-disabled="true"]):hover,
+.react-datepicker__day--keyboard-selected {
+  @apply !bg-darkSelected !text-white;
+}
+
+.react-datepicker__day {
+  @apply dark:!text-darkText;
+}
+
+.react-datepicker,
+.react-datepicker__time-list-item,
+.react-datepicker__header,
+.react-datepicker-time__header,
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  @apply dark:bg-darkInput dark:text-darkText;
+}
+
+.react-datepicker__time-list-item {
+  @apply flex justify-center items-center p-0 dark:border-r-[1px] border-[#aeaeae];
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range,
+.react-datepicker__time-list-item--selected {
+  @apply !bg-darkButton dark:!bg-darkButton;
+}
+
 @media (max-width: 639px) {
   .study-card-copy {
     @apply min-h-0;
