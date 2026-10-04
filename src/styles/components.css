@@ -644,15 +644,15 @@
 }
 
 .workspace-stat {
-  @apply min-w-28 rounded-lg border border-black/10 bg-lightSidebar px-4 py-3 shadow-sm dark:border-white/10 dark:bg-darkSidebar;
+  @apply hidden border-0 bg-transparent px-2 py-0 lg:block min-w-28 rounded-lg;
 }
 
 .workspace-stat-value {
-  @apply text-2xl font-semibold text-lightText dark:text-darkText;
+  @apply text-lg font-semibold text-lightText dark:text-darkText;
 }
 
 .workspace-stat-label {
-  @apply text-xs font-medium uppercase text-black/45 dark:text-white/45;
+  @apply text-[10px] font-medium uppercase text-black/40 dark:text-white/40;
 }
 
 .workspace-layout {
@@ -964,24 +964,8 @@
   @apply flex flex-none items-center gap-2;
 }
 
-.workspace-stat {
-  @apply hidden border-0 bg-transparent px-2 py-0 shadow-none lg:block;
-}
-
-.workspace-stat-value {
-  @apply text-lg font-semibold;
-}
-
-.workspace-stat-label {
-  @apply text-[10px] font-medium uppercase text-black/40 dark:text-white/40;
-}
-
 .workspace-layout {
   @apply grid min-h-0 flex-1 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_400px];
-}
-
-.workspace-results {
-  @apply min-w-0;
 }
 
 .group-grid,
@@ -1180,7 +1164,7 @@
 }
 
 .course-search-wrap .course-search-input {
-  @apply border-0 px-0 focus:ring-0;
+  @apply border-0 px-0 focus:ring-0 bg-transparent;
 }
 
 .course-search-result {
