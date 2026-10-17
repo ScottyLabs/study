@@ -11,7 +11,6 @@ import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
 import { usePostHog } from "posthog-js/react";
 
 import Card from "~/features/groups/components/Card";
-import { groupCardColors } from "~/features/groups/constants";
 import { useStudyGroups } from "~/features/groups/hooks/useStudyGroups";
 import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
 import { shouldHideFeedGroup } from "~/features/groups/utils/groupFilters";
@@ -79,10 +78,7 @@ export default function FeedPage() {
   const displayScheduled = visibleGroups.map((group) => {
     const [formattedDate, formattedTime] = formatDateTime(group.startTime);
     const isInGroup = joinedGroups ? joinedGroups.includes(group.id) : false;
-    const cardColors =
-      group.id === selectedGroup
-        ? groupCardColors.selected
-        : groupCardColors.default;
+    const selected = group.id === selectedGroup;
 
     return (
       <Card
@@ -92,8 +88,7 @@ export default function FeedPage() {
         time={formattedTime}
         date={formattedDate}
         isInGroup={isInGroup}
-        lightColor={cardColors.light}
-        darkColor={cardColors.dark}
+        selected={selected}
       />
     );
   });
