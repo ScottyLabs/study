@@ -91,7 +91,6 @@ export function GroupModalFields({
         dateFormat="Pp"
         placeholderText="Date/Time"
         popperClassName="custom-popper"
-        calendarClassName="bg-lightInput dark:bg-darkInput"
         customInput={<DatePickerInput />}
         wrapperClassName="w-full"
         className="w-full"
