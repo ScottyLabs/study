@@ -59,8 +59,7 @@ export default function MyGroupsPage() {
         time={formattedTime}
         date={formattedDate}
         isInGroup={true}
-        lightColor={"lightAccent"}
-        darkColor={"darkAccent"}
+        selected
       />
     );
   });
