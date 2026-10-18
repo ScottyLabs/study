@@ -4,9 +4,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 
-permissions:
-  contents: read
-  id-token: write
+enable-openid-connect: true
 
 concurrency:
   group: study-tests-${{ forgejo.event.pull_request.number }}
@@ -21,7 +19,14 @@ jobs:
       - name: Checkout pull request
         uses: actions/checkout@v4
 
+      - name: Build Prisma engines for NixOS
+        id: prisma-engines
+        run: echo "path=$(nix build .#prisma-engines --print-out-paths)" >> "$GITHUB_OUTPUT"
+
       - name: Install dependencies
+        env:
+          PRISMA_QUERY_ENGINE_LIBRARY: ${{ steps.prisma-engines.outputs.path }}/lib/libquery_engine.node
+          PRISMA_SCHEMA_ENGINE_BINARY: ${{ steps.prisma-engines.outputs.path }}/bin/schema-engine
         run: npm ci
 
       - name: Run unit tests
@@ -38,12 +43,40 @@ jobs:
       - name: Checkout pull request
         uses: actions/checkout@v4
 
+      - name: Build Prisma engines for NixOS
+        id: prisma-engines
+        run: echo "path=$(nix build .#prisma-engines --print-out-paths)" >> "$GITHUB_OUTPUT"
+
+      - name: Request OpenBao JWT
+        id: openbao-jwt
+        run: |
+          set -eu
+          token="$(curl --fail --silent --show-error \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=openbao" | \
+            node -e '
+              let response = "";
+              process.stdin.on("data", (chunk) => (response += chunk));
+              process.stdin.on("end", () => {
+                const { value } = JSON.parse(response);
+                if (typeof value !== "string" || value.split(".").length !== 3) process.exit(1);
+                process.stdout.write(value);
+              });
+            ')"
+          printf 'jwt=%s\n' "$token" >> "$GITHUB_OUTPUT"
+
       - name: Start local devenv services
+        env:
+          BAO_JWT: ${{ steps.openbao-jwt.outputs.jwt }}
         run: |
           devenv up -d
           devenv processes wait
 
       - name: Install dependencies, migrate, and run integration tests
+        env:
+          BAO_JWT: ${{ steps.openbao-jwt.outputs.jwt }}
+          PRISMA_QUERY_ENGINE_LIBRARY: ${{ steps.prisma-engines.outputs.path }}/lib/libquery_engine.node
+          PRISMA_SCHEMA_ENGINE_BINARY: ${{ steps.prisma-engines.outputs.path }}/bin/schema-engine
         run: |
           devenv shell -- npm ci
           devenv shell -- migrate
@@ -51,4 +84,6 @@ jobs:
 
       - name: Stop local devenv services
         if: always()
+        env:
+          BAO_JWT: ${{ steps.openbao-jwt.outputs.jwt }}
         run: devenv down || true
