@@ -177,6 +177,8 @@
           };
         in
         {
+          prisma-engines = prismaEngines;
+
           # hash collision prevention
           web = study;
           default = study;

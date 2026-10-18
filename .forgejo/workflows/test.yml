@@ -17,7 +17,14 @@ jobs:
       - name: Checkout pull request
         uses: actions/checkout@v4
 
+      - name: Build Prisma engines for NixOS
+        id: prisma-engines
+        run: echo "path=$(nix build .#prisma-engines --print-out-paths)" >> "$GITHUB_OUTPUT"
+
       - name: Install dependencies
+        env:
+          PRISMA_QUERY_ENGINE_LIBRARY: ${{ steps.prisma-engines.outputs.path }}/lib/libquery_engine.node
+          PRISMA_SCHEMA_ENGINE_BINARY: ${{ steps.prisma-engines.outputs.path }}/bin/schema-engine
         run: npm ci
 
       - name: Run unit tests
@@ -34,12 +41,19 @@ jobs:
       - name: Checkout pull request
         uses: actions/checkout@v4
 
+      - name: Build Prisma engines for NixOS
+        id: prisma-engines
+        run: echo "path=$(nix build .#prisma-engines --print-out-paths)" >> "$GITHUB_OUTPUT"
+
       - name: Start local devenv services
         run: |
           devenv up -d
           devenv processes wait
 
       - name: Install dependencies, migrate, and run integration tests
+        env:
+          PRISMA_QUERY_ENGINE_LIBRARY: ${{ steps.prisma-engines.outputs.path }}/lib/libquery_engine.node
+          PRISMA_SCHEMA_ENGINE_BINARY: ${{ steps.prisma-engines.outputs.path }}/bin/schema-engine
         run: |
           devenv shell -- npm ci
           devenv shell -- migrate
