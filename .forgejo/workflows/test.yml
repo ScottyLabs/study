@@ -4,10 +4,6 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 
-permissions:
-  contents: read
-  id-token: write
-
 concurrency:
   group: study-tests-${{ forgejo.event.pull_request.number }}
   cancel-in-progress: true
