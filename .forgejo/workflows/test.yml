@@ -50,10 +50,20 @@ jobs:
       - name: Request OpenBao JWT
         id: openbao-jwt
         run: |
+          set -eu
           token="$(curl --fail --silent --show-error \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=openbao")"
-          echo "jwt=$token" >> "$GITHUB_OUTPUT"
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=openbao" | \
+            node -e '
+              let response = "";
+              process.stdin.on("data", (chunk) => (response += chunk));
+              process.stdin.on("end", () => {
+                const { value } = JSON.parse(response);
+                if (typeof value !== "string" || value.split(".").length !== 3) process.exit(1);
+                process.stdout.write(value);
+              });
+            ')"
+          printf 'jwt=%s\n' "$token" >> "$GITHUB_OUTPUT"
 
       - name: Start local devenv services
         env:
