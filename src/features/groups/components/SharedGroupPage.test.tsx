@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
 import { SharedGroupPage } from "./SharedGroupPage";
 import { ApiRequestError } from "~/lib/api/client";
+import { MOBILE_LAYOUT_QUERY } from "~/lib/responsive";
 import type { StudyGroup } from "~/types";
 const mocks = vi.hoisted(() => ({
   fetch: vi.fn(),
@@ -158,7 +159,7 @@ test("existing members can leave even if the session is full or past", async () 
 });
 
 test("a newly signed-in recipient gets Join in the mobile overlay on first load", async () => {
-  const media = window.matchMedia("(max-width: 767px)");
+  const media = window.matchMedia(MOBILE_LAYOUT_QUERY);
   vi.spyOn(window, "matchMedia").mockReturnValue({ ...media, matches: true });
   const previousOverflow = document.body.style.overflow;
   mocks.sessionReady = false;
@@ -213,4 +214,35 @@ test("the shared link shows the normal group cards beside the selected details",
   expect(
     await screen.findByRole("dialog", { name: "Another session details" }),
   ).toBeVisible();
+});
+
+test("details scroll locking follows changes between tablet and desktop layouts", async () => {
+  const initial = window.matchMedia(MOBILE_LAYOUT_QUERY);
+  let handleChange: (() => void) | undefined;
+  const media = {
+    ...initial,
+    matches: true,
+    addEventListener: vi.fn((_event: string, listener: () => void) => {
+      handleChange = listener;
+    }),
+    removeEventListener: vi.fn(),
+  };
+  vi.spyOn(window, "matchMedia").mockReturnValue(media);
+  const previousOverflow = document.body.style.overflow;
+  const { unmount } = render(<SharedGroupPage groupId="abc" />);
+  await screen.findByRole("button", { name: "Join group" });
+  expect(window.matchMedia).toHaveBeenCalledWith(MOBILE_LAYOUT_QUERY);
+  expect(document.body.style.overflow).toBe("hidden");
+  media.matches = false;
+  handleChange?.();
+  expect(document.body.style.overflow).toBe(previousOverflow);
+  media.matches = true;
+  handleChange?.();
+  expect(document.body.style.overflow).toBe("hidden");
+  unmount();
+  expect(document.body.style.overflow).toBe(previousOverflow);
+  expect(media.removeEventListener).toHaveBeenCalledWith(
+    "change",
+    handleChange,
+  );
 });

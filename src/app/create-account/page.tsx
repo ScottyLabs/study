@@ -47,7 +47,7 @@ function CreateAccountPageContent() {
             <ProfileDetailsForm userId={userId} mastersValue="Masters" />
           </div>
         </div>
-        <div className="profile-column md:flex">
+        <div className="profile-column desktop:flex">
           <div className="settings-panel w-full">
             <div className="settings-panel-heading">
               <div>
