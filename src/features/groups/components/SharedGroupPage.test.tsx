@@ -6,6 +6,7 @@ import { ApiRequestError } from "~/lib/api/client";
 import type { StudyGroup } from "~/types";
 const mocks = vi.hoisted(() => ({
   fetch: vi.fn(),
+  fetchAll: vi.fn(),
   blocking: vi.fn(),
   push: vi.fn(),
   join: vi.fn(),
@@ -38,11 +39,15 @@ vi.mock("~/features/profile/components/CreateProfilePopUp", () => ({
 }));
 vi.mock("../services/groupApi", () => ({
   fetchGroup: mocks.fetch,
+  fetchGroups: mocks.fetchAll,
   subscribeToGroupChanges: () => vi.fn(),
   joinGroup: mocks.join,
 }));
 vi.mock("~/features/profile/services/profileApi", () => ({
   fetchBlockingState: mocks.blocking,
+}));
+vi.mock("~/features/profile/hooks/useUserCourses", () => ({
+  useUserCourses: () => ({ classes: [] }),
 }));
 const group: StudyGroup = {
   id: "abc",
@@ -58,6 +63,7 @@ const group: StudyGroup = {
 beforeEach(() => {
   mocks.sessionReady = true;
   mocks.fetch.mockResolvedValue(group);
+  mocks.fetchAll.mockResolvedValue([group]);
   mocks.blocking.mockResolvedValue({
     blockedByMe: [],
     blockedByThem: [],
@@ -73,6 +79,13 @@ test("opens a specific group without joining, then uses existing join/calendar f
   expect(
     await screen.findByRole("button", { name: "Join group" }),
   ).toBeEnabled();
+  expect(screen.getByRole("heading", { name: "Group Finder" })).toBeVisible();
+  expect(screen.getByRole("button", { name: "New group" })).toBeVisible();
+  expect(
+    screen
+      .getByRole("button", { name: "Join group" })
+      .closest(".workspace-detail"),
+  ).not.toBeNull();
   expect(mocks.join).not.toHaveBeenCalled();
   await userEventInstance.click(
     screen.getByRole("button", { name: "Join group" }),
@@ -114,7 +127,9 @@ test("fetch errors offer a working retry", async () => {
   mocks.fetch.mockRejectedValueOnce(new Error("offline"));
   render(<SharedGroupPage groupId="abc" />);
   await u.click(await screen.findByRole("button", { name: "Retry" }));
-  expect(await screen.findByText("Systems session")).toBeVisible();
+  expect(
+    await screen.findByRole("dialog", { name: "Systems session details" }),
+  ).toBeVisible();
 });
 test.each([
   ["full", { totalSeats: 1 }, "Group full"],
@@ -173,4 +188,29 @@ test("closing the shared group's overlay returns to the feed", async () => {
   await screen.findByRole("button", { name: "Join group" });
   await u.click(screen.getByRole("button", { name: "Close details" }));
   expect(mocks.push).toHaveBeenCalledWith("/feed");
+});
+
+test("the shared link shows the normal group cards beside the selected details", async () => {
+  const u = userEvent.setup();
+  const otherGroup = { ...group, id: "other", title: "Another session" };
+  mocks.fetchAll.mockResolvedValue([group, otherGroup]);
+  mocks.fetch.mockImplementation(async (id: string) =>
+    id === "other" ? otherGroup : group,
+  );
+  render(<SharedGroupPage groupId="abc" />);
+  expect(
+    await screen.findByRole("dialog", { name: "Systems session details" }),
+  ).toBeVisible();
+  const otherCard = await screen.findByRole("button", {
+    name: "15-213: Another session",
+  });
+  expect(
+    screen
+      .getByRole("button", { name: "15-213: Systems session" })
+      .closest("article"),
+  ).toHaveClass("study-card-accent");
+  await u.click(otherCard);
+  expect(
+    await screen.findByRole("dialog", { name: "Another session details" }),
+  ).toBeVisible();
 });

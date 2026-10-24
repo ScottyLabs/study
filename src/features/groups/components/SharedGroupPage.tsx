@@ -8,13 +8,12 @@ import { ApiRequestError } from "~/lib/api/client";
 import type { StudyGroup } from "~/types";
 import { fetchGroup } from "../services/groupApi";
 import { fetchBlockingState } from "~/features/profile/services/profileApi";
-import GroupDetails from "./GroupDetails";
+import { GroupFinder } from "./GroupFinder";
 
 export function SharedGroupPage({ groupId }: { groupId: string }) {
   const { user } = useUser();
   const router = useRouter();
   const [group, setGroup] = useState<StudyGroup | null>(null);
-  const [, setJoinedGroups] = useState<string[] | null>(null);
   const [status, setStatus] = useState<
     "loading" | "ready" | "missing" | "error"
   >("loading");
@@ -41,7 +40,6 @@ export function SharedGroupPage({ groupId }: { groupId: string }) {
           return;
         }
         setGroup(details);
-        setJoinedGroups(blocking.joinedGroups);
         setStatus("ready");
       })
       .catch((error: unknown) => {
@@ -56,6 +54,17 @@ export function SharedGroupPage({ groupId }: { groupId: string }) {
       cancelled = true;
     };
   }, [groupId, user, attempt]);
+  if (status === "ready" && group) {
+    return (
+      <GroupFinder
+        key={group.id}
+        initialGroup={group}
+        onCloseInitialGroup={close}
+        onInitialGroupUnavailable={() => setStatus("missing")}
+      />
+    );
+  }
+
   return (
     <main className="content-page">
       {status === "loading" && <p role="status">Loading group...</p>}
@@ -76,23 +85,6 @@ export function SharedGroupPage({ groupId }: { groupId: string }) {
           >
             Retry
           </button>
-        </div>
-      )}
-      {status === "ready" && group && (
-        <div
-          className="details-overlay"
-          onClick={(event) => {
-            if (event.target === event.currentTarget) close();
-          }}
-        >
-          <div className="details-overlay-inner">
-            <GroupDetails
-              details={group}
-              onClick={close}
-              onUnavailable={() => setStatus("missing")}
-              updateJoinedGroups={setJoinedGroups}
-            />
-          </div>
         </div>
       )}
     </main>
