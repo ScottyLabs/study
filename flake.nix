@@ -123,7 +123,7 @@
               ];
             };
 
-            npmDepsHash = "sha256-2+uEDJ6t++r4a7Lj5hMnmsk+y8Za+hf7uzc2ODsLK6c=";
+            npmDepsHash = "sha256-ZhvyCMBcxseyR5f0dTfqn/ZI9u3zpWYf0GDaW3Nl22E=";
 
             inherit nodejs;
             nativeBuildInputs = [ pkgs.makeWrapper ];
