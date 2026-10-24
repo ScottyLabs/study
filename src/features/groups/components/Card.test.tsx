@@ -111,7 +111,7 @@ test.each(["iPhone", "Android", "iPad"])(
     await user.click(invite);
     expect(share).toHaveBeenCalledWith({
       title: "Study Course with me",
-      text: "I'm looking for people to study Course with! Join my study group:",
+      text: "I'm looking for people to study Course with! Join my study group!",
       url: `${window.location.origin}/groups/id`,
     });
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();

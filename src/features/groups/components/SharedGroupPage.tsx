@@ -79,12 +79,21 @@ export function SharedGroupPage({ groupId }: { groupId: string }) {
         </div>
       )}
       {status === "ready" && group && (
-        <GroupDetails
-          details={group}
-          onClick={close}
-          onUnavailable={() => setStatus("missing")}
-          updateJoinedGroups={setJoinedGroups}
-        />
+        <div
+          className="details-overlay"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) close();
+          }}
+        >
+          <div className="details-overlay-inner">
+            <GroupDetails
+              details={group}
+              onClick={close}
+              onUnavailable={() => setStatus("missing")}
+              updateJoinedGroups={setJoinedGroups}
+            />
+          </div>
+        </div>
       )}
     </main>
   );

@@ -106,6 +106,6 @@ test("generates encoded links and casual invitations", () => {
   expect(
     invitationMessage({ course: "15-122", purpose: "Homework" }, "LINK"),
   ).toBe(
-    "I'm looking for people to study 15-122 with! Join my study group: LINK",
+    "I'm looking for people to study 15-122 with! Join my study group! LINK",
   );
 });

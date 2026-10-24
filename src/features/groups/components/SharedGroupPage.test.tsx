@@ -12,13 +12,16 @@ const mocks = vi.hoisted(() => ({
   calendar: vi.fn(),
   addCalendar: vi.fn(),
   capture: vi.fn(),
+  sessionReady: true,
 }));
 const user = {
   fullName: "Student",
   emailAddresses: [{ emailAddress: "student@cmu.edu" }],
 };
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: mocks.push }) }));
-vi.mock("~/lib/auth-client", () => ({ useUser: () => ({ user }) }));
+vi.mock("~/lib/auth-client", () => ({
+  useUser: () => ({ user: mocks.sessionReady ? user : null }),
+}));
 vi.mock("react-redux", () => ({ useDispatch: () => vi.fn() }));
 vi.mock("posthog-js/react", () => ({
   usePostHog: () => ({ capture: mocks.capture }),
@@ -53,6 +56,7 @@ const group: StudyGroup = {
   participantDetails: [{ name: "Owner", email: "owner@cmu.edu", url: null }],
 };
 beforeEach(() => {
+  mocks.sessionReady = true;
   mocks.fetch.mockResolvedValue(group);
   mocks.blocking.mockResolvedValue({
     blockedByMe: [],
@@ -136,4 +140,37 @@ test("existing members can leave even if the session is full or past", async () 
   expect(
     await screen.findByRole("button", { name: "Leave group" }),
   ).toBeEnabled();
+});
+
+test("a newly signed-in recipient gets Join in the mobile overlay on first load", async () => {
+  const media = window.matchMedia("(max-width: 767px)");
+  vi.spyOn(window, "matchMedia").mockReturnValue({ ...media, matches: true });
+  const previousOverflow = document.body.style.overflow;
+  mocks.sessionReady = false;
+  const { rerender, unmount } = render(<SharedGroupPage groupId="abc" />);
+  expect(mocks.fetch).not.toHaveBeenCalled();
+  expect(screen.getByRole("status")).toHaveTextContent("Loading group...");
+
+  // The auth client becomes ready after returning from account setup.
+  mocks.sessionReady = true;
+  rerender(<SharedGroupPage groupId="abc" />);
+  const join = await screen.findByRole("button", { name: "Join group" });
+  expect(join).toBeEnabled();
+  // Scroll locking requires the same viewport overlay used in the feed;
+  // rendering inline below navigation puts the footer outside a short screen.
+  expect(join.closest(".details-overlay-inner")).not.toBeNull();
+  expect(join.closest(".details-overlay")).not.toBeNull();
+  expect(document.body.style.overflow).toBe("hidden");
+  expect(mocks.push).not.toHaveBeenCalled();
+  expect(mocks.join).not.toHaveBeenCalled();
+  unmount();
+  expect(document.body.style.overflow).toBe(previousOverflow);
+});
+
+test("closing the shared group's overlay returns to the feed", async () => {
+  const u = userEvent.setup();
+  render(<SharedGroupPage groupId="abc" />);
+  await screen.findByRole("button", { name: "Join group" });
+  await u.click(screen.getByRole("button", { name: "Close details" }));
+  expect(mocks.push).toHaveBeenCalledWith("/feed");
 });
