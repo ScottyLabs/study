@@ -16,11 +16,10 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:unit": "vitest run --exclude 'test/integration/**'",
-    "test:integration": "node test/require-test-db.mjs && vitest run test/integration"
+    "test:calendar": "node --test test/calendar-*.test.mjs",
+    "test:unit": "node --test test/calendar-api.test.mjs test/calendar-browser.test.mjs test/calendar-env.test.mjs test/calendar-server.test.mjs",
+    "test:integration": "node test/require-calendar-test-db.mjs && node --test test/calendar-db.test.mjs",
+    "start": "next start"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",

@@ -107,6 +107,37 @@ You should already have a lot of tests from the last step, but they are likely n
 
 Fix the code (or, occasionally, the test when the test is genuinely incorrect) until the feature's unit tests pass. Also verify that all existing tests still pass. Repeat this process for integration tests.
 
+### Running the automated tests locally
+
+The test commands run inside the devenv environment. In one terminal, start the
+local PostgreSQL service and leave it running:
+
+```bash
+devenv up
+```
+
+In a second terminal, open the development shell and prepare the database:
+
+```bash
+devenv shell
+npm ci
+migrate
+```
+
+Run the unit tests first:
+
+```bash
+npm run test:unit
+```
+
+Then run the PostgreSQL integration tests against the local devenv database:
+
+```bash
+CALENDAR_TEST_DATABASE_URL="$DATABASE_URL" npm run test:integration
+```
+
+The integration test removes its own temporary records, but the URL must still refer only to your local database, never a shared or production database.
+
 ### 9. Test different screen sizes
 
 Any UI change must work on laptop, mobile, and tablet screen sizes.
@@ -171,15 +202,20 @@ Repeat [full-feature testing](#8-verify-the-complete-feature) and [responsive te
 git push -u origin <your-branch-name>
 ```
 
-CI will run on [git.cmu.dev/Scottylabs/study](https://git.cmu.dev/ScottyLabs/study): unit tests run first, followed by integration tests if they pass. If all tests pass, it deploys your branch to `dev.cmustudy.com`.
+Open a pull request after pushing. The `Test` workflow runs only for pull-request
+events, not ordinary pushes: unit tests run first, followed by integration tests
+only if unit tests pass. Pushing further commits to the open PR updates it and
+runs the workflow again.
 
-Monitor progress from the repository's **Actions** tab by finding your latest commit. A run usually takes about five minutes when no other jobs are queued, but may take longer during busy periods.
+Kennel independently builds and deploys an open PR preview. Monitor its
+`kennel/build` and `kennel/deploy` statuses on the latest commit; once it is
+healthy, Kennel comments with the preview URL.
 
 ### 12. Test on the development app
 
-After your branch deploys to `dev.cmustudy.com`, test the feature there thoroughly, including on multiple screen sizes.
+Kennel comments the deployment URL on the pull request, in the form `study-web-pr-<number>.scottylabs.net`. Test the feature there thoroughly, including on multiple screen sizes.
 
-The development app runs on Railway with a development PostgreSQL database, making it closer to production than your local environment. It can reveal issues that local testing misses, such as changed environment variables or authentication configuration.
+Each branch gets its own PostgreSQL database, provisioned by kennel and migrated when the service starts, making it closer to production than your local environment. It can reveal issues that local testing misses, such as changed environment variables or authentication configuration.
 
 ______________________________________________________________________
 
@@ -201,7 +237,7 @@ Once the feature works on the development app:
 
 Leads may ask questions, request code changes, or request additional tests. Reply to questions directly in the PR. You should not close and reopen the PR.
 
-For code changes, update your branch, test the changes thoroughly, and push again. This automatically updates the PR, reruns tests, and redeploys the branch to development. If the base branch changed, update your branch first; see [step 10](#10-update-from-the-base-branch). Your new code will show in the PR. Re-request review from each lead so we know you have updates ready.
+For code changes, update your branch, test the changes thoroughly, and push again. This updates the open PR, reruns its tests, and refreshes the Kennel preview. If the base branch changed, update your branch first; see [step 10](#10-update-from-the-base-branch). Your new code will show in the PR. Re-request review from each lead so we know you have updates ready.
 
 ### 15. Merge the pull request
 
@@ -209,10 +245,11 @@ After a lead approves the PR, you may merge it into the base branch yourself. On
 
 If the PR is out of date, update it from the base branch, test again, and push before merging.
 
-- A merge into `main` runs tests again and then deploys to production (usually about five minutes when no jobs are queued).
-- A merge into another branch deploys to development.
+- Tests are intentionally not rerun by a merge. Required PR checks must be green before merging.
+- A merge into `main` causes Kennel to deploy production (usually about five minutes when no jobs are queued).
+- Merging into another long-lived deployment branch, such as `dev` or `staging`, deploys that branch.
 
-Monitor the deployment in the **Actions** tab. Once it completes, verify the feature one final time. If anything breaks, revert the PR and contact the leads so the team can investigate; the problem may not be in your change.
+Monitor the Kennel commit statuses and deployment comment. Once it completes, verify the feature one final time. If anything breaks, revert the PR and contact the leads so the team can investigate; the problem may not be in your change.
 
 ______________________________________________________________________
 

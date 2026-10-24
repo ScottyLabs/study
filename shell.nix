@@ -1,13 +1,16 @@
-{ pkgs ? import (builtins.fetchGit {
+{
+  pkgs ? import (builtins.fetchGit {
     url = "https://github.com/NixOS/nixpkgs";
     rev = "01b6809f7f9d1183a2b3e081f0a1e6f8f415cb09";
-  }) { } }:
+  }) { },
+}:
 
 let
   prismaEngineCommit = "34ace0eb2704183d2c05b60b52fba5c43c13f303";
   prismaEngineBaseUrl = "https://binaries.prisma.sh/all_commits/${prismaEngineCommit}/debian-openssl-3.0.x";
 
-  fetchPrismaEngine = name: hash:
+  fetchPrismaEngine =
+    name: hash:
     pkgs.fetchurl {
       url = "${prismaEngineBaseUrl}/${name}.gz";
       inherit hash;

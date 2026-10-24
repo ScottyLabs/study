@@ -45,3 +45,13 @@ protected.zip
 
 # idea files
 .idea
+
+# nix / devenv
+.devenv/
+.pre-commit-config.yaml
+/result
+/result-*
+
+# AI
+.mcp.json
+.claude
