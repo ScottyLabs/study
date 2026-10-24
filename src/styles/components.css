@@ -754,6 +754,11 @@
   @apply min-w-0 pb-20 md:ml-[240px] md:pb-0;
 }
 
+/* Full-width content for app shells without the authenticated sidebar. */
+.app-standalone-content {
+  @apply min-w-0 w-full;
+}
+
 .sidebar-shell {
   @apply fixed inset-y-0 left-0 z-30 hidden w-[240px] border-r border-black/10 bg-white dark:border-white/10 dark:bg-darkSidebar md:block;
 }

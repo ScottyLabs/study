@@ -37,7 +37,7 @@ export default async function ContentLayout({
 
   return (
     <div className="app-shell">
-      <div className="app-content">
+      <div className="app-standalone-content">
         <main className="app-main-padded">{children}</main>
       </div>
     </div>
