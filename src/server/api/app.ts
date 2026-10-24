@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { Hono } from "hono";
 import { z } from "zod";
+import { calendarApi } from "./calendar";
 
 import {
   requireEligibleSession,
@@ -28,6 +29,8 @@ import {
 } from "~/server/api/profile";
 
 export const api = new Hono<ApiEnvironment>().basePath("/api/v1");
+
+api.route("/calendar", calendarApi);
 
 api.onError((error, context) => {
   console.error("API request failed", {

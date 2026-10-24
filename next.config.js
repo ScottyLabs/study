@@ -6,6 +6,8 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
+   // kennel runs the built server directly
+   output: "standalone",
    typescript: {
         ignoreBuildErrors: true,
    },

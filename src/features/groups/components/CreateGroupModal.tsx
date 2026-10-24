@@ -9,7 +9,6 @@ import { usePostHog } from "posthog-js/react";
 import {
   addToCal,
   setupGoogleApi,
-  isCalendarApiReady,
   requestCalendarAccessInteractive,
   deleteFromCal,
 } from "~/helpers/calendar_helper";
@@ -17,6 +16,7 @@ import { GroupModalFrame } from "./GroupModalFrame";
 import { GroupModalFields } from "./GroupModalFields";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { createGroup } from "../services/groupApi";
+import { LoaderCircle } from "lucide-react";
 
 export default function CreateGroupModal() {
   const { user } = useUser();
@@ -29,6 +29,7 @@ export default function CreateGroupModal() {
   const [seats, setSeats] = useState("");
   const [details, setDetails] = useState("");
   const { classes } = useUserCourses(userId);
+  const [disableSubmit, setDisableSubmit] = useState(false);
   const classOptions = classes.map((course) => course.courseID);
 
   const dispatch = useDispatch();
@@ -43,7 +44,7 @@ export default function CreateGroupModal() {
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
-
+    setDisableSubmit(true);
     if (!date) {
       toast.error("Invalid Date Input!");
       return;
@@ -52,8 +53,7 @@ export default function CreateGroupModal() {
     const userEmail = user?.emailAddresses[0]?.emailAddress;
 
     if (!userEmail) {
-      toast("Error creating study group", {
-        icon: "❌",
+      toast.error("Error creating study group", {
         style: {
           borderRadius: "10px",
           background: "#333",
@@ -66,11 +66,9 @@ export default function CreateGroupModal() {
     let group;
     let eventId = "None";
     try {
-      if (isCalendarApiReady()) {
-        await requestCalendarAccessInteractive().catch((err) => {
-          console.warn("Calendar auth failed:", err);
-        });
-      }
+      await requestCalendarAccessInteractive().catch((err) => {
+        console.warn("Calendar auth failed:", err);
+      });
 
       eventId =
         (await addToCal(
@@ -105,9 +103,10 @@ export default function CreateGroupModal() {
       console.error(error);
       if (eventId !== "None") {
         await deleteFromCal(eventId).catch((err) =>
-          console.error("Failed to roll back calendar event:", err)
+          console.error("Failed to roll back calendar event:", err),
         );
       }
+      setDisableSubmit(false);
       toast.error("Error creating study group");
       return;
     }
@@ -131,6 +130,7 @@ export default function CreateGroupModal() {
     setLocation("");
     setSeats("");
     setDetails("");
+    setDisableSubmit(false);
     handleClose();
 
     toast("Study group created successfully!", {
@@ -178,8 +178,16 @@ export default function CreateGroupModal() {
           details={details}
           setDetails={setDetails}
         />
-        <button type="submit" className="modal-submit-button">
-          Create Group
+        <button
+          type="submit"
+          className={`modal-submit-button ${disableSubmit ? "opacity-70":"modal-submit-interactive"}`}
+          disabled={disableSubmit}
+        >
+          {
+            disableSubmit ? <LoaderCircle className="animate-spin" size={20}/>
+            : "Create Group"
+          }
+          
         </button>
       </form>
     </GroupModalFrame>
