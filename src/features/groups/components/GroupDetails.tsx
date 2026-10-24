@@ -9,7 +9,8 @@ import { useUser } from "~/lib/auth-client";
 import CreateProfilePopUp from "~/features/profile/components/CreateProfilePopUp";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
-import { formatDateTime } from "~/helpers/date_helper";
+import { GroupShareAction } from "./GroupShareAction";
+import { formatDateTime, isInThePast } from "~/helpers/date_helper";
 import EditGroupModal from "./EditGroupModal";
 import {
   addToCal,
@@ -35,12 +36,18 @@ import {
 } from "lucide-react";
 interface Props {
   onClick: () => void;
+  onUnavailable?: () => void;
   details: StudyGroup;
   updateJoinedGroups: React.Dispatch<React.SetStateAction<string[] | null>>;
 }
 import { usePostHog } from "posthog-js/react";
 
-const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
+const GroupDetails = ({
+  onClick,
+  onUnavailable,
+  details,
+  updateJoinedGroups,
+}: Props) => {
   const { user } = useUser();
   const userEmail = user?.emailAddresses[0]?.emailAddress;
   const [participantsState, participantsSetState] = useState(true);
@@ -74,8 +81,8 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
   useEffect(() => {
     if (!isDeleted) return;
     toast.error("Group unavailable");
-    onClick();
-  }, [isDeleted, onClick]);
+    (onUnavailable ?? onClick)();
+  }, [isDeleted, onClick, onUnavailable]);
 
   useEffect(() => {
     if (!window.matchMedia("(max-width: 767px)").matches) return;
@@ -87,9 +94,17 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
   }, []);
 
   const joinGroup = async () => {
-    const calendarAuthPromise = requestCalendarAccessInteractive().catch((err) => {
-      console.warn("Calendar auth failed:", err);
-    });
+    if (
+      !joinedState &&
+      (isInThePast(currentDetails.startTime) ||
+        currentDetails.participantDetails.length >= currentDetails.totalSeats)
+    )
+      return;
+    const calendarAuthPromise = requestCalendarAccessInteractive().catch(
+      (err) => {
+        console.warn("Calendar auth failed:", err);
+      },
+    );
     const userId = user?.emailAddresses[0]?.emailAddress;
     let eventId: string | undefined = undefined;
     if (!joinedState) {
@@ -305,7 +320,24 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
         )}
       </div>
 
-      <JoinGroupButton isJoined={joinedState} onClick={joinGroup} />
+      <div className="group-details-footer">
+        <GroupShareAction group={currentDetails} />
+        <JoinGroupButton
+          isJoined={joinedState}
+          onClick={joinGroup}
+          disabled={
+            !joinedState &&
+            (isInThePast(currentDetails.startTime) ||
+              currentDetails.participantDetails.length >=
+                currentDetails.totalSeats)
+          }
+          unavailableLabel={
+            isInThePast(currentDetails.startTime)
+              ? "Session ended"
+              : "Group full"
+          }
+        />
+      </div>
       <EditGroupModal group={currentDetails} />
     </div>
   );

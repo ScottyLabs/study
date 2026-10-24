@@ -9,6 +9,7 @@ type GroupModalFrameProps = {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  suspended?: boolean;
 };
 
 export function GroupModalFrame({
@@ -16,11 +17,16 @@ export function GroupModalFrame({
   title,
   onClose,
   children,
+  suspended = false,
 }: GroupModalFrameProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = `${id}-title`;
 
   useEffect(() => {
+    const previousFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     const panel = panelRef.current;
     if (!panel) return;
 
@@ -28,15 +34,20 @@ export function GroupModalFrame({
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
     firstFocusable?.focus();
+    return () => {
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
   }, []);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape") {
+      event.stopPropagation();
       onClose();
       return;
     }
 
     if (event.key !== "Tab") return;
+    event.stopPropagation();
 
     const panel = panelRef.current;
     if (!panel) return;
@@ -65,7 +76,13 @@ export function GroupModalFrame({
   };
 
   return (
-    <div className="modal-overlay" id={id} onClick={onClose}>
+    <div
+      className="modal-overlay"
+      id={id}
+      onClick={onClose}
+      aria-hidden={suspended || undefined}
+      style={suspended ? { display: "none" } : undefined}
+    >
       <div
         ref={panelRef}
         className="modal-panel"

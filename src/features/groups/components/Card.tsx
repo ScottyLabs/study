@@ -2,6 +2,7 @@
 
 import type { StudyGroup } from "~/types";
 import { ArrowUpRight, CalendarDays, Check, MapPin } from "lucide-react";
+import { GroupShareAction } from "./GroupShareAction";
 import { AvatarImage } from "~/components/ui/UserAvatar";
 
 interface Props {
@@ -13,14 +14,7 @@ interface Props {
   selected: boolean;
 }
 
-const Card = ({
-  onClick,
-  group,
-  time,
-  date,
-  isInGroup,
-  selected
-}: Props) => {
+const Card = ({ onClick, group, time, date, isInGroup, selected }: Props) => {
   const visibleParticipants = group.participantDetails.slice(0, 4);
   const remainingParticipants = Math.max(
     group.participantDetails.length - visibleParticipants.length,
@@ -28,11 +22,15 @@ const Card = ({
   );
 
   return (
-    <button
-      type="button"
+    <article
       className={`study-card ${selected ? "study-card-accent" : "study-card-sidebar"}`}
-      onClick={() => onClick(group)}
     >
+      <button
+        type="button"
+        className="study-card-details-trigger"
+        aria-label={`${group.course}: ${group.title}`}
+        onClick={() => onClick(group)}
+      />
       <div className="study-card-header">
         <span className="study-card-course">{group.course}</span>
         {isInGroup && (
@@ -85,11 +83,18 @@ const Card = ({
             {group.participantDetails.length} of {group.totalSeats}
           </span>
         </div>
-        <span className="study-card-open">
-          Details <ArrowUpRight size={16} />
-        </span>
+        <div className="study-card-footer-actions">
+          <GroupShareAction
+            group={group}
+            compact
+            className="study-card-share"
+          />
+          <span className="study-card-open" aria-hidden="true">
+            Details <ArrowUpRight size={16} />
+          </span>
+        </div>
       </div>
-    </button>
+    </article>
   );
 };
 

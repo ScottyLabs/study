@@ -1,20 +1,26 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { ClassList } from "~/features/profile/components/ClassList";
 import { ProfileDetailsForm } from "~/features/profile/components/ProfileDetailsForm";
 import { ProfileHeader } from "~/features/profile/components/ProfileHeader";
 import { useUserTheme } from "~/features/profile/hooks/useUserTheme";
 import { useUser } from "~/lib/auth-client";
 
+import { useSearchParams } from "next/navigation";
+import { groupDestination } from "~/lib/group-destination";
+
 function ContinueButton() {
+  const params = useSearchParams();
   return (
-    <a href="/feed" className="button-primary">
+    <a href={groupDestination(params.get("next"))} className="button-primary">
       Continue
     </a>
   );
 }
 
-export default function CreateAccountPage() {
+function CreateAccountPageContent() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
   useUserTheme(userId);
@@ -48,5 +54,13 @@ export default function CreateAccountPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CreateAccountPage() {
+  return (
+    <Suspense fallback={<p role="status">Loading...</p>}>
+      <CreateAccountPageContent />
+    </Suspense>
   );
 }
