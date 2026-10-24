@@ -47,8 +47,16 @@ function CreateAccountPageContent() {
             <ProfileDetailsForm userId={userId} mastersValue="Masters" />
           </div>
         </div>
-        <div className="profile-column">
-          <div className="settings-panel">
+        <div className="profile-column md:flex">
+          <div className="settings-panel w-full">
+            <div className="settings-panel-heading">
+              <div>
+                <h2>My courses</h2>
+                <p>
+                  Add the courses you are taking to connect with classmates.
+                </p>
+              </div>
+            </div>
             <ClassList />
           </div>
         </div>

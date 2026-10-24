@@ -62,14 +62,6 @@ export default function ProfilePage() {
           <section
             className={`settings-panel profile-section profile-section-courses ${activeTab === "courses" ? "profile-section-active" : ""}`}
           >
-            <div className="settings-panel-heading">
-              <div>
-                <h2>My courses</h2>
-                <p>
-                  Add the courses you are taking to connect with classmates.
-                </p>
-              </div>
-            </div>
             <ClassList />
           </section>
           <section

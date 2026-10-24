@@ -1179,6 +1179,10 @@
   @apply mt-4 divide-y divide-black/10 overflow-hidden rounded-md border border-black/10 dark:divide-white/10 dark:border-white/10;
 }
 
+.class-list-items:empty {
+  display: none;
+}
+
 .class-list-item {
   @apply flex min-h-[68px] w-full items-center justify-between gap-3 rounded-none border-0 bg-white px-4 py-3 text-sm shadow-none dark:bg-darkSidebar;
 }
