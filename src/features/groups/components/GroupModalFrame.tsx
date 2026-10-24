@@ -9,7 +9,6 @@ type GroupModalFrameProps = {
   title: string;
   onClose: () => void;
   children: ReactNode;
-  suspended?: boolean;
 };
 
 export function GroupModalFrame({
@@ -17,7 +16,6 @@ export function GroupModalFrame({
   title,
   onClose,
   children,
-  suspended = false,
 }: GroupModalFrameProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = `${id}-title`;
@@ -76,13 +74,7 @@ export function GroupModalFrame({
   };
 
   return (
-    <div
-      className="modal-overlay"
-      id={id}
-      onClick={onClose}
-      aria-hidden={suspended || undefined}
-      style={suspended ? { display: "none" } : undefined}
-    >
+    <div className="modal-overlay" id={id} onClick={onClose}>
       <div
         ref={panelRef}
         className="modal-panel"

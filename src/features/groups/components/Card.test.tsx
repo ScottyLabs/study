@@ -95,21 +95,28 @@ test("desktop card copies its group link without opening details or native shari
   expect(openDetails).toHaveBeenCalledWith(cardDummy.group);
 });
 test.each(["iPhone", "Android", "iPad"])(
-  "%s card opens an editable invitation from its share icon",
+  "%s card opens the native share menu directly",
   async (userAgent) => {
     vi.spyOn(navigator, "userAgent", "get").mockReturnValue(userAgent);
     const user = userEvent.setup();
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "share", {
+      configurable: true,
+      value: share,
+    });
     const openDetails = vi.fn();
     renderCard(openDetails);
     const invite = screen.getByRole("button", { name: "Invite friends" });
     expect(invite).toHaveAttribute("title", "Invite friends");
     await user.click(invite);
-    expect(screen.getByLabelText("Message")).toHaveValue(
-      `I'm looking for people to study Course with! Join my study group: ${window.location.origin}/groups/id`,
-    );
+    expect(share).toHaveBeenCalledWith({
+      title: "Study Course with me",
+      text: "I'm looking for people to study Course with! Join my study group:",
+      url: `${window.location.origin}/groups/id`,
+    });
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(openDetails).not.toHaveBeenCalled();
-    await user.keyboard("{Escape}");
-    expect(invite).toHaveFocus();
   },
 );
 test("an iPad using a desktop user agent still offers invitations", async () => {
@@ -118,9 +125,13 @@ test("an iPad using a desktop user agent still offers invitations", async () => 
     value: 5,
   });
   const user = userEvent.setup();
+  const share = vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(navigator, "share", {
+    configurable: true,
+    value: share,
+  });
   renderCard();
   await user.click(screen.getByRole("button", { name: "Invite friends" }));
-  expect(
-    screen.getByRole("dialog", { name: "Invite classmates" }),
-  ).toBeVisible();
+  expect(share).toHaveBeenCalledOnce();
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });

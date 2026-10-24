@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(),
   dispatch: vi.fn(),
   capture: vi.fn(),
+  share: vi.fn(),
 }));
 vi.mock("react-redux", () => ({ useDispatch: () => mocks.dispatch }));
 vi.mock("~/lib/hooks", () => ({ useAppSelector: () => true }));
@@ -39,6 +40,10 @@ vi.mock("./GroupModalFields", () => ({
 }));
 beforeEach(() => {
   vi.spyOn(navigator, "userAgent", "get").mockReturnValue("iPhone");
+  Object.defineProperty(navigator, "share", {
+    configurable: true,
+    value: mocks.share.mockResolvedValue(undefined),
+  });
   mocks.create.mockResolvedValue({
     id: "created-id",
     course: "15-213",
@@ -59,17 +64,13 @@ test("creation offers optional invitations and preserves created group data", as
   ).toBeVisible();
   expect(mocks.dispatch).not.toHaveBeenCalled();
   await user.click(screen.getByRole("button", { name: "Invite classmates" }));
-  expect(screen.getByLabelText("Message")).toHaveValue(
-    `Anyone want to study for the 15-213 exam? Join here: ${window.location.origin}/groups/created-id`,
-  );
-  await user.clear(screen.getByLabelText("Message"));
-  await user.keyboard("{Escape}");
-  expect(
-    screen.getByRole("button", { name: "Invite classmates" }),
-  ).toHaveFocus();
-  await user.click(screen.getByRole("button", { name: "Invite classmates" }));
-  expect(screen.getByLabelText("Message")).not.toHaveValue("");
-  await user.keyboard("{Escape}");
+  expect(mocks.share).toHaveBeenCalledWith({
+    title: "Study 15-213 with me",
+    text: "Anyone want to study for the 15-213 exam? Join here:",
+    url: `${window.location.origin}/groups/created-id`,
+  });
+  expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Group created!" })).toBeVisible();
   await user.click(screen.getByRole("button", { name: "Done" }));
   expect(mocks.dispatch).toHaveBeenCalledWith(
     expect.objectContaining({ payload: false }),

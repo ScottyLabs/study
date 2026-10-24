@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { Link2, Share } from "lucide-react";
 import toast from "react-hot-toast";
 import type { StudyGroup } from "~/types";
-import { groupLink } from "../utils/groupSharing";
-import { ShareGroupModal } from "./ShareGroupModal";
+import {
+  groupLink,
+  invitationMessage,
+  nativeInvitation,
+} from "../utils/groupSharing";
 
 // iPads can identify as Macs when requesting desktop websites.
 export function usesMobileInvitations(
@@ -23,23 +26,45 @@ export function GroupShareAction({
   className = "button-outline gap-2",
   mobileLabel = "Invite friends",
   desktopLabel = "Copy link",
-  onOpenChange,
 }: {
   group: StudyGroup;
   compact?: boolean;
   className?: string;
   mobileLabel?: string;
   desktopLabel?: string;
-  onOpenChange?: (open: boolean) => void;
 }) {
   const [mobile, setMobile] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [sharing, setSharing] = useState(false);
   useEffect(() => {
     setMobile(usesMobileInvitations(navigator));
   }, []);
-  const setInvitationOpen = (value: boolean) => {
-    setOpen(value);
-    onOpenChange?.(value);
+  const shareInvitation = async () => {
+    const link = groupLink(window.location.origin, group.id);
+    const message = invitationMessage(group, link);
+    if (typeof navigator.share !== "function") {
+      try {
+        await navigator.clipboard.writeText(message);
+        toast.success(
+          "Invitation copied. Paste it into your messaging or email app.",
+        );
+      } catch {
+        toast.error(
+          "Sharing is unavailable and the invitation could not be copied.",
+        );
+      }
+      return;
+    }
+    setSharing(true);
+    try {
+      // Invoke directly from the click, before any await, to preserve user activation.
+      await navigator.share(nativeInvitation(group.course, message, link));
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === "AbortError")) {
+        toast.error("Could not open sharing. Please try again.");
+      }
+    } finally {
+      setSharing(false);
+    }
   };
   const copyLink = async () => {
     try {
@@ -58,9 +83,10 @@ export function GroupShareAction({
         className={className}
         aria-label={mobile ? mobileLabel : desktopLabel}
         title={mobile ? mobileLabel : desktopLabel}
+        disabled={sharing}
         onClick={(event) => {
           event.stopPropagation();
-          if (mobile) setInvitationOpen(true);
+          if (mobile) void shareInvitation();
           else void copyLink();
         }}
       >
@@ -73,12 +99,6 @@ export function GroupShareAction({
           <span>{mobile ? mobileLabel : desktopLabel}</span>
         )}
       </button>
-      {open && (
-        <ShareGroupModal
-          group={group}
-          onClose={() => setInvitationOpen(false)}
-        />
-      )}
     </>
   );
 }

@@ -22,7 +22,6 @@ import { LoaderCircle } from "lucide-react";
 
 export default function CreateGroupModal() {
   const [createdGroup, setCreatedGroup] = useState<StudyGroup | null>(null);
-  const [isSharing, setIsSharing] = useState(false);
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
   const [title, setTitle] = useState("");
@@ -42,7 +41,6 @@ export default function CreateGroupModal() {
 
   const handleClose = () => {
     setCreatedGroup(null);
-    setIsSharing(false);
     dispatch(setIsCreateGroupModalOpen(false));
   };
 
@@ -166,7 +164,6 @@ export default function CreateGroupModal() {
         <GroupModalFrame
           key="success"
           id="group-created"
-          suspended={isSharing}
           title="Group created!"
           onClose={handleClose}
         >
@@ -179,7 +176,6 @@ export default function CreateGroupModal() {
               className="button-primary"
               mobileLabel="Invite classmates"
               desktopLabel="Copy link to study group"
-              onOpenChange={setIsSharing}
             />
             <button
               type="button"
