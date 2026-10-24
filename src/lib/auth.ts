@@ -71,18 +71,8 @@ export const auth = betterAuth({
   ],
 });
 
-export async function getServerSession() {
+export async function requireServerSession() {
   return auth.api.getSession({
     headers: headers(),
   });
-}
-
-export async function requireServerSession() {
-  const session = await getServerSession();
-
-  if (!session) {
-    return null;
-  }
-
-  return session;
 }
