@@ -10,7 +10,7 @@ export function invitationMessage(
 ) {
   return /exam/i.test(group.purpose)
     ? `Anyone want to study for the ${group.course} exam? Join here: ${link}`
-    : `I'm looking for people to study ${group.course} with! Join my study group: ${link}`;
+    : `I'm looking for people to study ${group.course} with! Join my study group! ${link}`;
 }
 
 export function nativeInvitation(
