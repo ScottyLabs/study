@@ -11,7 +11,8 @@ import { useStudyGroups } from "~/features/groups/hooks/useStudyGroups";
 import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
 import { shouldHideBySharedFilters } from "~/features/groups/utils/groupFilters";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
-import { CalendarCheck } from "lucide-react";
+import { CalendarCheck, Search } from "lucide-react";
+import DisplayedSchedule from "../feed/components/DisplayedSchedules";
 
 export default function MyGroupsPage() {
   const { user } = useUser();
@@ -22,14 +23,24 @@ export default function MyGroupsPage() {
     value: course.courseID,
     label: course.courseID,
   }));
-  const { joinedGroups, setJoinedGroups } = useUserGroupState(userId);
+  const { joinedGroups, setJoinedGroups, loading } = useUserGroupState(userId);
   const [selectedCourses, setSelectedCourses] = useState<
     MultiValue<{ value: string; label: string }>
   >([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState<StudyGroup | null>(null);
 
+  const handleCardClick = (group: StudyGroup) => {
+    setSelectedGroup(group.id);
+    setShowDetails(group);
+  };
+
+  const closeDetailsPopUp = () => {
+    setShowDetails(null);
+    setSelectedGroup(null);
+  };
   const visibleGroups = groups.filter((group) => {
     const isParticipant = joinedGroups?.includes(group.id);
     if (!isParticipant) return false;
@@ -108,8 +119,11 @@ export default function MyGroupsPage() {
               <div
                 className={`${showDetails ? "group-grid" : "group-grid-wide"}`}
               >
-                {displayScheduled}
-                {visibleGroups.length === 0 && (
+                {loading ? (
+                  Array.from(Array(6)).map(() => (
+                    <div className="app-loading" />
+                  ))
+                ) : visibleGroups.length === 0 ? (
                   <div className="app-empty">
                     <CalendarCheck className="h-6 w-6 text-black/35 dark:text-white/35" />
                     <p>No joined groups found</p>
@@ -117,6 +131,15 @@ export default function MyGroupsPage() {
                       Try changing the filters or join a group from the finder.
                     </p>
                   </div>
+                ) : (
+                  <DisplayedSchedule
+                    {...{
+                      group: visibleGroups,
+                      handleCardClick,
+                      joinedGroups,
+                      selectedGroup,
+                    }}
+                  />
                 )}
               </div>
             </div>

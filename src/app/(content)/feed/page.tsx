@@ -27,7 +27,7 @@ export default function FeedPage() {
     value: course.courseID,
     label: course.courseID,
   }));
-  const { joinedGroups, setJoinedGroups, blockedUsers } =
+  const { joinedGroups, setJoinedGroups, blockedUsers, loading } =
     useUserGroupState(userId);
   const [selectedCourses, setSelectedCourses] = useState<
     MultiValue<{ value: string; label: string }>
@@ -127,12 +127,22 @@ export default function FeedPage() {
               <div
                 className={`${showDetails ? "group-grid" : "group-grid-wide"}`}
               >
-                <DisplayedSchedule {...{group:visibleGroups, handleCardClick, joinedGroups, selectedGroup}}/>
-                {visibleGroups.length === 0 && (
+                {loading ? (
+                  Array.from(Array(6)).map(() => <div className="app-loading" />)
+                ) : visibleGroups.length === 0 ? (
                   <div className="app-empty">
                     <Search className="h-6 w-6 text-black/35 dark:text-white/35" />
-                    <p>No groups found</p>
+                    <p>Loading</p>
                   </div>
+                ) : (
+                  <DisplayedSchedule
+                    {...{
+                      group: visibleGroups,
+                      handleCardClick,
+                      joinedGroups,
+                      selectedGroup,
+                    }}
+                  />
                 )}
               </div>
             </div>
