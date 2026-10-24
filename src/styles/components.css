@@ -1221,7 +1221,6 @@
   @apply text-sm text-lightText dark:text-darkText;
 }
 
-.blocked-empty span,
 .form-empty-copy {
   @apply text-xs text-black/45 dark:text-white/45;
 }
