@@ -77,6 +77,16 @@ describe("feed page filter bar layout", () => {
     expect(screen.getByRole("button", { name: /new group/i })).toBeVisible();
   });
 
+  test("New group label is hidden on mobile while its accessible name remains", () => {
+    render(<FeedPage />);
+
+    const button = screen.getByRole("button", { name: "New group" });
+    const label = screen.getByText("New group");
+
+    expect(button).toHaveAttribute("aria-label", "New group");
+    expect(label).toHaveClass("hidden", "md:inline");
+  });
+
   test("filter bar is not sticky, so it cannot cover the New group button when scrolling", () => {
     const css = fs.readFileSync(stylesheetPath, "utf8");
     const topBarRule = lastRuleBody(css, ".top-bar");

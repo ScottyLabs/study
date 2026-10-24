@@ -1235,7 +1235,7 @@
     display: none;
   }
   .workspace-actions .button-primary {
-    @apply h-11 w-11 overflow-hidden px-0 text-[0];
+    @apply h-11 w-11 px-0;
   }
   .workspace-actions .button-primary svg {
     @apply h-5 w-5;
