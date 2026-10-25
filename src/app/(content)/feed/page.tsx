@@ -140,7 +140,7 @@ export default function FeedPage() {
                 ) : visibleGroups.length === 0 ? (
                   <div className="app-empty">
                     <Search className="h-6 w-6 text-black/35 dark:text-white/35" />
-                    <p>Loading</p>
+                    <p>No groups found</p>
                   </div>
                 ) : (
                   <DisplayedSchedule
