@@ -36,7 +36,6 @@ export default function NavBar() {
   const { theme, toggleTheme } = useUserTheme(userId);
   const dispatch = useDispatch();
   const displayName = user?.fullName ?? user?.firstName ?? "CMU student";
-  console.log("ge")
   return (
     <Fragment>
       <aside className="sidebar-shell" aria-label="Primary navigation">

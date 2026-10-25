@@ -52,7 +52,12 @@ export default function MobileNavBar() {
         >
           {isDrawerOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
-        <Link href="/feed" className="mobile-brand" aria-label="CMU Study home">
+        <Link
+          href="/feed"
+          className="mobile-brand"
+          aria-label="CMU Study home"
+          onClick={() => setIsDrawerOpen(false)}
+        >
           <span>CMU</span> Study
         </Link>
         {page === "profile" ? (
@@ -66,6 +71,7 @@ export default function MobileNavBar() {
             href="/profile"
             className="mobile-avatar-link"
             aria-label="Open profile"
+            onClick={() => setIsDrawerOpen(false)}
           >
             <UserAvatar user={user} />
           </Link>
@@ -102,13 +108,19 @@ export default function MobileNavBar() {
           <Plus size={19} /> New group
         </button>
         <nav className="mobile-drawer-links">
-          <Link href="/feed" className="nav-link" tabIndex={isDrawerOpen ? 0 : -1}>
+          <Link
+            href="/feed"
+            className="nav-link"
+            tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
+          >
             <Search className="nav-link-icon" /> Group Finder
           </Link>
           <Link
             href="/my-groups"
             className="nav-link"
             tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
           >
             <Users className="nav-link-icon" /> My Groups
           </Link>
@@ -116,6 +128,7 @@ export default function MobileNavBar() {
             href="/profile"
             className="nav-link"
             tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
           >
             <User className="nav-link-icon" /> Profile
           </Link>
@@ -125,6 +138,7 @@ export default function MobileNavBar() {
             rel="noopener noreferrer"
             className="nav-link"
             tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
           >
             <MessageSquare className="nav-link-icon" /> Feedback
           </Link>
@@ -134,6 +148,7 @@ export default function MobileNavBar() {
             rel="noopener noreferrer"
             className="nav-link"
             tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
           >
             <FileText className="nav-link-icon" /> Privacy
           </Link>
@@ -172,6 +187,7 @@ export default function MobileNavBar() {
               href={item.href}
               className={`mobile-bottom-link ${active ? "mobile-bottom-link-active" : ""}`}
               aria-current={active ? "page" : undefined}
+              onClick={() => setIsDrawerOpen(false)}
             >
               <Icon size={22} />
               <span>{item.label}</span>

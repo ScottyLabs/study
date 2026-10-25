@@ -15,7 +15,10 @@ import Link from "next/link";
 function ContinueButton() {
   const params = useSearchParams();
   return (
-    <Link href={groupDestination(params.get("next"))} className="button-primary">
+    <Link
+      href={groupDestination(params.get("next"))}
+      className="button-primary"
+    >
       Continue
     </Link>
   );
