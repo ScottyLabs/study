@@ -847,19 +847,12 @@
   @apply sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-black/10 bg-white px-4 dark:border-white/10 dark:bg-darkSidebar desktop:hidden;
 }
 
-.mobile-menu-button,
-.mobile-avatar-link {
+.mobile-menu-button {
   @apply flex h-11 w-11 items-center justify-center rounded-md text-lightText focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkText;
 }
 
 .mobile-logout-quick {
   @apply flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected;
-}
-
-.mobile-avatar-link .avatar-small,
-.mobile-avatar-link .avatar-fallback,
-.mobile-avatar-link .avatar-label {
-  @apply h-9 w-9;
 }
 
 .mobile-drawer-backdrop {

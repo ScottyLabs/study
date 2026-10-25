@@ -11,7 +11,6 @@ import {
   Plus,
   Search,
   Sun,
-  User,
   Users,
 } from "lucide-react";
 import { SignOutButton, useUser } from "~/lib/auth-client";
@@ -24,7 +23,6 @@ import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
 const navItems = [
   { href: "/feed", label: "Group Finder", page: "feed", icon: Search },
   { href: "/my-groups", label: "My Groups", page: "my-groups", icon: Users },
-  { href: "/profile", label: "Profile", page: "profile", icon: User },
 ];
 
 export default function NavBar() {
