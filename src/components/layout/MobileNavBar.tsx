@@ -30,7 +30,8 @@ const bottomItems = [
 export default function MobileNavBar() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
-  const page = usePathname().split("/")[1];
+  const route = usePathname().split("/")[1];
+  const page = route === "groups" ? "feed" : route;
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { theme, toggleTheme } = useUserTheme(userId);
   const dispatch = useDispatch();
