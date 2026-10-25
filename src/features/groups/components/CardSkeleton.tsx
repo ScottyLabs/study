@@ -36,7 +36,7 @@ export default function CardSkeleton({
           <CalendarDays className="study-card-icon opacity-30" />
           <span className="study-card-value">
             <strong className="study-card-loading">Location</strong>
-            <small className="study-card-loading-sub">timeaaaaa</small>
+            <small className="study-card-loading-sub">timeaaa</small>
           </span>
         </div>
         <div className="study-card-row">
@@ -60,7 +60,7 @@ export default function CardSkeleton({
               </div>
             ))}
           </div>
-          <span className="study-card-loading">
+          <span className="study-card-loading-sub">
             {23} of {512}
           </span>
         </div>
