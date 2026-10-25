@@ -1,26 +1,9 @@
 "use client";
-import GroupDetails from "~/features/groups/components/GroupDetails";
-import type { StudyGroup } from "~/types";
-import React, { useState } from "react";
-import { useUser } from "~/lib/auth-client";
-import { formatDateTime } from "~/helpers/date_helper";
-import type { MultiValue } from "react-select";
-import TopFilterBar from "~/features/groups/components/FilterBar";
-import { useDispatch } from "react-redux";
-import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
-import { usePostHog } from "posthog-js/react";
 
-import Card from "~/features/groups/components/Card";
-import { useStudyGroups } from "~/features/groups/hooks/useStudyGroups";
-import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
-import { shouldHideFeedGroup } from "~/features/groups/utils/groupFilters";
-import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
-import { Plus, Search } from "lucide-react";
-import DisplayedSchedule from "./components/DisplayedSchedules";
-import CardSkeleton from "~/features/groups/components/CardSkeleton";
-import CardSkeletonGroup from "~/features/groups/components/CardSkeletonGroup";
+import { GroupFinder } from "~/features/groups/components/GroupFinder";
 
 export default function FeedPage() {
+  return <GroupFinder />;
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
   const groups = useStudyGroups(Boolean(user));

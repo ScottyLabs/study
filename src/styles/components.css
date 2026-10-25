@@ -27,7 +27,7 @@
 }
 
 .sidebar-shell {
-  @apply left-0 top-0 hidden h-full w-[248px] flex-none border-r border-black/10 bg-lightSidebar dark:border-white/10 dark:bg-darkSidebar md:block;
+  @apply left-0 top-0 hidden h-full w-[248px] flex-none border-r border-black/10 bg-lightSidebar dark:border-white/10 dark:bg-darkSidebar desktop:block;
 }
 
 .sidebar-content {
@@ -43,7 +43,7 @@
 }
 
 .mobile-nav-bar {
-  @apply sticky top-0 z-20 flex w-full items-center justify-between border-b border-black/10 bg-lightSidebar px-4 py-3 text-lightText shadow-sm dark:border-white/10 dark:bg-darkSidebar dark:text-darkText md:hidden;
+  @apply sticky top-0 z-20 flex w-full items-center justify-between border-b border-black/10 bg-lightSidebar px-4 py-3 text-lightText shadow-sm dark:border-white/10 dark:bg-darkSidebar dark:text-darkText desktop:hidden;
 }
 
 .mobile-menu-button {
@@ -51,7 +51,7 @@
 }
 
 .mobile-nav-list {
-  @apply overflow-hidden border-b border-black/10 bg-lightSidebar transition-all duration-300 ease-in-out dark:border-white/10 dark:bg-darkSidebar md:hidden;
+  @apply overflow-hidden border-b border-black/10 bg-lightSidebar transition-all duration-300 ease-in-out dark:border-white/10 dark:bg-darkSidebar desktop:hidden;
 }
 
 .mobile-nav-list-inner {
@@ -194,7 +194,7 @@
 
 .profile-menu-container {
   z-index: 1000;
-  @apply relative hidden h-11 w-11 items-center justify-center md:flex;
+  @apply relative hidden h-11 w-11 items-center justify-center desktop:flex;
 }
 
 .drawer-profile-menu-container {
@@ -212,7 +212,7 @@
   @apply h-full w-full;
 }
 
-@media (min-width: 768px) {
+@screen desktop {
   .filter-controls {
     grid-template-columns: minmax(12rem, 24rem) minmax(10rem, 16rem) 44px;
   }
@@ -254,7 +254,7 @@
 }
 
 .profile-workspace {
-  @apply grid w-full gap-5 xl:grid-cols-[minmax(22rem,0.7fr)_minmax(28rem,1fr)];
+  @apply grid w-full gap-5 desktop:grid-cols-[minmax(22rem,0.7fr)_minmax(28rem,1fr)];
 }
 
 .profile-column {
@@ -473,7 +473,7 @@
   backdrop-filter: blur(6px);
 }
 
-@media (min-width: 768px) {
+@screen desktop {
   .details-overlay {
     position: static;
     inset: auto;
@@ -488,7 +488,7 @@
 }
 
 .details-overlay-inner {
-  @apply max-h-[90vh] w-full max-w-md overflow-auto md:max-h-none md:max-w-none md:overflow-visible;
+  @apply max-h-[90vh] w-full max-w-md overflow-auto desktop:max-h-none desktop:max-w-none desktop:overflow-visible;
 }
 
 .group-details-card {
@@ -628,7 +628,7 @@
 }
 
 .workspace-header {
-  @apply grid gap-4 border-b border-black/10 pb-5 dark:border-white/10 lg:grid-cols-[1fr_auto];
+  @apply grid gap-4 border-b border-black/10 pb-5 dark:border-white/10 desktop:grid-cols-[1fr_auto];
 }
 
 .workspace-kicker {
@@ -644,11 +644,11 @@
 }
 
 .workspace-actions {
-  @apply flex flex-wrap items-end gap-3 lg:justify-end;
+  @apply flex flex-wrap items-end gap-3 desktop:justify-end;
 }
 
 .workspace-stat {
-  @apply hidden min-w-28 rounded-lg border-0 bg-transparent px-2 py-0 lg:block;
+  @apply hidden border-0 bg-transparent px-2 py-0 desktop:block min-w-28 rounded-lg;
 }
 
 .workspace-stat-value {
@@ -660,7 +660,7 @@
 }
 
 .workspace-layout {
-  @apply grid flex-1 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_420px];
+  @apply grid flex-1 grid-cols-1 gap-5 desktop:grid-cols-[minmax(0,1fr)_420px];
 }
 
 .workspace-results {
@@ -668,7 +668,7 @@
 }
 
 .workspace-detail {
-  @apply xl:sticky xl:top-24 xl:self-start;
+  @apply desktop:sticky desktop:top-24 desktop:self-start;
 }
 
 .group-grid {
@@ -739,15 +739,20 @@
 
 /* Approved responsive redesign */
 .app-shell {
-  @apply flex h-auto min-h-screen w-full flex-col bg-lightbg text-lightText dark:bg-darkbg dark:text-darkText md:block;
+  @apply flex h-auto min-h-screen w-full flex-col bg-lightbg text-lightText dark:bg-darkbg dark:text-darkText desktop:block;
 }
 
 .app-content {
-  @apply min-w-0 pb-20 md:ml-[240px] md:pb-0;
+  @apply min-w-0 pb-20 desktop:ml-[240px] desktop:pb-0;
+}
+
+/* Full-width content for app shells without the authenticated sidebar. */
+.app-standalone-content {
+  @apply min-w-0 w-full;
 }
 
 .sidebar-shell {
-  @apply fixed inset-y-0 left-0 z-30 hidden w-[240px] border-r border-black/10 bg-white dark:border-white/10 dark:bg-darkSidebar md:block;
+  @apply fixed inset-y-0 left-0 z-30 hidden w-[240px] border-r border-black/10 bg-white dark:border-white/10 dark:bg-darkSidebar desktop:block;
 }
 
 .sidebar-content {
@@ -831,7 +836,7 @@
 }
 
 .mobile-nav-bar {
-  @apply sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-black/10 bg-white px-4 dark:border-white/10 dark:bg-darkSidebar md:hidden;
+  @apply sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-black/10 bg-white px-4 dark:border-white/10 dark:bg-darkSidebar desktop:hidden;
 }
 
 .mobile-menu-button,
@@ -850,11 +855,11 @@
 }
 
 .mobile-drawer-backdrop {
-  @apply fixed inset-0 z-40 bg-black/35 md:hidden;
+  @apply fixed inset-0 z-40 bg-black/35 desktop:hidden;
 }
 
 .mobile-drawer {
-  @apply fixed inset-y-0 left-0 z-50 flex w-[min(84vw,320px)] -translate-x-full flex-col bg-white p-5 shadow-2xl transition-transform duration-200 dark:bg-darkSidebar md:hidden;
+  @apply fixed inset-y-0 left-0 z-50 flex w-[min(84vw,320px)] -translate-x-full flex-col bg-white p-5 shadow-2xl transition-transform duration-200 dark:bg-darkSidebar desktop:hidden;
 }
 
 .mobile-drawer-open {
@@ -879,7 +884,7 @@
 }
 
 .mobile-bottom-nav {
-  @apply fixed inset-x-0 bottom-0 z-40 grid h-[68px] grid-cols-3 border-t border-black/10 bg-white pb-[env(safe-area-inset-bottom)] dark:border-white/10 dark:bg-darkSidebar md:hidden;
+  @apply fixed inset-x-0 bottom-0 z-40 grid h-[68px] grid-cols-3 border-t border-black/10 bg-white pb-[env(safe-area-inset-bottom)] dark:border-white/10 dark:bg-darkSidebar desktop:hidden;
 }
 
 .mobile-bottom-link {
@@ -896,7 +901,7 @@
 }
 
 .top-bar {
-  @apply sticky top-16 z-20 md:top-0;
+  @apply sticky top-16 z-20 desktop:top-0;
 }
 
 .filter-bar {
@@ -904,11 +909,11 @@
 }
 
 .filter-controls {
-  @apply grid w-full grid-cols-2 gap-2 md:grid-cols-[minmax(18rem,1fr)_minmax(12rem,18rem)_minmax(10rem,14rem)] md:gap-3;
+  @apply grid w-full grid-cols-2 gap-2 desktop:grid-cols-[minmax(18rem,1fr)_minmax(12rem,18rem)_minmax(10rem,14rem)] desktop:gap-3;
 }
 
 .filter-search {
-  @apply col-span-2 flex h-11 min-w-0 items-center gap-2 rounded-lg border border-black/15 bg-lightInput px-3 text-black/40 transition focus-within:border-lightSelected focus-within:ring-2 focus-within:ring-lightSelected/15 dark:border-white/15 dark:bg-darkInput dark:text-white/40 md:col-span-1;
+  @apply col-span-2 flex h-11 min-w-0 items-center gap-2 rounded-lg border border-black/15 bg-lightInput px-3 text-black/40 transition focus-within:border-lightSelected focus-within:ring-2 focus-within:ring-lightSelected/15 dark:border-white/15 dark:bg-darkInput dark:text-white/40 desktop:col-span-1;
 }
 
 .filter-search input {
@@ -932,7 +937,7 @@
 }
 
 .filter-mobile-button {
-  @apply flex h-11 items-center justify-center gap-2 rounded-lg border border-black/15 bg-white text-sm font-medium dark:border-white/15 dark:bg-darkInput md:hidden;
+  @apply flex h-11 items-center justify-center gap-2 rounded-lg border border-black/15 bg-white text-sm font-medium dark:border-white/15 dark:bg-darkInput desktop:hidden;
 }
 
 .content-page,
@@ -961,12 +966,12 @@
 }
 
 .workspace-layout {
-  @apply grid min-h-0 flex-1 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_400px];
+  @apply grid min-h-0 flex-1 grid-cols-1 gap-5 desktop:grid-cols-[minmax(0,1fr)_400px];
 }
 
 .group-grid,
 .group-grid-wide {
-  @apply grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3;
+  @apply grid grid-cols-1 gap-4 desktop:grid-cols-2 2xl:grid-cols-3;
 }
 
 @media (min-width: 1280px) {
@@ -1049,11 +1054,11 @@
 }
 
 .workspace-detail {
-  @apply xl:sticky xl:top-24 xl:self-start;
+  @apply desktop:sticky desktop:top-24 desktop:self-start;
 }
 
 .profile-page {
-  @apply pb-24 md:pb-8;
+  @apply pb-24 desktop:pb-8;
 }
 
 .profile-page-title {
@@ -1061,7 +1066,7 @@
 }
 
 .profile-header {
-  @apply relative mb-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5 rounded-lg border border-black/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-darkSidebar md:grid-cols-[auto_minmax(0,1fr)_auto];
+  @apply relative mb-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5 rounded-lg border border-black/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-darkSidebar desktop:grid-cols-[auto_minmax(0,1fr)_auto];
 }
 
 .profile-header .avatar-large,
@@ -1091,11 +1096,11 @@
 }
 
 .profile-edit-button {
-  @apply col-span-2 gap-2 md:col-span-1;
+  @apply col-span-2 gap-2 desktop:col-span-1;
 }
 
 .profile-tabs {
-  @apply mb-5 grid grid-cols-3 border-b border-black/10 dark:border-white/10 md:hidden;
+  @apply mb-5 grid grid-cols-3 border-b border-black/10 dark:border-white/10 desktop:hidden;
 }
 
 .profile-tabs button {
@@ -1107,7 +1112,7 @@
 }
 
 .profile-workspace {
-  @apply grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-2;
+  @apply grid w-full grid-cols-1 gap-5 desktop:grid-cols-2;
 }
 
 .settings-panel {
@@ -1115,7 +1120,7 @@
 }
 
 .profile-section-account {
-  @apply md:col-span-2;
+  @apply desktop:col-span-2;
 }
 
 .settings-panel-heading {
@@ -1131,7 +1136,7 @@
 }
 
 .profile-details-form {
-  @apply grid gap-4 md:grid-cols-3;
+  @apply grid gap-4 desktop:grid-cols-3;
 }
 
 .profile-details-form label > span {
@@ -1171,6 +1176,10 @@
   @apply mt-4 divide-y divide-black/10 overflow-hidden rounded-md border border-black/10 dark:divide-white/10 dark:border-white/10;
 }
 
+.class-list-items:empty {
+  display: none;
+}
+
 .class-list-item {
   @apply flex min-h-[68px] w-full items-center justify-between gap-3 rounded-none border-0 bg-white px-4 py-3 text-sm shadow-none dark:bg-darkSidebar;
 }
@@ -1208,7 +1217,7 @@
   @apply text-xs text-black/45 dark:text-white/45;
 }
 
-@media (max-width: 767px) {
+@screen compact {
   .profile-section {
     display: none;
   }
@@ -1221,10 +1230,10 @@
   .workspace-header .workspace-subtitle {
     display: none;
   }
-  .workspace-actions .button-primary {
+  .workspace-actions button.button-primary {
     @apply h-11 w-11 overflow-hidden px-0 text-[0];
   }
-  .workspace-actions .button-primary svg {
+  .workspace-actions button.button-primary svg {
     @apply h-5 w-5;
   }
   .study-card {
@@ -1510,11 +1519,11 @@
 .group-details-card {
   max-height: calc(100dvh - 2rem);
   overscroll-behavior: contain;
-  @apply my-0 flex w-full flex-col overflow-hidden rounded-lg border border-black/10 bg-white px-0 text-lightText shadow-2xl dark:border-white/10 dark:bg-darkSidebar dark:text-darkText md:max-h-[calc(100dvh-7rem)] md:shadow-lg;
+  @apply my-0 flex w-full flex-col overflow-hidden rounded-lg border border-black/10 bg-white px-0 text-lightText shadow-2xl dark:border-white/10 dark:bg-darkSidebar dark:text-darkText desktop:max-h-[calc(100dvh-7rem)] desktop:shadow-lg;
 }
 
 .group-details-header {
-  @apply static flex flex-none items-start justify-between gap-4 border-b border-black/10 bg-white px-5 py-5 dark:border-white/10 dark:bg-darkSidebar;
+  @apply static flex flex-none items-start justify-between gap-4 border-0 bg-white px-5 pb-2 pt-5 dark:bg-darkSidebar;
 }
 
 .group-details-heading {
@@ -1541,18 +1550,22 @@
   @apply h-10 w-10 rounded-md border border-transparent hover:border-black/10 hover:bg-black/[0.035] dark:hover:border-white/10 dark:hover:bg-white/[0.05];
 }
 
-.group-details-body {
+.group-details-scroll {
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
-  @apply min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5;
+  @apply min-h-0 flex-1 overflow-y-auto;
+}
+
+.group-details-body {
+  @apply space-y-5 px-5 pb-5 pt-2;
 }
 
 .group-details-list {
-  @apply grid grid-cols-1 gap-0 divide-y divide-black/[0.07] overflow-hidden rounded-lg border border-black/[0.08] dark:divide-white/[0.08] dark:border-white/10 sm:grid-cols-1;
+  @apply grid grid-cols-2 gap-3;
 }
 
 .group-details-text {
-  @apply flex min-h-[64px] items-center gap-3 rounded-none border-0 bg-transparent px-4 py-3 dark:bg-transparent;
+  @apply flex min-h-[64px] items-center gap-2 rounded-lg border border-black/[0.08] bg-transparent px-3 py-3 dark:border-white/10 dark:bg-transparent;
 }
 
 .group-details-info-icon {
@@ -1676,4 +1689,32 @@
   .study-card-row {
     @apply min-h-[58px] border-b border-r-0 border-black/[0.07] py-2.5 last:border-b-0 dark:border-white/[0.08];
   }
+}
+
+.group-details-footer {
+  @apply flex flex-none flex-wrap items-center gap-3 border-t border-black/10 p-4 dark:border-white/10;
+}
+
+.group-details-footer .join-button {
+  @apply m-0 w-auto flex-1 disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.group-details-footer > .button-outline {
+  @apply min-h-12;
+}
+
+.study-card-details-trigger {
+  @apply absolute inset-0 z-10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lightSelected dark:focus-visible:ring-darkSelected;
+}
+
+.study-card-footer-actions {
+  @apply flex flex-none items-center gap-3;
+}
+
+.study-card-share {
+  @apply relative z-20 inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-semibold text-lightSelected hover:bg-lightAccent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected dark:hover:bg-darkAccent dark:focus-visible:ring-darkSelected;
+}
+
+.study-card-footer {
+  @apply flex-wrap;
 }

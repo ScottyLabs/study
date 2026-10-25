@@ -21,6 +21,10 @@ export function GroupModalFrame({
   const titleId = `${id}-title`;
 
   useEffect(() => {
+    const previousFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     const panel = panelRef.current;
     if (!panel) return;
 
@@ -28,15 +32,20 @@ export function GroupModalFrame({
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
     firstFocusable?.focus();
+    return () => {
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
   }, []);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape") {
+      event.stopPropagation();
       onClose();
       return;
     }
 
     if (event.key !== "Tab") return;
+    event.stopPropagation();
 
     const panel = panelRef.current;
     if (!panel) return;

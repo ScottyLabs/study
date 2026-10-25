@@ -30,7 +30,8 @@ const navItems = [
 export default function NavBar() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
-  const page = usePathname().split("/")[1];
+  const route = usePathname().split("/")[1];
+  const page = route === "groups" ? "feed" : route;
   const { theme, toggleTheme } = useUserTheme(userId);
   const dispatch = useDispatch();
   const displayName = user?.fullName ?? user?.firstName ?? "CMU student";
