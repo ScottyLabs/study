@@ -16,6 +16,8 @@ import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
 import { shouldHideFeedGroup } from "~/features/groups/utils/groupFilters";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { Plus, Search } from "lucide-react";
+import CardSkeletonGroup from "./CardSkeletonGroup";
+import DisplayedSchedule from "~/app/(content)/feed/components/DisplayedSchedules";
 
 type GroupFinderProps = {
   initialGroup?: StudyGroup;
@@ -36,7 +38,7 @@ export function GroupFinder({
     value: course.courseID,
     label: course.courseID,
   }));
-  const { joinedGroups, setJoinedGroups, blockedUsers } =
+  const { joinedGroups, setJoinedGroups, blockedUsers, loading } =
     useUserGroupState(userId);
   const [selectedCourses, setSelectedCourses] = useState<
     MultiValue<{ value: string; label: string }>
@@ -90,24 +92,6 @@ export function GroupFinder({
   });
   const joinedCount = joinedGroups?.length ?? 0;
 
-  const displayScheduled = visibleGroups.map((group) => {
-    const [formattedDate, formattedTime] = formatDateTime(group.startTime);
-    const isInGroup = joinedGroups ? joinedGroups.includes(group.id) : false;
-    const selected = group.id === selectedGroup;
-
-    return (
-      <Card
-        key={group.id}
-        onClick={() => handleCardClick(group)}
-        group={group}
-        time={formattedTime}
-        date={formattedDate}
-        isInGroup={isInGroup}
-        selected={selected}
-      />
-    );
-  });
-
   return (
     <>
       <TopFilterBar
@@ -132,13 +116,19 @@ export function GroupFinder({
             </div>
             <div className="workspace-actions">
               <div className="workspace-stat">
-                <div className="workspace-stat-value">
-                  {visibleGroups.length}
+                <div
+                  className={`workspace-stat-value ${loading ? "study-card-loading" : ""}`}
+                >
+                  {loading ? "space" : visibleGroups.length}
                 </div>
                 <div className="workspace-stat-label">Available</div>
               </div>
               <div className="workspace-stat">
-                <div className="workspace-stat-value">{joinedCount}</div>
+                <div
+                  className={`workspace-stat-value ${loading ? "study-card-loading" : ""}`}
+                >
+                  {loading ? "spa" : joinedCount}
+                </div>
                 <div className="workspace-stat-label">Joined</div>
               </div>
               <button
@@ -154,17 +144,27 @@ export function GroupFinder({
 
           <div className="workspace-layout">
             <div
-              className={`workspace-results ${showDetails ? "" : "desktop:col-span-2"}`}
+              className={`workspace-results ${showDetails ? "" : "xl:col-span-2"}`}
             >
               <div
                 className={`${showDetails ? "group-grid" : "group-grid-wide"}`}
               >
-                {displayScheduled}
-                {visibleGroups.length === 0 && (
+                {loading ? (
+                  <CardSkeletonGroup/>
+                ) : visibleGroups.length === 0 ? (
                   <div className="app-empty">
                     <Search className="h-6 w-6 text-black/35 dark:text-white/35" />
                     <p>No groups found</p>
                   </div>
+                ) : (
+                  <DisplayedSchedule
+                    {...{
+                      group: visibleGroups,
+                      handleCardClick,
+                      joinedGroups,
+                      selectedGroup,
+                    }}
+                  />
                 )}
               </div>
             </div>
