@@ -17,6 +17,8 @@ import { shouldHideFeedGroup } from "~/features/groups/utils/groupFilters";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { Plus, Search } from "lucide-react";
 import DisplayedSchedule from "./components/DisplayedSchedules";
+import CardSkeleton from "~/features/groups/components/CardSkeleton";
+import CardSkeletonGroup from "~/features/groups/components/CardSkeletonGroup";
 
 export default function FeedPage() {
   const { user } = useUser();
@@ -100,13 +102,19 @@ export default function FeedPage() {
             </div>
             <div className="workspace-actions">
               <div className="workspace-stat">
-                <div className="workspace-stat-value">
-                  {visibleGroups.length}
+                <div
+                  className={`workspace-stat-value ${loading ? "study-card-loading" : ""}`}
+                >
+                  {loading ? "space" : visibleGroups.length}
                 </div>
                 <div className="workspace-stat-label">Available</div>
               </div>
               <div className="workspace-stat">
-                <div className="workspace-stat-value">{joinedCount}</div>
+                <div
+                  className={`workspace-stat-value ${loading ? "study-card-loading" : ""}`}
+                >
+                  {loading ? "spa" : joinedCount}
+                </div>
                 <div className="workspace-stat-label">Joined</div>
               </div>
               <button
@@ -128,7 +136,7 @@ export default function FeedPage() {
                 className={`${showDetails ? "group-grid" : "group-grid-wide"}`}
               >
                 {loading ? (
-                  Array.from(Array(6)).map(() => <div className="app-loading" />)
+                  <CardSkeletonGroup/>
                 ) : visibleGroups.length === 0 ? (
                   <div className="app-empty">
                     <Search className="h-6 w-6 text-black/35 dark:text-white/35" />

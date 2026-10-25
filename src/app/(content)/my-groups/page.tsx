@@ -13,6 +13,8 @@ import { shouldHideBySharedFilters } from "~/features/groups/utils/groupFilters"
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { CalendarCheck, Search } from "lucide-react";
 import DisplayedSchedule from "../feed/components/DisplayedSchedules";
+import CardSkeleton from "~/features/groups/components/CardSkeleton";
+import CardSkeletonGroup from "~/features/groups/components/CardSkeletonGroup";
 
 export default function MyGroupsPage() {
   const { user } = useUser();
@@ -98,14 +100,18 @@ export default function MyGroupsPage() {
             </div>
             <div className="workspace-actions">
               <div className="workspace-stat">
-                <div className="workspace-stat-value">
-                  {visibleGroups.length}
+                <div
+                  className={`workspace-stat-value ${loading ? "study-card-loading" : ""}`}
+                >
+                  {loading ? "spac" : visibleGroups.length}
                 </div>
                 <div className="workspace-stat-label">Showing</div>
               </div>
               <div className="workspace-stat">
-                <div className="workspace-stat-value">
-                  {joinedGroups?.length ?? 0}
+                <div
+                  className={`workspace-stat-value ${loading ? "study-card-loading" : ""}`}
+                >
+                  {loading ? "spa" : joinedGroups?.length ?? 0}
                 </div>
                 <div className="workspace-stat-label">Joined</div>
               </div>
@@ -120,9 +126,7 @@ export default function MyGroupsPage() {
                 className={`${showDetails ? "group-grid" : "group-grid-wide"}`}
               >
                 {loading ? (
-                  Array.from(Array(6)).map(() => (
-                    <div className="app-loading" />
-                  ))
+                  <CardSkeletonGroup/>
                 ) : visibleGroups.length === 0 ? (
                   <div className="app-empty">
                     <CalendarCheck className="h-6 w-6 text-black/35 dark:text-white/35" />
