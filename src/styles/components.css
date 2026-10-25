@@ -1492,11 +1492,11 @@
 }
 
 .study-card-loading {
-  @apply w-fit bg-[#e0e0e0] !text-transparent dark:bg-[#313132];
+  @apply w-fit bg-[#bbb9b9] !text-transparent dark:bg-[#313132];
 }
 
 .study-card-loading-sub {
-  @apply w-fit bg-[#bbb9b9] !text-transparent dark:bg-[#2c2c2d];
+  @apply w-fit bg-[#e0e0e0] !text-transparent dark:bg-[#2c2c2d];
 }
 
 .details-overlay {
