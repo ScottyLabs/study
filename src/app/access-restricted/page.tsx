@@ -6,6 +6,7 @@ import darkLogo from "~/image/darkLogoLarge.png";
 import lightLogo from "~/image/lightLogoLarge.png";
 import { ShieldAlert } from "lucide-react";
 import { SignOutButton } from "~/lib/auth-client";
+import Link from "next/link";
 
 export default function AccessRestrictedPage() {
   return (
@@ -57,12 +58,12 @@ export default function AccessRestrictedPage() {
         {/* Subtle footer note */}
         <div className="mt-12 text-sm text-black opacity-70 dark:text-white">
           If you believe you reached this page in error, please contact{" "}
-          <a
+          <Link
             href="mailto:cmustudy.help@gmail.com?subject=Access%20Restriction%20Issue"
             className="inline-link"
           >
             cmustudy.help@gmail.com
-          </a>
+          </Link>
           .
         </div>
       </div>

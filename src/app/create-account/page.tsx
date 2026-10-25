@@ -10,13 +10,14 @@ import { useUser } from "~/lib/auth-client";
 
 import { useSearchParams } from "next/navigation";
 import { groupDestination } from "~/lib/group-destination";
+import Link from "next/link";
 
 function ContinueButton() {
   const params = useSearchParams();
   return (
-    <a href={groupDestination(params.get("next"))} className="button-primary">
+    <Link href={groupDestination(params.get("next"))} className="button-primary">
       Continue
-    </a>
+    </Link>
   );
 }
 

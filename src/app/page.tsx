@@ -16,6 +16,7 @@ import {
 import { SignedIn, SignedOut, SignInButton, useUser } from "~/lib/auth-client";
 
 import { destinationQuery, groupDestination } from "~/lib/group-destination";
+import Link from "next/link";
 
 const previewGroups = [
   {
@@ -61,9 +62,9 @@ function HomePageContent() {
     <div className="landing-page">
       <SignedOut>
         <header className="landing-nav">
-          <a href="/" className="landing-brand">
+          <Link href="/" className="landing-brand">
             <span>CMU</span> Study
-          </a>
+          </Link>
           <nav className="landing-nav-actions">
             <SignInButton forceRedirectUrl={loginUrl}>
               <button type="button" className="landing-signin">
@@ -193,7 +194,7 @@ function HomePageContent() {
         </main>
         <footer className="landing-footer">
           <span>CMU Study</span>
-          <a href="/privacy">Privacy</a>
+          <Link href="/privacy">Privacy</Link>
         </footer>
       </SignedOut>
 
