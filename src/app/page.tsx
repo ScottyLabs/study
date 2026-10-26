@@ -1,7 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   CalendarDays,
   CheckSquare,
@@ -12,6 +14,8 @@ import {
   Users,
 } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, useUser } from "~/lib/auth-client";
+
+import { destinationQuery, groupDestination } from "~/lib/group-destination";
 
 const previewGroups = [
   {
@@ -40,16 +44,18 @@ const previewGroups = [
   },
 ];
 
-export default function HomePage() {
+function HomePageContent() {
   const { user } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const loginUrl = `/login${destinationQuery(groupDestination(searchParams.get("next")))}`;
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     setIsRedirecting(true);
-    router.replace("/login");
-  }, [user, router]);
+    router.replace(loginUrl);
+  }, [user, router, loginUrl]);
 
   return (
     <div className="landing-page">
@@ -59,18 +65,18 @@ export default function HomePage() {
             <span>CMU</span> Study
           </a>
           <nav className="landing-nav-actions">
-            <SignInButton forceRedirectUrl="/login">
+            <SignInButton forceRedirectUrl={loginUrl}>
               <button type="button" className="landing-signin">
                 Sign in
               </button>
             </SignInButton>
-            <SignInButton forceRedirectUrl="/login">
+            <SignInButton forceRedirectUrl={loginUrl}>
               <button type="button" className="button-primary">
                 Create account
               </button>
             </SignInButton>
           </nav>
-          <SignInButton forceRedirectUrl="/login">
+          <SignInButton forceRedirectUrl={loginUrl}>
             <button type="button" className="landing-mobile-signin">
               Sign in
             </button>
@@ -86,12 +92,12 @@ export default function HomePage() {
             </h1>
             <p>Create or join study groups for your CMU courses.</p>
             <div className="landing-actions">
-              <SignInButton forceRedirectUrl="/login">
+              <SignInButton forceRedirectUrl={loginUrl}>
                 <button type="button" className="button-large">
                   Find a study group
                 </button>
               </SignInButton>
-              <SignInButton forceRedirectUrl="/login">
+              <SignInButton forceRedirectUrl={loginUrl}>
                 <button
                   type="button"
                   className="button-outline landing-secondary"
@@ -201,5 +207,13 @@ export default function HomePage() {
         )}
       </SignedIn>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<p role="status">Loading...</p>}>
+      <HomePageContent />
+    </Suspense>
   );
 }

@@ -1,5 +1,9 @@
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
+import {
+  DESKTOP_LAYOUT_QUERY,
+  MOBILE_LAYOUT_QUERY,
+} from "./src/lib/responsive";
 
 export default {
   content: ["./src/**/*.tsx"],
@@ -12,6 +16,10 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        desktop: { raw: DESKTOP_LAYOUT_QUERY },
+        compact: { raw: MOBILE_LAYOUT_QUERY },
+      },
       fontFamily: {
         sans: ["var(--font-geist-sans)", ...fontFamily.sans],
       },

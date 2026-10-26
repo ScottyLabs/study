@@ -11,7 +11,6 @@ import {
   Plus,
   Search,
   Sun,
-  User,
   Users,
 } from "lucide-react";
 import { SignOutButton, useUser } from "~/lib/auth-client";
@@ -24,13 +23,13 @@ import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
 const navItems = [
   { href: "/feed", label: "Group Finder", page: "feed", icon: Search },
   { href: "/my-groups", label: "My Groups", page: "my-groups", icon: Users },
-  { href: "/profile", label: "Profile", page: "profile", icon: User },
 ];
 
 export default function NavBar() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
-  const page = usePathname().split("/")[1];
+  const route = usePathname().split("/")[1];
+  const page = route === "groups" ? "feed" : route;
   const { theme, toggleTheme } = useUserTheme(userId);
   const dispatch = useDispatch();
   const displayName = user?.fullName ?? user?.firstName ?? "CMU student";
