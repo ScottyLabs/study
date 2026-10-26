@@ -29,6 +29,8 @@ model User {
   memberships             GroupMembership[]
   blocksCreated           Block[]              @relation("Blocker")
   blocksReceived          Block[]              @relation("Blocked")
+  calendarConnections     CalendarConnection[]
+  calendarAuthAttempts    CalendarAuthAttempt[]
 }
 
 model StudyGroup {
@@ -118,6 +120,39 @@ model Verification {
 
   @@index([identifier, createdAt(sort: Desc)])
   @@index([expiresAt])
+}
+
+model CalendarConnection {
+  id                    String   @id @default(uuid())
+  userId                String
+  appOrigin             String
+  googleAccountId       String?
+  accessToken           String
+  refreshToken          String
+  accessTokenExpiresAt  DateTime @db.Timestamptz(3)
+  scopes                String[]
+  requiresReconnection  Boolean  @default(false)
+  createdAt             DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime @updatedAt @db.Timestamptz(3)
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, appOrigin])
+}
+
+model CalendarAuthAttempt {
+  id           String   @id @default(uuid())
+  userId       String
+  sessionId    String
+  appOrigin    String
+  stateHash    String   @unique
+  codeVerifier String
+  status       String   @default("pending")
+  expiresAt    DateTime @db.Timestamptz(3)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([userId, appOrigin])
 }
 
 enum ThemePreference {

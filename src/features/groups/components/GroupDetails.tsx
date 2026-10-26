@@ -9,12 +9,13 @@ import { useUser } from "~/lib/auth-client";
 import CreateProfilePopUp from "~/features/profile/components/CreateProfilePopUp";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
-import { formatDateTime } from "~/helpers/date_helper";
+import { MOBILE_LAYOUT_QUERY } from "~/lib/responsive";
+import { GroupShareAction } from "./GroupShareAction";
+import { formatDateTime, isInThePast } from "~/helpers/date_helper";
 import EditGroupModal from "./EditGroupModal";
 import {
   addToCal,
   deleteFromCal,
-  isCalendarApiReady,
   requestCalendarAccessInteractive,
   setupGoogleApi,
 } from "~/helpers/calendar_helper";
@@ -36,12 +37,18 @@ import {
 } from "lucide-react";
 interface Props {
   onClick: () => void;
+  onUnavailable?: () => void;
   details: StudyGroup;
   updateJoinedGroups: React.Dispatch<React.SetStateAction<string[] | null>>;
 }
 import { usePostHog } from "posthog-js/react";
 
-const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
+const GroupDetails = ({
+  onClick,
+  onUnavailable,
+  details,
+  updateJoinedGroups,
+}: Props) => {
   const { user } = useUser();
   const userEmail = user?.emailAddresses[0]?.emailAddress;
   const [participantsState, participantsSetState] = useState(true);
@@ -75,25 +82,37 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
   useEffect(() => {
     if (!isDeleted) return;
     toast.error("Group unavailable");
-    onClick();
-  }, [isDeleted, onClick]);
+    (onUnavailable ?? onClick)();
+  }, [isDeleted, onClick, onUnavailable]);
 
   useEffect(() => {
-    if (!window.matchMedia("(max-width: 767px)").matches) return;
+    const media = window.matchMedia(MOBILE_LAYOUT_QUERY);
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const syncScrollLock = () => {
+      document.body.style.overflow = media.matches
+        ? "hidden"
+        : previousOverflow;
+    };
+    syncScrollLock();
+    media.addEventListener("change", syncScrollLock);
     return () => {
+      media.removeEventListener("change", syncScrollLock);
       document.body.style.overflow = previousOverflow;
     };
   }, []);
 
   const joinGroup = async () => {
-    let calendarAuthPromise: Promise<void> | null = null;
-    if (isCalendarApiReady()) {
-      calendarAuthPromise = requestCalendarAccessInteractive().catch((err) => {
+    if (
+      !joinedState &&
+      (isInThePast(currentDetails.startTime) ||
+        currentDetails.participantDetails.length >= currentDetails.totalSeats)
+    )
+      return;
+    const calendarAuthPromise = requestCalendarAccessInteractive().catch(
+      (err) => {
         console.warn("Calendar auth failed:", err);
-      });
-    }
+      },
+    );
     const userId = user?.emailAddresses[0]?.emailAddress;
     let eventId: string | undefined = undefined;
     if (!joinedState) {
@@ -112,9 +131,7 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
         return;
       }
       // add group to calendar
-      if (calendarAuthPromise) {
-        await calendarAuthPromise;
-      }
+      await calendarAuthPromise;
       eventId =
         (await addToCal(
           currentDetails.title,
@@ -177,9 +194,7 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
       });
       posthog.capture("group_left", { group: currentDetails });
 
-      if (calendarAuthPromise) {
-        await calendarAuthPromise;
-      }
+      await calendarAuthPromise;
 
       if (eventIdToDelete && eventIdToDelete !== "None") {
         const calendarDeleted = await deleteFromCal(eventIdToDelete);
@@ -197,8 +212,7 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
           );
         }
       } else {
-        toast("Could not delete from calendar", {
-          icon: "❌",
+        toast.error("Could not delete from calendar", {
           style: {
             borderRadius: "10px",
             background: "#333",
@@ -228,93 +242,114 @@ const GroupDetails = ({ onClick, details, updateJoinedGroups }: Props) => {
       role="dialog"
       aria-label={`${currentDetails.title} details`}
     >
-      <GroupDetailsHeader
-        title={currentDetails.title}
-        course={currentDetails.course}
-        purpose={currentDetails.purpose}
-        canEdit={canEditGroup}
-        onEdit={() => dispatch(setIsEditGroupModalOpen(true))}
-        onClose={onClick}
-      />
+      <div className="group-details-scroll">
+        <GroupDetailsHeader
+          title={currentDetails.title}
+          course={currentDetails.course}
+          purpose={currentDetails.purpose}
+          canEdit={canEditGroup}
+          onEdit={() => dispatch(setIsEditGroupModalOpen(true))}
+          onClose={onClick}
+        />
 
-      <div id="group_info_popup_body" className="group-details-body">
-        <div className="group-details-list">
-          <p className="group-details-text">
-            <CalendarDays className="group-details-info-icon" />
-            <span>
-              <span className="group-details-label">Date</span>
-              <span className="group-details-value">{formattedDate}</span>
-            </span>
-          </p>
-          <p className="group-details-text">
-            <Clock3 className="group-details-info-icon" />
-            <span>
-              <span className="group-details-label">Time</span>
-              <span className="group-details-value">{formattedTime}</span>
-            </span>
-          </p>
-          <p className="group-details-text">
-            <MapPin className="group-details-info-icon" />
-            <span>
-              <span className="group-details-label">Location</span>
-              <span className="group-details-value">
-                {currentDetails.location}
+        <div id="group_info_popup_body" className="group-details-body">
+          <div className="group-details-list">
+            <p className="group-details-text">
+              <CalendarDays className="group-details-info-icon" />
+              <span>
+                <span className="group-details-label">Date</span>
+                <span className="group-details-value">{formattedDate}</span>
               </span>
-            </span>
-          </p>
+            </p>
+            <p className="group-details-text">
+              <Clock3 className="group-details-info-icon" />
+              <span>
+                <span className="group-details-label">Time</span>
+                <span className="group-details-value">{formattedTime}</span>
+              </span>
+            </p>
+            <p className="group-details-text col-span-2">
+              <MapPin className="group-details-info-icon" />
+              <span>
+                <span className="group-details-label">Location</span>
+                <span className="group-details-value">
+                  {currentDetails.location}
+                </span>
+              </span>
+            </p>
+          </div>
+
+          <section className="group-details-section">
+            <div className="group-details-section-heading">
+              <span>
+                <Users size={17} /> Participants
+              </span>
+              <div>
+                <span className="group-details-count">
+                  {currentDetails.participantDetails.length} /{" "}
+                  {currentDetails.totalSeats}
+                </span>
+                <button
+                  onClick={() => participantsSetState(!participantsState)}
+                  className="participants-toggle"
+                  aria-expanded={participantsState}
+                  aria-label={
+                    participantsState
+                      ? "Hide participants"
+                      : "Show participants"
+                  }
+                >
+                  {participantsState ? (
+                    <ChevronUp size={17} />
+                  ) : (
+                    <ChevronDown size={17} />
+                  )}
+                </button>
+              </div>
+            </div>
+            {participantsState && (
+              <ParticipantList
+                participants={currentDetails.participantDetails}
+                onViewProfile={handleViewProfileClick}
+              />
+            )}
+          </section>
+
+          <section className="group-details-section">
+            <div className="group-details-section-heading">
+              <span>About this group</span>
+            </div>
+            <div className="group-details-freeform">
+              {currentDetails.details
+                ? currentDetails.details
+                : "Hope you have a good time!"}
+            </div>
+          </section>
+
+          {viewUser && (
+            <CreateProfilePopUp username={viewUser} email={viewEmail ?? ""} />
+          )}
         </div>
 
-        <section className="group-details-section">
-          <div className="group-details-section-heading">
-            <span>
-              <Users size={17} /> Participants
-            </span>
-            <div>
-              <span className="group-details-count">
-                {currentDetails.participantDetails.length} /{" "}
-                {currentDetails.totalSeats}
-              </span>
-              <button
-                onClick={() => participantsSetState(!participantsState)}
-                className="participants-toggle"
-                aria-expanded={participantsState}
-                aria-label={
-                  participantsState ? "Hide participants" : "Show participants"
-                }
-              >
-                {participantsState ? (
-                  <ChevronUp size={17} />
-                ) : (
-                  <ChevronDown size={17} />
-                )}
-              </button>
-            </div>
-          </div>
-          {participantsState && (
-            <ParticipantList
-              participants={currentDetails.participantDetails}
-              onViewProfile={handleViewProfileClick}
-            />
-          )}
-        </section>
-
-        <section className="group-details-section">
-          <div className="group-details-section-heading">
-            <span>About this group</span>
-          </div>
-          <div className="group-details-freeform">
-            {currentDetails.details
-              ? currentDetails.details
-              : "Hope you have a good time!"}
-          </div>
-        </section>
-
-        {viewUser && (
-          <CreateProfilePopUp username={viewUser} email={viewEmail ?? ""} />
-        )}
+        <div className="group-details-footer">
+          <GroupShareAction group={currentDetails} />
+          <JoinGroupButton
+            isJoined={joinedState}
+            onClick={joinGroup}
+            disabled={
+              !joinedState &&
+              (isInThePast(currentDetails.startTime) ||
+                currentDetails.participantDetails.length >=
+                  currentDetails.totalSeats)
+            }
+            unavailableLabel={
+              isInThePast(currentDetails.startTime)
+                ? "Session ended"
+                : "Group full"
+            }
+          />
+        </div>
       </div>
-
-      <JoinGroupButton isJoined={joinedState} onClick={joinGroup} />
       <EditGroupModal group={currentDetails} />
     </div>
   );

@@ -63,7 +63,7 @@ export function ProfileDetailsForm({
         />
       </label>
       <label>
-        <span>Minor or concentration</span>
+        <span>Minor</span>
         <input
           id="minorInput"
           className={inputClassName}

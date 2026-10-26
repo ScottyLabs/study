@@ -6,6 +6,7 @@ import { getUserEligibility } from "~/server/eligibility/service";
 export type ApiEnvironment = {
   Variables: {
     userId: string;
+    sessionId: string;
   };
 };
 
@@ -20,6 +21,7 @@ export const requireSession = createMiddleware<ApiEnvironment>(
     }
 
     context.set("userId", session.user.id);
+    context.set("sessionId", session.session.id);
     await next();
   },
 );
@@ -51,6 +53,7 @@ export const requireEligibleSession = createMiddleware<ApiEnvironment>(
     }
 
     context.set("userId", session.user.id);
+    context.set("sessionId", session.session.id);
     await next();
   },
 );

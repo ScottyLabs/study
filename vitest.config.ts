@@ -5,10 +5,24 @@ import { defineConfig } from "vitest/config";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
-// Integration tests opt in with DATABASE_URL_TEST. Never silently reuse the
+// Integration tests opt in with DATABASE_URL_TEST. Never reuse the
 // development DATABASE_URL for a destructive test-database reset.
-if (process.env.DATABASE_URL_TEST) {
-  process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
+const testDatabaseUrl = process.env.DATABASE_URL_TEST;
+if (process.env.DATABASE_TEST_REQUIRED === "true") {
+  if (!testDatabaseUrl) {
+    throw new Error(
+      "DATABASE_URL_TEST is required for integration tests. Use the temporary database runner or configure a dedicated test database.",
+    );
+  }
+  if (testDatabaseUrl === process.env.DATABASE_URL) {
+    throw new Error(
+      "DATABASE_URL_TEST must be different from DATABASE_URL to protect development data.",
+    );
+  }
+}
+
+if (testDatabaseUrl) {
+  process.env.DATABASE_URL = testDatabaseUrl;
 }
 
 export default defineConfig({

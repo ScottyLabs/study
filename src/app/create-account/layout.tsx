@@ -1,9 +1,6 @@
 import "~/styles/globals.css";
 import React from "react";
-import { redirect } from "next/navigation";
-
-import { requireServerSession } from "~/lib/auth";
-import { getUserEligibility } from "~/server/eligibility/service";
+import { requireContentAccess } from "~/lib/require-content-access";
 
 export const metadata = {
   title: "CMU Study",
@@ -16,28 +13,11 @@ export default async function ContentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await requireServerSession();
-
-  if (!session?.user) {
-    redirect("/");
-  }
-
-  const eligibility = await getUserEligibility(
-    session.user.id,
-    session.user.andrewID,
-  );
-
-  if (eligibility === "INELIGIBLE") {
-    redirect("/access-restricted");
-  }
-
-  if (eligibility === "UNAVAILABLE") {
-    redirect("/eligibility-unavailable");
-  }
+  await requireContentAccess(undefined, false);
 
   return (
     <div className="app-shell">
-      <div className="app-content">
+      <div className="app-standalone-content">
         <main className="app-main-padded">{children}</main>
       </div>
     </div>

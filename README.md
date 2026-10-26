@@ -2,76 +2,142 @@
 
 Find and manage CMU study groups.
 
-## Development
+A Next.js app deployed by [kennel](https://git.cmu.dev/ScottyLabs/kennel).
 
-- `npm run dev` starts the local Next.js app.
-- `npm run build` creates a production build.
-- `npx tsc --noEmit` runs TypeScript validation.
-- `npm run test:unit` runs the Vitest UI/unit suite. `npm run test:integration` runs the Prisma-backed API and vertical tests; it requires `DATABASE_URL_TEST` to point to a dedicated disposable database (see `.env.test.example`), which must be migrated with `npx prisma migrate deploy` first.
-- On the native NixOS CI runner, the test workflow launches and removes an isolated PostgreSQL instance with Nix; Docker is not required.
-- `shell.nix` supplies a NixOS-compatible build of the exact Prisma engine commit pinned in `package-lock.json`; use `nix-shell` before running Prisma commands on NixOS.
-- `GET /api/v1/health` verifies the Hono API boundary.
-- `GET /api/v1/groups` returns groups ordered by start time; pass `courseCode` to filter by course.
-- PostgreSQL is configured through `DATABASE_URL`; use `npm run db:generate` to create a migration after changing the Prisma schema.
-- To connect to the Railway Postgres-dev database, create a local SSH key, upload to Railway, install the railway CLI, and run `railway connect Postgres-dev --tunnel-only`. Copy the given URL into the .env and .env.local DATABASE_URL before starting the app. You will need to be a member of the Railway project (if you have not been added yet, proceed with creating a local Postgress database).
-- To create a local Postgres database with Docker, run:
+## One-time setup
 
-  ```bash
-  docker run --name studystarter-postgres \
-    -e POSTGRES_USER=studystarter \
-    -e POSTGRES_PASSWORD=studystarter \
-    -e POSTGRES_DB=studystarter \
-    -p 5433:5432 \
-    -d postgres:17
-  ```
-
-  Then add this value to both `.env` and `.env.local`:
-
-  ```env
-  DATABASE_URL="postgresql://studystarter:studystarter@localhost:5433/studystarter?schema=public"
-  ```
-
-  Prisma CLI reads `.env`, while the Next.js app reads `.env.local`. After setting the URL, run `npx prisma migrate dev`, then start the app with `npm run dev`. Use `docker stop studystarter-postgres` and `docker start studystarter-postgres` to stop or restart the local database.
-
-## Testing
-
-Currently, very limited testing exists, and the goal is to build more tests as we implement and update code. This means you should be adding tests for every feature you work on, as you work on it. If it is a new feature, add new tests for that feature. Often it is better to define the tests (and minimally the specification) for the feature before starting the implementation, especially if using AI for the implementation. Use the existing tests to help write your tests. We use Vitest, with unit and integration tests. The integration tests test the database as well, so require a disposable test database to run. Run the tests using the following commands:
-
-First, run:
+Install [devenv](https://devenv.sh/getting-started/) and its shell hooks (stop before devenv init), then
+sign in to OpenBao so secretspec can resolve this project's secrets:
 
 ```bash
-npm install
+nix run git+https://git.cmu.dev/ScottyLabs/kennel#login
 ```
 
-Unit tests:
+## Running the app
+
+Make sure you run `devenv allow` the first time you open the shell so the environment loads properly!
+
+Starting services (postgres, ricochet):
 
 ```bash
-npm run test:unit
+devenv up
 ```
 
-Then create the test database:
+Once you see postgres ready and ricochet running, open a devenv shell:
 
 ```bash
-docker run --name studystarter-postgres-test \
-  -e POSTGRES_USER=studystarter \
-  -e POSTGRES_PASSWORD=studystarter \
-  -e POSTGRES_DB=studystarter_test \
-  -p 5434:5432 \
-  -d postgres:17
+devenv shell
+npm ci
+migrate               # applies prisma migrations
 ```
 
-Now run the integration tests:
+Run the app in the same devenv shell:
 
 ```bash
-export DATABASE_URL_TEST='postgresql://studystarter:studystarter@localhost:5434/studystarter_test?schema=public'
-
-DATABASE_URL="$DATABASE_URL_TEST" npx prisma migrate deploy
-npm run test:integration
+npm run dev
 ```
 
-All tests should run and pass before you make a PR. If a test fails, you likely have to change your code to pass the test. In general, the test itself should only ever be edited if you actually intend for the behavior to change. Remember to add more tests as you implement your feature (even if your feature is just improving on something, there probably are not tests for that something yet).
+Keep `devenv up` running in its own terminal.
 
-## Project Structure
+## Tests
+
+Run tests from a devenv shell so they use the same Node.js and PostgreSQL setup
+as the app. Start `devenv up` in another terminal first, then install
+dependencies and apply the local migrations if you have not already done so:
+
+```bash
+devenv shell
+npm ci
+migrate
+```
+
+From that shell:
+
+| Command | Runs |
+| --- | --- |
+| `npm test` or `npm run test:unit` | Every unit test in `src/` and `test/unit/`; these tests must not require PostgreSQL. |
+| `npm run test:integration` | Every database-backed test in `test/integration/`; creates, migrates, and destroys a temporary PostgreSQL database unless `DATABASE_URL_TEST` is set. |
+| `npm run test:all` | Runs the unit suite, then the integration suite only if unit tests pass, and prints a final pass/fail and test-count summary. |
+
+All test commands use Vitest. The temporary database runner creates, migrates,
+and destroys a test database. To use an existing dedicated test database
+instead, set `DATABASE_URL_TEST` when invoking `npm run test:integration`:
+
+```bash
+DATABASE_URL_TEST="postgresql://.../dedicated_test_database" npm run test:integration
+```
+
+`DATABASE_URL_TEST` must be different from `DATABASE_URL`; never point it at a
+development, shared, or production database.
+
+### Test placement
+
+Tests are assigned to a suite by location. Use the following rule whenever
+adding a new `*.test.*` file:
+
+| Test type | Location | Requirements |
+| --- | --- | --- |
+| Unit | Beside its source under `src/`, or in `test/unit/` | Must not require PostgreSQL. Frontend, server, and utility tests all belong here when their external state is mocked. |
+| Integration | `test/integration/` | Requires PostgreSQL and must use the disposable `DATABASE_URL_TEST` database. |
+
+The directory-based commands discover new test files automatically. Do not add
+test files directly under `test/`.
+
+To stop a suite after its first failed test, append Vitest's `--bail=1` flag:
+
+```bash
+npm run test:unit -- --bail=1
+npm run test:integration -- --bail=1
+npm run test:all -- --bail=1
+```
+
+The first `--` tells npm to pass `--bail=1` to Vitest rather than interpret it
+as an npm option.
+
+## Database
+
+`devenv up` runs PostgreSQL on a unix socket and exports `DATABASE_URL`. There
+is no password and no port to configure.
+
+| Command | Does |
+| --- | --- |
+| `migrate` | applies pending migrations (`prisma migrate deploy`) |
+| `migration` | creates a migration from schema changes (`prisma migrate dev`) |
+| `studio` | opens Prisma Studio |
+
+Deployed services migrate themselves on startup, so a migration ships with the
+commit that needs it.
+
+## Environment
+
+Secrets live in OpenBao, declared in `secretspec.toml` and resolved per
+environment by profile. Kennel supplies `DATABASE_URL`, `PORT`, and `APP_URL` at
+runtime, so none of those are declared as secrets.
+
+Only `src/env.js` may read the environment at runtime. Next inlines any direct
+`process.env.FOO` at build time, so a value read that way in a component or
+route handler is whatever it was during the build, not during the request.
+
+You do not need a .env anymore, unless you are working on a feature that requires adding new environment variables that do not exist in OpenBao yet. You should delete your .env (or clear it) so it doesn't overwrite the OpenBao variables.
+
+## Deployment and CI
+
+The Forgejo `Test` workflow runs only when a pull request is opened, reopened,
+or updated. It runs unit tests first and only starts the PostgreSQL integration
+tests after they pass. It does not run again for ordinary branch pushes or when
+a pull request is merged.
+
+Kennel independently receives Forgejo's pull-request and push webhooks: an open
+pull request gets a preview at `study-web-pr-<number>.scottylabs.net`, and a
+push to `main` deploys production at `cmustudy.com`. Kennel currently starts
+those deployments as soon as it receives its webhook; the repository workflow
+cannot make it wait for CI. Configure the two `Test` workflow job statuses as
+required checks for `main` so an untested or failing pull request cannot be
+merged and therefore cannot reach production. Progress for the independent
+Kennel build and deployment appears as `kennel/build` and `kennel/deploy`
+commit statuses.
+
+## Project structure
 
 - `src/app` contains Next.js routes and route layouts.
 - `src/features/groups` contains study-group components, hooks, services, filters, and constants.
@@ -80,3 +146,5 @@ All tests should run and pass before you make a PR. If a test fails, you likely 
 - `src/helpers` contains external integration helpers such as calendar/date utilities.
 - `src/server/api` contains the Hono API application and route composition.
 - `src/styles` contains global and component-level CSS.
+- `flake.nix` builds the deployable package
+- `devenv.nix` declares the development environment and what kennel deploys.

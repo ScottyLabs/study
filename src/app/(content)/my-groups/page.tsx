@@ -59,8 +59,7 @@ export default function MyGroupsPage() {
         time={formattedTime}
         date={formattedDate}
         isInGroup={true}
-        lightColor={"lightAccent"}
-        darkColor={"darkAccent"}
+        selected
       />
     );
   });
@@ -104,7 +103,7 @@ export default function MyGroupsPage() {
 
           <div className="workspace-layout">
             <div
-              className={`workspace-results ${showDetails ? "" : "xl:col-span-2"}`}
+              className={`workspace-results ${showDetails ? "" : "desktop:col-span-2"}`}
             >
               <div
                 className={`${showDetails ? "group-grid" : "group-grid-wide"}`}

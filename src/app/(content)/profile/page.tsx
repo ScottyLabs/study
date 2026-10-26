@@ -14,7 +14,7 @@ type ProfileTab = "courses" | "blocked" | "account";
 export default function ProfilePage() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
-  const [activeTab, setActiveTab] = useState<ProfileTab>("courses");
+  const [activeTab, setActiveTab] = useState<ProfileTab>("account");
   return (
     <main className="profile-page">
       <ConfirmProvider>
@@ -26,7 +26,7 @@ export default function ProfilePage() {
           role="tablist"
           aria-label="Profile sections"
         >
-          {(["courses", "blocked", "account"] as const).map((tab) => (
+          {(["account", "courses", "blocked"] as const).map((tab) => (
             <button
               key={tab}
               type="button"
@@ -46,16 +46,20 @@ export default function ProfilePage() {
 
         <div className="profile-workspace">
           <section
-            className={`settings-panel profile-section profile-section-courses ${activeTab === "courses" ? "profile-section-active" : ""}`}
+            ref={accountRef}
+            className={`settings-panel profile-section profile-section-account ${activeTab === "account" ? "profile-section-active" : ""}`}
           >
             <div className="settings-panel-heading">
               <div>
-                <h2>My courses</h2>
-                <p>
-                  Add the courses you are taking to connect with classmates.
-                </p>
+                <h2>Account details</h2>
+                <p>Keep your academic profile up to date.</p>
               </div>
             </div>
+            <ProfileDetailsForm userId={userId} />
+          </section>
+          <section
+            className={`settings-panel profile-section profile-section-courses ${activeTab === "courses" ? "profile-section-active" : ""}`}
+          >
             <ClassList />
           </section>
           <section

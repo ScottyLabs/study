@@ -14,7 +14,6 @@ import { updateGroup } from "../services/groupApi";
 import {
   updateEvent,
   setupGoogleApi,
-  isCalendarApiReady,
   requestCalendarAccessInteractive,
   hasCalendarAccess,
 } from "~/helpers/calendar_helper";
@@ -55,12 +54,12 @@ export default function EditGroupModal({ group }: EditGroupModalProps) {
     }
 
     let calendarAuthPromise: Promise<void> | null = null;
-    if (isCalendarApiReady() && !hasCalendarAccess()) {
+    if (!hasCalendarAccess()) {
       calendarAuthPromise = requestCalendarAccessInteractive().catch((err) => {
         console.warn("Calendar auth failed:", err);
       });
     }
-    const updatedGroup = await updateGroup({
+    await updateGroup({
       group,
       input: {
         title,
