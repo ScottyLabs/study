@@ -40,6 +40,12 @@ jobs:
     name: Integration tests
     needs: unit
     runs-on: native
+    # The runner-local substituter can advertise NAR files that are no longer
+    # available. Prefer the public cache so Nix downloads prebuilt packages
+    # instead of compiling Node.js during CI.
+    env:
+      NIX_CONFIG: |
+        substituters = https://cache.nixos.org http://localhost:5000
 
     steps:
       - name: Checkout repository
