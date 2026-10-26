@@ -43,6 +43,7 @@ describe("POST /api/v1/groups/:groupId/join", () => {
     const group = await createTestGroup({ ownerId: owner.id });
     authMocks.getSession.mockResolvedValue({
       user: { id: joiner.id, andrewID: joiner.andrewID },
+      session: { id: "joiner-session" },
     });
 
     const response = await requestJoin(group.id, {
@@ -64,6 +65,7 @@ describe("POST /api/v1/groups/:groupId/join", () => {
     const group = await createTestGroup({ ownerId: owner.id, totalSeats: 2 });
     authMocks.getSession.mockResolvedValue({
       user: { id: joiner.id, andrewID: joiner.andrewID },
+      session: { id: "joiner-session" },
     });
 
     expect((await requestJoin("does-not-exist")).status).toBe(404);
@@ -75,6 +77,7 @@ describe("POST /api/v1/groups/:groupId/join", () => {
     const fullGroup = await createTestGroup({ ownerId: owner.id, totalSeats: 1 });
     authMocks.getSession.mockResolvedValue({
       user: { id: otherJoiner.id, andrewID: otherJoiner.andrewID },
+      session: { id: "other-joiner-session" },
     });
     expect((await requestJoin(fullGroup.id)).status).toBe(409);
 

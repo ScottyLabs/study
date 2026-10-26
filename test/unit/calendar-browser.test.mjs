@@ -1,6 +1,8 @@
+// @vitest-environment node
+
 import assert from "node:assert/strict";
-import test from "node:test";
-import { typescriptLoader } from "./load-typescript.mjs";
+import { test } from "vitest";
+import { typescriptLoader } from "../load-typescript.mjs";
 
 class ApiRequestError extends Error {
   constructor(message, status) {
