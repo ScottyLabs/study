@@ -1,7 +1,6 @@
 // app/privacy/page.tsx
 "use client";
 
-import Link from "next/link";
 import React from "react";
 import "~/styles/globals.css";
 
@@ -184,14 +183,14 @@ export default function PrivacyPage() {
             <p className="mt-2">
               You can revoke the app&apos;s access to your Google Account at any
               time via your{" "}
-              <Link
+              <a
                 href="https://myaccount.google.com/permissions"
                 className="text-lightSelected hover:underline dark:text-darkSelected"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Google Account Permissions
-              </Link>{" "}
+              </a>{" "}
               page. After access is revoked, the app will no longer be able to
               create or delete events.
             </p>

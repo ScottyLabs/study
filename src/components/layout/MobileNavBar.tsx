@@ -114,7 +114,7 @@ export default function MobileNavBar() {
           >
             <Users className="nav-link-icon" /> My Groups
           </Link>
-          <Link
+          <a
             href="https://forms.gle/MEQ7miCZCrC48P6y8"
             target="_blank"
             rel="noopener noreferrer"
@@ -123,7 +123,7 @@ export default function MobileNavBar() {
             onClick={() => setIsDrawerOpen(false)}
           >
             <MessageSquare className="nav-link-icon" /> Feedback
-          </Link>
+          </a>
           <Link
             href="/privacy"
             target="_blank"

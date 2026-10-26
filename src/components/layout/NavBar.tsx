@@ -72,14 +72,14 @@ export default function NavBar() {
 
           <div className="sidebar-bottom">
             <nav className="sidebar-utilities" aria-label="Utility navigation">
-              <Link
+              <a
                 href="https://forms.gle/MEQ7miCZCrC48P6y8"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="nav-link"
               >
                 <MessageSquare className="nav-link-icon" /> Feedback
-              </Link>
+              </a>
               <Link
                 href="/privacy"
                 target="_blank"

@@ -33,12 +33,12 @@ export default function EligibilityUnavailablePage() {
 
         <div className="mt-12 text-sm text-black opacity-70 dark:text-white">
           If this continues, please contact{" "}
-          <Link
+          <a
             href="mailto:cmustudy.help@gmail.com?subject=Student%20Eligibility%20Verification"
             className="inline-link"
           >
             cmustudy.help@gmail.com
-          </Link>
+          </a>
           .
         </div>
       </div>
