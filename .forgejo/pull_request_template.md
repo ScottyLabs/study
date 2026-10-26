@@ -14,6 +14,8 @@ Closes #<!-- Add your issue number here -->
 
 ## Testing
 
+<!-- "- [ ]" creates an unchecked checkbox. "- [X]" creates a checked checkbox. For each item you have completed, just replace the space inside with an X. -->
+
 - [ ] I added/updated tests.
 - [ ] I tested my changes locally.
   - [ ] I tested my changes with a laptop-size screen.
