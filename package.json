@@ -16,11 +16,11 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:unit": "vitest run --exclude 'test/integration/**'",
-    "test:integration": "node test/require-test-db.mjs && vitest run test/integration"
+    "test": "npm run test:unit",
+    "test:unit": "vitest run src test/unit",
+    "test:integration": "bash test/run-integration.sh",
+    "test:all": "bash test/run-all-tests.sh",
+    "start": "next start"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",

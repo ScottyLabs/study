@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ClassList } from "~/features/profile/components/ClassList";
 import { ProfileDetailsForm } from "~/features/profile/components/ProfileDetailsForm";
 import { ProfileHeader } from "~/features/profile/components/ProfileHeader";
 import { useUserTheme } from "~/features/profile/hooks/useUserTheme";
 import { fetchCourseCodes } from "~/features/profile/services/profileApi";
 import { useUser } from "~/lib/auth-client";
+import { groupDestination } from "~/lib/group-destination";
 
 function CourseRequiredPopup({ onClose }: { onClose: () => void }) {
   useEffect(() => {
@@ -50,6 +51,7 @@ function CourseRequiredPopup({ onClose }: { onClose: () => void }) {
 
 function ContinueButton({ onNeedsCourse }: { onNeedsCourse: () => void }) {
   const router = useRouter();
+  const params = useSearchParams();
 
   const handleContinue = async () => {
     try {
@@ -58,7 +60,7 @@ function ContinueButton({ onNeedsCourse }: { onNeedsCourse: () => void }) {
         onNeedsCourse();
         return;
       }
-      router.push("/feed");
+      router.push(groupDestination(params.get("next")));
     } catch (error) {
       console.error("Error checking saved courses:", error);
     }
@@ -71,7 +73,7 @@ function ContinueButton({ onNeedsCourse }: { onNeedsCourse: () => void }) {
   );
 }
 
-export default function CreateAccountPage() {
+function CreateAccountPageContent() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
   useUserTheme(userId);
@@ -99,8 +101,16 @@ export default function CreateAccountPage() {
             <ProfileDetailsForm userId={userId} mastersValue="Masters" />
           </div>
         </div>
-        <div className="profile-column">
-          <div className="settings-panel">
+        <div className="profile-column desktop:flex">
+          <div className="settings-panel w-full">
+            <div className="settings-panel-heading">
+              <div>
+                <h2>My courses</h2>
+                <p>
+                  Add the courses you are taking to connect with classmates.
+                </p>
+              </div>
+            </div>
             <ClassList />
           </div>
         </div>
@@ -109,5 +119,13 @@ export default function CreateAccountPage() {
         <CourseRequiredPopup onClose={() => setShowCoursePopup(false)} />
       )}
     </div>
+  );
+}
+
+export default function CreateAccountPage() {
+  return (
+    <Suspense fallback={<p role="status">Loading...</p>}>
+      <CreateAccountPageContent />
+    </Suspense>
   );
 }

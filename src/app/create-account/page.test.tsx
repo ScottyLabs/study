@@ -7,6 +7,7 @@ const profileApiMocks = vi.hoisted(() => ({ fetchCourseCodes: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: routerMocks.push }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 vi.mock("~/lib/auth-client", () => ({
   useUser: () => ({

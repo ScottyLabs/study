@@ -36,7 +36,7 @@ vi.mock("~/helpers/calendar_helper", () => ({
   addToCal: vi.fn(async () => "calendar-event-from-ui"),
   deleteFromCal: vi.fn(async () => true),
   isCalendarApiReady: vi.fn(() => false),
-  requestCalendarAccessInteractive: vi.fn(),
+  requestCalendarAccessInteractive: vi.fn(async () => undefined),
   setupGoogleApi: vi.fn(async () => undefined),
 }));
 vi.mock("~/features/groups/components/EditGroupModal", () => ({
@@ -73,6 +73,7 @@ describe("GroupDetails Join Group vertical pipeline", () => {
     const group = await createTestGroup({ ownerId: owner.id });
     authMocks.getSession.mockResolvedValue({
       user: { id: joiner.id, andrewID: joiner.andrewID },
+      session: { id: "joiner-session" },
     });
     vi.stubGlobal("fetch", vi.fn(fetchViaInProcessApi));
 

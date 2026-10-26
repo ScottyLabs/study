@@ -45,7 +45,7 @@ export async function updateUserProfileDetails(
 
 export async function getAllCourses(): Promise<Course[]> {
   const response = await axios.get<Course[]>(
-    "https://course-tools.apis.scottylabs.org/courses/all",
+    "https://course.apis.scottylabs.org/courses/all",
   );
   return response.data;
 }

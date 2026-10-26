@@ -110,7 +110,10 @@ export async function getBlockingState(userId: string) {
       select: { blocker: { select: { email: true } } },
     }),
     db.groupMembership.findMany({
-      where: { userId },
+      where: {
+        userId,
+        group: { startTime: { gte: new Date() } },
+      },
       select: { groupId: true },
     }),
   ]);
