@@ -46,7 +46,6 @@ export default function ProfilePage() {
 
         <div className="profile-workspace">
           <section
-            ref={accountRef}
             className={`settings-panel profile-section profile-section-account ${activeTab === "account" ? "profile-section-active" : ""}`}
           >
             <div className="settings-panel-heading">
@@ -72,17 +71,6 @@ export default function ProfilePage() {
               </div>
             </div>
             <BlockList />
-          </section>
-          <section
-            className={`settings-panel profile-section profile-section-account ${activeTab === "account" ? "profile-section-active" : ""}`}
-          >
-            <div className="settings-panel-heading">
-              <div>
-                <h2>Account details</h2>
-                <p>Keep your academic profile up to date.</p>
-              </div>
-            </div>
-            <ProfileDetailsForm userId={userId} />
           </section>
         </div>
       </ConfirmProvider>
