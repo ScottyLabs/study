@@ -16,9 +16,10 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "test:calendar": "node --test test/calendar-*.test.mjs",
-    "test:unit": "node --test test/calendar-api.test.mjs test/calendar-browser.test.mjs test/calendar-env.test.mjs test/calendar-server.test.mjs",
-    "test:integration": "node test/require-calendar-test-db.mjs && node --test test/calendar-db.test.mjs",
+    "test": "npm run test:unit",
+    "test:unit": "vitest run src test/unit",
+    "test:integration": "bash test/run-integration.sh",
+    "test:all": "bash test/run-all-tests.sh",
     "start": "next start"
   },
   "dependencies": {

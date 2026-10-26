@@ -1,18 +1,19 @@
+// @vitest-environment node
+
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import { createRequire } from "node:module";
-import { typescriptLoader } from "./load-typescript.mjs";
+import { typescriptLoader } from "../load-typescript.mjs";
 
 const require = createRequire(import.meta.url);
 const { PrismaClient } = require("@prisma/client");
 const googleAuth = require("google-auth-library");
-const databaseURL = process.env.CALENDAR_TEST_DATABASE_URL;
+const databaseURL = process.env.DATABASE_URL_TEST;
 
-test(
+const calendarDbTest = databaseURL ? test : test.skip;
+
+calendarDbTest(
   "PostgreSQL atomically consumes callbacks and persists isolated encrypted connections",
-  {
-    skip: !databaseURL,
-  },
   async () => {
     const db = new PrismaClient({ datasources: { db: { url: databaseURL } } });
     const userId = `calendar-test-${crypto.randomUUID()}`;

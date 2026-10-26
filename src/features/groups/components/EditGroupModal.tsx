@@ -59,7 +59,7 @@ export default function EditGroupModal({ group }: EditGroupModalProps) {
         console.warn("Calendar auth failed:", err);
       });
     }
-    const updatedGroup = await updateGroup({
+    await updateGroup({
       group,
       input: {
         title,

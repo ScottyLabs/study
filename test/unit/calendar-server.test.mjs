@@ -1,7 +1,9 @@
+// @vitest-environment node
+
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import { createRequire } from "node:module";
-import { typescriptLoader } from "./load-typescript.mjs";
+import { typescriptLoader } from "../load-typescript.mjs";
 
 const require = createRequire(import.meta.url);
 const googleAuth = require("google-auth-library");

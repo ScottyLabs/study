@@ -1,6 +1,8 @@
+// @vitest-environment node
+
 import assert from "node:assert/strict";
-import test from "node:test";
-import { typescriptLoader } from "./load-typescript.mjs";
+import { test } from "vitest";
+import { typescriptLoader } from "../load-typescript.mjs";
 
 const baseEnvironment = {
   SERVER_URL: "https://preview.example.com",

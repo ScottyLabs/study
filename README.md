@@ -55,12 +55,44 @@ From that shell:
 
 | Command | Runs |
 | --- | --- |
-| `npm run test:unit` | Tests that do not use PostgreSQL. |
-| `CALENDAR_TEST_DATABASE_URL="$DATABASE_URL" npm run test:integration` | PostgreSQL-backed tests against the local devenv database. |
-| `npm run test:calendar` | The full Calendar suite; its database test is skipped unless `CALENDAR_TEST_DATABASE_URL` is set. |
+| `npm test` or `npm run test:unit` | Every unit test in `src/` and `test/unit/`; these tests must not require PostgreSQL. |
+| `npm run test:integration` | Every database-backed test in `test/integration/`; creates, migrates, and destroys a temporary PostgreSQL database unless `DATABASE_URL_TEST` is set. |
+| `npm run test:all` | Runs the unit suite, then the integration suite only if unit tests pass, and prints a final pass/fail and test-count summary. |
 
-The integration test creates and removes its own temporary test records. Do not
-point `CALENDAR_TEST_DATABASE_URL` at a shared or production database.
+All test commands use Vitest. The temporary database runner creates, migrates,
+and destroys a test database. To use an existing dedicated test database
+instead, set `DATABASE_URL_TEST` when invoking `npm run test:integration`:
+
+```bash
+DATABASE_URL_TEST="postgresql://.../dedicated_test_database" npm run test:integration
+```
+
+`DATABASE_URL_TEST` must be different from `DATABASE_URL`; never point it at a
+development, shared, or production database.
+
+### Test placement
+
+Tests are assigned to a suite by location. Use the following rule whenever
+adding a new `*.test.*` file:
+
+| Test type | Location | Requirements |
+| --- | --- | --- |
+| Unit | Beside its source under `src/`, or in `test/unit/` | Must not require PostgreSQL. Frontend, server, and utility tests all belong here when their external state is mocked. |
+| Integration | `test/integration/` | Requires PostgreSQL and must use the disposable `DATABASE_URL_TEST` database. |
+
+The directory-based commands discover new test files automatically. Do not add
+test files directly under `test/`.
+
+To stop a suite after its first failed test, append Vitest's `--bail=1` flag:
+
+```bash
+npm run test:unit -- --bail=1
+npm run test:integration -- --bail=1
+npm run test:all -- --bail=1
+```
+
+The first `--` tells npm to pass `--bail=1` to Vitest rather than interpret it
+as an npm option.
 
 ## Database
 
