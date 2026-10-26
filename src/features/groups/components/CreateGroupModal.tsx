@@ -9,7 +9,6 @@ import { usePostHog } from "posthog-js/react";
 import {
   addToCal,
   setupGoogleApi,
-  isCalendarApiReady,
   requestCalendarAccessInteractive,
   deleteFromCal,
 } from "~/helpers/calendar_helper";
@@ -17,8 +16,12 @@ import { GroupModalFrame } from "./GroupModalFrame";
 import { GroupModalFields } from "./GroupModalFields";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { createGroup } from "../services/groupApi";
+import type { StudyGroup } from "~/types";
+import { GroupShareAction } from "./GroupShareAction";
+import { LoaderCircle } from "lucide-react";
 
 export default function CreateGroupModal() {
+  const [createdGroup, setCreatedGroup] = useState<StudyGroup | null>(null);
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
   const [title, setTitle] = useState("");
@@ -29,6 +32,7 @@ export default function CreateGroupModal() {
   const [seats, setSeats] = useState("");
   const [details, setDetails] = useState("");
   const { classes } = useUserCourses(userId);
+  const [disableSubmit, setDisableSubmit] = useState(false);
   const classOptions = classes.map((course) => course.courseID);
 
   const dispatch = useDispatch();
@@ -36,6 +40,7 @@ export default function CreateGroupModal() {
   const posthog = usePostHog();
 
   const handleClose = () => {
+    setCreatedGroup(null);
     dispatch(setIsCreateGroupModalOpen(false));
   };
 
@@ -43,8 +48,9 @@ export default function CreateGroupModal() {
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
-
+    setDisableSubmit(true);
     if (!date) {
+      setDisableSubmit(false);
       toast.error("Invalid Date Input!");
       return;
     }
@@ -52,8 +58,8 @@ export default function CreateGroupModal() {
     const userEmail = user?.emailAddresses[0]?.emailAddress;
 
     if (!userEmail) {
-      toast("Error creating study group", {
-        icon: "❌",
+      setDisableSubmit(false);
+      toast.error("Error creating study group", {
         style: {
           borderRadius: "10px",
           background: "#333",
@@ -66,11 +72,9 @@ export default function CreateGroupModal() {
     let group;
     let eventId = "None";
     try {
-      if (isCalendarApiReady()) {
-        await requestCalendarAccessInteractive().catch((err) => {
-          console.warn("Calendar auth failed:", err);
-        });
-      }
+      await requestCalendarAccessInteractive().catch((err) => {
+        console.warn("Calendar auth failed:", err);
+      });
 
       eventId =
         (await addToCal(
@@ -105,9 +109,10 @@ export default function CreateGroupModal() {
       console.error(error);
       if (eventId !== "None") {
         await deleteFromCal(eventId).catch((err) =>
-          console.error("Failed to roll back calendar event:", err)
+          console.error("Failed to roll back calendar event:", err),
         );
       }
+      setDisableSubmit(false);
       toast.error("Error creating study group");
       return;
     }
@@ -124,6 +129,7 @@ export default function CreateGroupModal() {
       },
     });
 
+    setCreatedGroup(group);
     setTitle("");
     setCourse("");
     setPurpose("");
@@ -131,7 +137,7 @@ export default function CreateGroupModal() {
     setLocation("");
     setSeats("");
     setDetails("");
-    handleClose();
+    setDisableSubmit(false);
 
     toast("Study group created successfully!", {
       icon: "👏",
@@ -151,6 +157,37 @@ export default function CreateGroupModal() {
   }, [isOpen]);
 
   if (!isOpen) return null;
+
+  if (createdGroup)
+    return (
+      <>
+        <GroupModalFrame
+          key="success"
+          id="group-created"
+          title="Group created!"
+          onClose={handleClose}
+        >
+          <p>
+            Your study group is ready. Share it with classmates to invite them.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <GroupShareAction
+              group={createdGroup}
+              className="button-primary"
+              mobileLabel="Invite classmates"
+              desktopLabel="Copy link to study group"
+            />
+            <button
+              type="button"
+              className="button-outline"
+              onClick={handleClose}
+            >
+              Done
+            </button>
+          </div>
+        </GroupModalFrame>
+      </>
+    );
 
   return (
     <GroupModalFrame
@@ -178,8 +215,16 @@ export default function CreateGroupModal() {
           details={details}
           setDetails={setDetails}
         />
-        <button type="submit" className="modal-submit-button">
-          Create Group
+        <button
+          type="submit"
+          className={`modal-submit-button ${disableSubmit ? "opacity-70" : "modal-submit-interactive"}`}
+          disabled={disableSubmit}
+        >
+          {disableSubmit ? (
+            <LoaderCircle className="animate-spin" size={20} />
+          ) : (
+            "Create Group"
+          )}
         </button>
       </form>
     </GroupModalFrame>

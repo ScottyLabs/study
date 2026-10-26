@@ -11,7 +11,6 @@ import type { BlockedUsers } from "~/features/profile/types";
 import {
   deleteFromCal,
   setupGoogleApi,
-  isCalendarApiReady,
   hasCalendarAccess,
   requestCalendarAccessInteractive,
 } from "~/helpers/calendar_helper";
@@ -89,18 +88,21 @@ export function BlockList() {
       const { sharedGroupCount: numShared } =
         await fetchBlockImpact(userToBlock);
       if (numShared > 0) {
+        const calendarAuthorization: { promise?: Promise<void> } = {};
         const ok = await confirm(
           `You are currently in ${numShared} group${numShared === 1 ? "" : "s"} with ${userToBlock}. You will be removed from ${numShared === 1 ? "this group" : "these groups"} if you continue.`,
+          () => {
+            if (!hasCalendarAccess()) {
+              calendarAuthorization.promise = requestCalendarAccessInteractive().catch((err) => {
+                console.warn("Calendar auth failed:", err);
+              });
+            }
+          },
         );
         if (!ok) {
           return;
         }
-        await setupGoogleApi();
-        if (isCalendarApiReady() && !hasCalendarAccess()) {
-          await requestCalendarAccessInteractive().catch((err) => {
-            console.warn("Calendar auth failed:", err);
-          });
-        }
+        if (calendarAuthorization.promise) await calendarAuthorization.promise;
       }
 
       const result = await blockEmail(userToBlock);
@@ -160,27 +162,27 @@ export function BlockList() {
           </button>
         </form>
       </div>
-      {blocked.blockedByMe.length === 0 && (
+      {blocked.blockedByMe.length === 0 ? (
         <div className="blocked-empty">
           <ShieldCheck size={30} />
           <strong>No blocked users</strong>
-          <span>People you block will appear here.</span>
         </div>
+      ) : (
+        <ul className="class-list-items">
+          {blocked.blockedByMe.map((blockedUser) => (
+            <li key={blockedUser} className="class-list-item">
+              <div className="class-list-text">{blockedUser}</div>
+              <button
+                onClick={() => handleUnblock(blockedUser)}
+                className="unblock-text-button"
+                aria-label={`Unblock ${blockedUser}`}
+              >
+                <UserMinus size={16} /> Unblock
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
-      <ul className="class-list-items">
-        {blocked.blockedByMe.map((blockedUser) => (
-          <li key={blockedUser} className="class-list-item">
-            <div className="class-list-text">{blockedUser}</div>
-            <button
-              onClick={() => handleUnblock(blockedUser)}
-              className="unblock-text-button"
-              aria-label={`Unblock ${blockedUser}`}
-            >
-              <UserMinus size={16} /> Unblock
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

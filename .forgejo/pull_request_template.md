@@ -5,24 +5,21 @@
 ## Related Issue
 
 <!-- Link the issue this PR addresses, if applicable. -->
-Closes #
+
+Closes #<!-- Add your issue number here -->
 
 ## Type of change
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Refactor / code improvement
-- [ ] Test coverage
-- [ ] Documentation
+**Type:** <!-- Bug fix / New feature / Refactor / Test coverage / Documentation -->
 
 ## Testing
 
 - [ ] I added/updated tests.
 - [ ] I tested my changes locally.
-    - [ ] I tested my changes with a laptop-size screen.
-    - [ ] I tested my changes with a phone-size screen.
-    - [ ] I tested my changes with a tablet-size screen.
-- [ ] I tested on the dev app (dev.cmustudy.com)
+  - [ ] I tested my changes with a laptop-size screen.
+  - [ ] I tested my changes with a phone-size screen.
+  - [ ] I tested my changes with a tablet-size screen.
+- [ ] I tested on the kennel preview deployment for this pull request.
 
 ## Screenshots/Recordings
 

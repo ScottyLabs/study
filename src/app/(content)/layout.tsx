@@ -1,10 +1,6 @@
-import "~/styles/globals.css";
-import { redirect } from "next/navigation";
-import NavBar from "~/components/layout/NavBar";
-import React from "react";
-import { userHasCreatedProfile } from "~/features/profile/services/serverAccountService";
-import { requireServerSession } from "~/lib/auth";
-import { getUserEligibility } from "~/server/eligibility/service";
+import type { ReactNode } from "react";
+import { requireContentAccess } from "~/lib/require-content-access";
+import { AuthenticatedShell } from "~/components/layout/AuthenticatedShell";
 
 export const metadata = {
   title: "CMU Study",
@@ -15,40 +11,9 @@ export const metadata = {
 export default async function ContentLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
-  const session = await requireServerSession();
+  await requireContentAccess();
 
-  if (!session?.user) {
-    redirect("/");
-  }
-
-  const email = session.user.email;
-
-  if (!email) {
-    redirect("/");
-  }
-
-  const eligibility = await getUserEligibility(session.user.id, session.user.andrewID);
-
-  if (eligibility === "INELIGIBLE") {
-    redirect("/access-restricted");
-  }
-
-  if (eligibility === "UNAVAILABLE") {
-    redirect("/eligibility-unavailable");
-  }
-
-  if (!(await userHasCreatedProfile(session.user.id))) {
-    redirect("/create-account");
-  }
-
-  return (
-    <div className="app-shell">
-      <NavBar />
-      <div className="app-content">
-        <div className="app-main">{children}</div>
-      </div>
-    </div>
-  );
+  return <AuthenticatedShell>{children}</AuthenticatedShell>;
 }
