@@ -40,22 +40,48 @@ jobs:
     name: Integration tests
     needs: unit
     runs-on: native
-    # The runner-local substituter can advertise NAR files that are no longer
-    # available. Prefer the public cache so Nix downloads prebuilt packages
-    # instead of compiling Node.js during CI.
-    env:
-      NIX_CONFIG: |
-        substituters = https://cache.nixos.org http://localhost:5000
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Verify Docker is available
+        run: docker version
+
+      - name: Start temporary PostgreSQL database
+        run: |
+          docker rm --force studystarter-ci-postgres 2>/dev/null || true
+          docker run --detach --rm \
+            --name studystarter-ci-postgres \
+            --env POSTGRES_DB=studystarter_test \
+            --env POSTGRES_USER=postgres \
+            --env POSTGRES_PASSWORD=postgres \
+            --publish 127.0.0.1:54329:5432 \
+            postgres:16-alpine
+
+          until docker exec studystarter-ci-postgres pg_isready \
+            --username postgres --dbname studystarter_test; do
+            sleep 1
+          done
+
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Run integration tests with temporary Nix database
-        run: nix-shell --run "npm run test:integration"
+      - name: Generate Prisma client and apply migrations
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54329/studystarter_test
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL_TEST: postgresql://postgres:postgres@127.0.0.1:54329/studystarter_test
+        run: npm run test:integration
+
+      - name: Stop temporary PostgreSQL database
+        if: always()
+        run: docker rm --force studystarter-ci-postgres || true
 
   deploy-dev:
     name: Deploy to Dev
