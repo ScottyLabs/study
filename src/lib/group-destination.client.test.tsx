@@ -1,13 +1,15 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, expect, test, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
+  push: vi.fn(),
   next: "/groups/abc-123",
   signedIn: false,
+  courseCodes: ["15-112"],
 }));
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ replace: mocks.replace }),
+  useRouter: () => ({ replace: mocks.replace, push: mocks.push }),
   useSearchParams: () => new URLSearchParams({ next: mocks.next }),
 }));
 vi.mock("~/lib/auth-client", () => ({
@@ -44,11 +46,16 @@ vi.mock("~/features/profile/components/ProfileHeader", () => ({
 vi.mock("~/features/profile/hooks/useUserTheme", () => ({
   useUserTheme: vi.fn(),
 }));
+vi.mock("~/features/profile/services/profileApi", () => ({
+  fetchCourseCodes: () => Promise.resolve(mocks.courseCodes),
+}));
 import HomePage from "~/app/page";
 import CreateAccountPage from "~/app/create-account/page";
 beforeEach(() => {
   mocks.next = "/groups/abc-123";
   mocks.signedIn = false;
+  mocks.courseCodes = ["15-112"];
+  mocks.push.mockReset();
 });
 test("every landing-page sign-in action carries the group destination", () => {
   render(<HomePage />);
@@ -68,18 +75,18 @@ test("signed-in landing redirect preserves the destination", async () => {
     ),
   );
 });
-test("account setup Continue returns to the group", () => {
+test("account setup Continue returns to the group", async () => {
   render(<CreateAccountPage />);
-  expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute(
-    "href",
-    "/groups/abc-123",
+  fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+  await waitFor(() =>
+    expect(mocks.push).toHaveBeenCalledWith("/groups/abc-123"),
   );
 });
-test("unsafe destinations fall back to feed after setup", () => {
+test("unsafe destinations fall back to feed after setup", async () => {
   mocks.next = "//evil.test";
   render(<CreateAccountPage />);
-  expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute(
-    "href",
-    "/feed",
+  fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+  await waitFor(() =>
+    expect(mocks.push).toHaveBeenCalledWith("/feed"),
   );
 });
