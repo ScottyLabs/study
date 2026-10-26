@@ -12,7 +12,7 @@ interface Props {
 export default function CardSkeleton({
   title,
   purpose,
-  num
+  num,
 }: {
   title: string;
   purpose: string;
@@ -26,9 +26,7 @@ export default function CardSkeleton({
 
       <div className="study-card-copy">
         <h2 className="study-card-title study-card-loading">{title}</h2>
-        <p className="study-card-purpose study-card-loading-sub">
-          {purpose}
-        </p>
+        <p className="study-card-purpose study-card-loading-sub">{purpose}</p>
       </div>
 
       <div className="study-card-meta">
@@ -64,9 +62,14 @@ export default function CardSkeleton({
             {23} of {512}
           </span>
         </div>
-        <span className="study-card-open bg-lightAccent !text-transparent dark:bg-darkAccent">
-          Details <ArrowUpRight size={16} />
-        </span>
+        <div className="study-card-footer-actions">
+          <span className="study-card-open bg-lightAccent !text-transparent dark:bg-darkAccent max-w-8 md:max-w-max">
+            Detailssssss
+          </span>
+          <span className="study-card-open bg-lightAccent !text-transparent dark:bg-darkAccent">
+            Detailssss
+          </span>
+        </div>
       </div>
     </div>
   );
