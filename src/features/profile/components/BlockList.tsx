@@ -24,7 +24,6 @@ const defaultBlockedUsers: BlockedUsers = {
 export function BlockList() {
   const { user } = useUser();
   const [blocked, setBlocked] = useState<BlockedUsers>(defaultBlockedUsers);
-  const [groups, setGroups] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const confirm = useConfirm();
 
@@ -40,7 +39,6 @@ export function BlockList() {
         blockedByMe: blockingState.blockedByMe,
         blockedByThem: blockingState.blockedByThem,
       });
-      setGroups(blockingState.joinedGroups);
     } catch (err) {
       console.error(err);
       setBlocked(defaultBlockedUsers);
@@ -113,7 +111,6 @@ export function BlockList() {
         blockedByMe: updatedState.blockedByMe,
         blockedByThem: updatedState.blockedByThem,
       });
-      setGroups(updatedState.joinedGroups);
       setInputValue("");
     } catch (err) {
       console.error(err);
