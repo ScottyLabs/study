@@ -58,12 +58,12 @@ export default function AccessRestrictedPage() {
         {/* Subtle footer note */}
         <div className="mt-12 text-sm text-black opacity-70 dark:text-white">
           If you believe you reached this page in error, please contact{" "}
-          <Link
+          <a
             href="mailto:cmustudy.help@gmail.com?subject=Access%20Restriction%20Issue"
             className="inline-link"
           >
             cmustudy.help@gmail.com
-          </Link>
+          </a>
           .
         </div>
       </div>
