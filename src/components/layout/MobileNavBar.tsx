@@ -17,7 +17,6 @@ import {
   X,
 } from "lucide-react";
 import { SignOutButton, useUser } from "~/lib/auth-client";
-import { UserAvatar } from "~/components/ui/UserAvatar";
 import { useUserTheme } from "~/features/profile/hooks/useUserTheme";
 import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
 import Link from "next/link";

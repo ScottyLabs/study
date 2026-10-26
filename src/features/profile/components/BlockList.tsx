@@ -162,27 +162,27 @@ export function BlockList() {
           </button>
         </form>
       </div>
-      {blocked.blockedByMe.length === 0 && (
+      {blocked.blockedByMe.length === 0 ? (
         <div className="blocked-empty">
           <ShieldCheck size={30} />
           <strong>No blocked users</strong>
-          <span>People you block will appear here.</span>
         </div>
+      ) : (
+        <ul className="class-list-items">
+          {blocked.blockedByMe.map((blockedUser) => (
+            <li key={blockedUser} className="class-list-item">
+              <div className="class-list-text">{blockedUser}</div>
+              <button
+                onClick={() => handleUnblock(blockedUser)}
+                className="unblock-text-button"
+                aria-label={`Unblock ${blockedUser}`}
+              >
+                <UserMinus size={16} /> Unblock
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
-      <ul className="class-list-items">
-        {blocked.blockedByMe.map((blockedUser) => (
-          <li key={blockedUser} className="class-list-item">
-            <div className="class-list-text">{blockedUser}</div>
-            <button
-              onClick={() => handleUnblock(blockedUser)}
-              className="unblock-text-button"
-              aria-label={`Unblock ${blockedUser}`}
-            >
-              <UserMinus size={16} /> Unblock
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
