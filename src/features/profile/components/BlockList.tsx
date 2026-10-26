@@ -24,7 +24,6 @@ const defaultBlockedUsers: BlockedUsers = {
 export function BlockList() {
   const { user } = useUser();
   const [blocked, setBlocked] = useState<BlockedUsers>(defaultBlockedUsers);
-  const [groups, setGroups] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const confirm = useConfirm();
 
@@ -40,7 +39,6 @@ export function BlockList() {
         blockedByMe: blockingState.blockedByMe,
         blockedByThem: blockingState.blockedByThem,
       });
-      setGroups(blockingState.joinedGroups);
     } catch (err) {
       console.error(err);
       setBlocked(defaultBlockedUsers);
@@ -113,7 +111,6 @@ export function BlockList() {
         blockedByMe: updatedState.blockedByMe,
         blockedByThem: updatedState.blockedByThem,
       });
-      setGroups(updatedState.joinedGroups);
       setInputValue("");
     } catch (err) {
       console.error(err);
@@ -162,27 +159,27 @@ export function BlockList() {
           </button>
         </form>
       </div>
-      {blocked.blockedByMe.length === 0 && (
+      {blocked.blockedByMe.length === 0 ? (
         <div className="blocked-empty">
           <ShieldCheck size={30} />
           <strong>No blocked users</strong>
-          <span>People you block will appear here.</span>
         </div>
+      ) : (
+        <ul className="class-list-items">
+          {blocked.blockedByMe.map((blockedUser) => (
+            <li key={blockedUser} className="class-list-item">
+              <div className="class-list-text">{blockedUser}</div>
+              <button
+                onClick={() => handleUnblock(blockedUser)}
+                className="unblock-text-button"
+                aria-label={`Unblock ${blockedUser}`}
+              >
+                <UserMinus size={16} /> Unblock
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
-      <ul className="class-list-items">
-        {blocked.blockedByMe.map((blockedUser) => (
-          <li key={blockedUser} className="class-list-item">
-            <div className="class-list-text">{blockedUser}</div>
-            <button
-              onClick={() => handleUnblock(blockedUser)}
-              className="unblock-text-button"
-              aria-label={`Unblock ${blockedUser}`}
-            >
-              <UserMinus size={16} /> Unblock
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

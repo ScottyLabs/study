@@ -17,7 +17,6 @@ import {
   X,
 } from "lucide-react";
 import { SignOutButton, useUser } from "~/lib/auth-client";
-import { UserAvatar } from "~/components/ui/UserAvatar";
 import { useUserTheme } from "~/features/profile/hooks/useUserTheme";
 import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
 
@@ -54,20 +53,12 @@ export default function MobileNavBar() {
         <a href="/feed" className="mobile-brand" aria-label="CMU Study home">
           <span>CMU</span> Study
         </a>
-        {page === "profile" ? (
+        {page === "profile" && (
           <SignOutButton>
             <button type="button" className="mobile-logout-quick">
               <LogOut size={18} /> Log out
             </button>
           </SignOutButton>
-        ) : (
-          <a
-            href="/profile"
-            className="mobile-avatar-link"
-            aria-label="Open profile"
-          >
-            <UserAvatar user={user} />
-          </a>
         )}
       </header>
 
@@ -110,13 +101,6 @@ export default function MobileNavBar() {
             tabIndex={isDrawerOpen ? 0 : -1}
           >
             <Users className="nav-link-icon" /> My Groups
-          </a>
-          <a
-            href="/profile"
-            className="nav-link"
-            tabIndex={isDrawerOpen ? 0 : -1}
-          >
-            <User className="nav-link-icon" /> Profile
           </a>
           <a
             href="https://forms.gle/MEQ7miCZCrC48P6y8"

@@ -105,6 +105,12 @@ When all implementation steps are done, test the feature thoroughly yourself.
 
 You should already have a lot of tests from the last step, but they are likely not exhaustive yet. Write additional unit tests based on the **high-level plan**, not on the implementation. One useful approach is to start a separate agent session and ask it to reference only the plan. This helps expose cases where the implementation differs from the intended behavior.
 
+Classify each new test by what it needs, not by the layer it exercises. Put any
+database-free frontend, server, or utility test beside its source under `src/`
+or in `test/unit/`. Put every PostgreSQL-backed test in `test/integration/`.
+Both directories are discovered automatically by the test commands; never add a
+test file directly under `test/`.
+
 Fix the code (or, occasionally, the test when the test is genuinely incorrect) until the feature's unit tests pass. Also verify that all existing tests still pass. Repeat this process for integration tests.
 
 ### Running the automated tests locally
@@ -127,16 +133,32 @@ migrate
 Run the unit tests first:
 
 ```bash
-npm run test:unit
+npm test
 ```
 
-Then run the PostgreSQL integration tests against the local devenv database:
+Then run the PostgreSQL integration tests against a temporary, disposable database:
 
 ```bash
-CALENDAR_TEST_DATABASE_URL="$DATABASE_URL" npm run test:integration
+npm run test:integration
 ```
 
-The integration test removes its own temporary records, but the URL must still refer only to your local database, never a shared or production database.
+Or run both suites, with integration skipped if unit tests fail and a final
+combined summary:
+
+```bash
+npm run test:all
+```
+
+The runner creates, migrates, and destroys the test database. To use an
+existing dedicated test database, pass its connection string only for the
+command: `DATABASE_URL_TEST="postgresql://.../dedicated_test_database" npm run test:integration`.
+It must differ from `DATABASE_URL`; never use a development,
+shared, or production database.
+
+To stop any suite after its first failure, append `-- --bail=1`, such as
+`npm run test:unit -- --bail=1`, `npm run test:integration -- --bail=1`, or
+`npm run test:all -- --bail=1`. The first `--` passes the Vitest flag through
+npm.
 
 ### 9. Test different screen sizes
 

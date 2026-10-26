@@ -132,12 +132,13 @@ export function GroupFinder({
                 <div className="workspace-stat-label">Joined</div>
               </div>
               <button
+                aria-label="New group"
                 className="button-primary"
                 onClick={handleCreateGroup}
                 type="button"
               >
-                <Plus className="nav-link-icon" />
-                New group
+                <Plus aria-hidden="true" className="nav-link-icon" />
+                <span className="hidden desktop:inline">New group</span>
               </button>
             </div>
           </section>

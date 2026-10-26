@@ -832,26 +832,19 @@
 }
 
 .sidebar-logout {
-  @apply flex min-h-11 w-full items-center gap-3 rounded-md border-t border-black/10 px-3 pt-3 text-sm font-semibold text-lightSelected transition hover:bg-lightAccent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:text-darkSelected dark:hover:bg-darkAccent;
+  @apply flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold text-lightSelected transition hover:bg-lightAccent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected dark:hover:bg-darkAccent;
 }
 
 .mobile-nav-bar {
   @apply sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-black/10 bg-white px-4 dark:border-white/10 dark:bg-darkSidebar desktop:hidden;
 }
 
-.mobile-menu-button,
-.mobile-avatar-link {
+.mobile-menu-button {
   @apply flex h-11 w-11 items-center justify-center rounded-md text-lightText focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkText;
 }
 
 .mobile-logout-quick {
   @apply flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected;
-}
-
-.mobile-avatar-link .avatar-small,
-.mobile-avatar-link .avatar-fallback,
-.mobile-avatar-link .avatar-label {
-  @apply h-9 w-9;
 }
 
 .mobile-drawer-backdrop {
@@ -901,7 +894,7 @@
 }
 
 .top-bar {
-  @apply sticky top-16 z-20 desktop:top-0;
+  @apply relative z-20;
 }
 
 .filter-bar {
@@ -1212,7 +1205,6 @@
   @apply text-sm text-lightText dark:text-darkText;
 }
 
-.blocked-empty span,
 .form-empty-copy {
   @apply text-xs text-black/45 dark:text-white/45;
 }
@@ -1231,7 +1223,7 @@
     display: none;
   }
   .workspace-actions button.button-primary {
-    @apply h-11 w-11 overflow-hidden px-0 text-[0];
+    @apply h-11 w-11 px-0;
   }
   .workspace-actions button.button-primary svg {
     @apply h-5 w-5;

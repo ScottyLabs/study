@@ -95,12 +95,14 @@ completion. Denial, failure, and a five-minute timeout settle the request. If
 the browser severs the popup reference, manually closing it may be detected
 only by the timeout. Calendar failures retain the existing group-action behavior.
 
-Run `npm run test:calendar`, `npx tsc --noEmit`, and `npm run lint`. Before broad
-rollout, manually connect and create, edit, and delete events on two PR previews
-using the same registered relay URL, then check production and local settings.
+Run `npm test`, `npm run test:integration`, `npx tsc --noEmit`, and
+`npm run lint`. The integration command automatically creates a temporary PostgreSQL
+database and includes the Calendar database test. Before broad rollout,
+manually connect and create, edit, and delete events on two PR previews using
+the same registered relay URL, then check production and local settings.
 Do not log callback query strings, authorization codes, or decrypted tokens in
 application or reverse-proxy access logs.
 
-The PostgreSQL integration test also runs when `CALENDAR_TEST_DATABASE_URL`
-points to a dedicated, migrated test database. It creates and removes its own
-test user; do not point this setting at production.
+To use an existing dedicated test database rather than the temporary database,
+set `DATABASE_URL_TEST` for `npm run test:integration`. It must be different
+from `DATABASE_URL`; never point it at development, shared, or production data.
