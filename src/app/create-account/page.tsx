@@ -9,7 +9,6 @@ import { useUserTheme } from "~/features/profile/hooks/useUserTheme";
 import { fetchCourseCodes } from "~/features/profile/services/profileApi";
 import { useUser } from "~/lib/auth-client";
 import { groupDestination } from "~/lib/group-destination";
-import Link from "next/link";
 
 function CourseRequiredPopup({ onClose }: { onClose: () => void }) {
   useEffect(() => {

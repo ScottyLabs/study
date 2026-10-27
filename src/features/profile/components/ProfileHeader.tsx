@@ -32,22 +32,24 @@ export function ProfileHeader({
       <UserAvatar user={user} size="lg" />
       <div className="profile-header-meta">
         <h1 className="profile-header-title">{displayName}</h1>
-        <div className="profile-header-details">
-          {profile.majors && (
-            <span>
-              <GraduationCap size={17} /> {profile.majors}
-            </span>
-          )}
-          {profile.year && profile.year != "default" && (
-            <span>
-              <CalendarDays size={17} />{" "}
-              {profile.year === "Masters Student" ||
-                profile.year === "PhD Student"
-                ? profile.year
-                : `Class of ${profile.year}`}
-            </span>
-          )}
-        </div>
+        {(profile.majors || (profile.year && profile.year != "default")) && (
+          <div className="profile-header-details">
+            {profile.majors && (
+              <span>
+                <GraduationCap size={17} /> {profile.majors}
+              </span>
+            )}
+            {profile.year && profile.year != "default" && (
+              <span>
+                <CalendarDays size={17} />{" "}
+                {profile.year === "Masters Student" ||
+                  profile.year === "PhD Student"
+                  ? profile.year
+                  : `Class of ${profile.year}`}
+              </span>
+            )}
+          </div>
+        )}
         <p className="profile-header-email">{emailAddress}</p>
       </div>
       {showLogout && (
