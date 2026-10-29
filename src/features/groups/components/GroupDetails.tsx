@@ -205,8 +205,8 @@ const GroupDetails = ({
               icon: "⚠️",
               style: {
                 borderRadius: "10px",
-                background: "#333",
-                color: "#fff",
+                background: "var(--color-toast-background)",
+                color: "var(--color-toast-text)",
               },
             },
           );
@@ -215,8 +215,8 @@ const GroupDetails = ({
         toast.error("Could not delete from calendar", {
           style: {
             borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
+            background: "var(--color-toast-background)",
+            color: "var(--color-toast-text)",
           },
         });
       }

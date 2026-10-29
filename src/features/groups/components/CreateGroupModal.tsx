@@ -62,8 +62,8 @@ export default function CreateGroupModal() {
       toast.error("Error creating study group", {
         style: {
           borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
+          background: "var(--color-toast-background)",
+          color: "var(--color-toast-text)",
         },
       });
       return;
@@ -143,8 +143,8 @@ export default function CreateGroupModal() {
       icon: "👏",
       style: {
         borderRadius: "10px",
-        background: "#333",
-        color: "#fff",
+        background: "var(--color-toast-background)",
+        color: "var(--color-toast-text)",
       },
     });
   };

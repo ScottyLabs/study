@@ -12,41 +12,49 @@ const customSelectComponents = {
 const customSelectStyles: StylesConfig<FilterOption, true> = {
   input: (provided) => ({
     ...provided,
-    color: "inherit",
+    color: "var(--filter-text-color)",
   }),
   control: (provided, state) => ({
     ...provided,
     height: "44px",
     minHeight: "44px",
     backgroundColor: "var(--filter-input-background)",
-    borderColor: state.isFocused ? "#B91C1C" : "var(--filter-border-color)",
-    boxShadow: state.isFocused ? "0 0 0 2px rgb(28 28 28 / 0.00001)" : "none",
+    borderColor: state.isFocused
+      ? "var(--filter-selected-color)"
+      : "var(--filter-border-color)",
+    boxShadow: "none",
     borderRadius: "8px",
     padding: "0 4px",
-    color: "inherit",
+    color: "var(--filter-text-color)",
   }),
-  multiValue: (provided, state) => ({
+  multiValue: (provided) => ({
     ...provided,
-    backgroundColor: state.isFocused ? "#F3F4F6" : "#F3F4F6",
+    backgroundColor: "var(--filter-chip-background)",
     borderRadius: "6px",
     padding: "2px",
   }),
   multiValueLabel: (provided) => ({
     ...provided,
-    color: "#000",
+    color: "var(--filter-chip-text)",
   }),
   multiValueRemove: (provided, state) => ({
     ...provided,
-    color: state.isFocused ? "#B91C1C" : "#6b7280",
+    color: state.isFocused
+      ? "var(--filter-option-selected-text)"
+      : "var(--filter-chip-text)",
     ":hover": {
-      backgroundColor: "#FEE2E2",
-      color: "#B91C1C",
+      backgroundColor: "var(--filter-option-selected-background)",
+      color: "var(--filter-option-selected-text)",
     },
   }),
   placeholder: (provided) => ({
-    ...provided, 
-    color: "inherit",
+    ...provided,
+    color: "var(--filter-placeholder-color)",
     opacity: 0.4,
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: "var(--filter-text-color)",
   }),
   dropdownIndicator: (provided) => ({
     ...provided,
@@ -55,6 +63,31 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
   indicatorSeparator: (provided) => ({
     ...provided,
     backgroundColor: "var(--filter-border-color)",
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: "var(--filter-menu-background)",
+    border: "1px solid var(--filter-border-color)",
+    boxShadow: "var(--filter-menu-shadow)",
+    color: "var(--filter-text-color)",
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected
+      ? "var(--filter-option-selected-background)"
+      : state.isFocused
+        ? "var(--filter-option-hover-background)"
+        : "transparent",
+    color: state.isSelected
+      ? "var(--filter-option-selected-text)"
+      : "var(--filter-text-color)",
+    ":active": {
+      backgroundColor: "var(--filter-option-selected-background)",
+    },
+  }),
+  noOptionsMessage: (provided) => ({
+    ...provided,
+    color: "var(--filter-placeholder-color)",
   }),
 };
 
