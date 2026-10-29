@@ -66,6 +66,18 @@ test("every landing-page sign-in action carries the group destination", () => {
     );
   }
 });
+test("the study group preview is a sign-in action", () => {
+  render(<HomePage />);
+  const preview = screen.getByRole("button", {
+    name: "Browse study groups preview. Sign in to explore study groups.",
+  });
+
+  expect(preview).toHaveAttribute("tabindex", "0");
+  expect(preview.parentElement).toHaveAttribute(
+    "data-callback",
+    "/login?next=%2Fgroups%2Fabc-123",
+  );
+});
 test("signed-in landing redirect preserves the destination", async () => {
   mocks.signedIn = true;
   render(<HomePage />);
@@ -86,7 +98,5 @@ test("unsafe destinations fall back to feed after setup", async () => {
   mocks.next = "//evil.test";
   render(<CreateAccountPage />);
   fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-  await waitFor(() =>
-    expect(mocks.push).toHaveBeenCalledWith("/feed"),
-  );
+  await waitFor(() => expect(mocks.push).toHaveBeenCalledWith("/feed"));
 });
