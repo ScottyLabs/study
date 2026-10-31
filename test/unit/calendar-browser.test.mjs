@@ -66,6 +66,13 @@ function browserFixture(options = {}) {
       if (status === "success") finished = true;
       return { status };
     }
+    if (url.includes("/busy?")) {
+      if (options.busyFailure)
+        throw new ApiRequestError("Reconnect Calendar", 409);
+      return {
+        busy: [{ start: "2026-11-02T15:00:00Z", end: "2026-11-02T16:00:00Z" }],
+      };
+    }
     if (options.eventFailure)
       throw new ApiRequestError("Reconnect Calendar", 409);
     return { id: "event-1", deleted: true };
@@ -214,6 +221,26 @@ test("Calendar operations use only same-origin endpoints and retain failure conv
   assert.equal(f.helper.hasCalendarAccess(), false);
   assert.ok(f.calls.every((call) => call.url.startsWith("/api/v1/calendar/")));
   assert.ok(f.calls.every((call) => !JSON.stringify(call).includes("Bearer")));
+});
+
+test("availability requests send the range and a revoked connection reads as disconnected", async () => {
+  const from = new Date("2026-11-02T00:00:00Z");
+  const to = new Date("2026-11-09T00:00:00Z");
+  const f = browserFixture({ connected: true });
+  await f.helper.setupGoogleApi();
+  assert.deepEqual(await f.helper.fetchBusyIntervals(from, to), [
+    { start: "2026-11-02T15:00:00Z", end: "2026-11-02T16:00:00Z" },
+  ]);
+  assert.equal(
+    f.calls.at(-1).url,
+    `/api/v1/calendar/busy?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`,
+  );
+  const revoked = browserFixture({ connected: true, busyFailure: true });
+  await revoked.helper.setupGoogleApi();
+  await assert.rejects(revoked.helper.fetchBusyIntervals(from, to), {
+    status: 409,
+  });
+  assert.equal(revoked.helper.hasCalendarAccess(), false);
 });
 
 test("disabled Calendar leaves group actions free to continue without popups", async () => {

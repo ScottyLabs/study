@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { StudyGroup } from "~/types";
-import { shouldHideBySharedFilters } from "./groupFilters";
+import { shouldHideBySharedFilters, shouldHideFeedGroup } from "./groupFilters";
 
 function groupOn(date: string): StudyGroup {
   return {
@@ -85,6 +85,43 @@ describe("shouldHideBySharedFilters date ranges", () => {
       shouldHideBySharedFilters({
         group: groupOn("2100-01-01T12:00:00"),
         selectedDateRange,
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("shouldHideFeedGroup availability", () => {
+  const busy = [{ start: "2099-10-02T15:00:00Z", end: "2099-10-02T16:00:00Z" }];
+  const hidden = (startTime: string, joinedGroups: string[] = []) =>
+    shouldHideFeedGroup({
+      group: groupOn(startTime),
+      joinedGroups,
+      showFullFilter: true,
+      busyIntervals: busy,
+    });
+
+  test("hides a group whose hour overlaps a busy time", () => {
+    expect(hidden("2099-10-02T14:30:00Z")).toBe(true);
+    expect(hidden("2099-10-02T15:30:00Z")).toBe(true);
+  });
+
+  test("keeps groups that only touch a busy time at its edges", () => {
+    expect(hidden("2099-10-02T14:00:00Z")).toBe(false);
+    expect(hidden("2099-10-02T16:00:00Z")).toBe(false);
+  });
+
+  test("never hides a group the user joined", () => {
+    expect(hidden("2099-10-02T15:00:00Z", ["2099-10-02T15:00:00Z"])).toBe(
+      false,
+    );
+  });
+
+  test("changes nothing when availability was not loaded", () => {
+    expect(
+      shouldHideFeedGroup({
+        group: groupOn("2099-10-02T15:00:00Z"),
+        showFullFilter: true,
+        busyIntervals: null,
       }),
     ).toBe(false);
   });

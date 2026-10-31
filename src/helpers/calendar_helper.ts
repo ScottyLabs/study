@@ -2,6 +2,7 @@ import { apiRequest, ApiRequestError } from "~/lib/api/client";
 
 type CalendarDate = Date | { toDate: () => Date; toMillis: () => number };
 type ConnectionStatus = { configured: boolean; connected: boolean };
+export type BusyInterval = { start: string; end: string };
 const CALENDAR_API = "/api/v1/calendar";
 
 let configured = false;
@@ -122,12 +123,28 @@ async function calendarRequest<T>(path: string, init: RequestInit): Promise<T> {
   if (initialized && !configured)
     throw new Error("Calendar integration is not configured");
   try {
-    return await apiRequest<T>(`${CALENDAR_API}/events${path}`, init);
+    return await apiRequest<T>(`${CALENDAR_API}${path}`, init);
   } catch (error) {
     if (error instanceof ApiRequestError && [401, 409].includes(error.status))
       connected = false;
     throw error;
   }
+}
+
+/** Returns busy times on the connected user's primary calendar. */
+export async function fetchBusyIntervals(
+  from: Date,
+  to: Date,
+): Promise<BusyInterval[]> {
+  const range = new URLSearchParams({
+    from: from.toISOString(),
+    to: to.toISOString(),
+  });
+  const { busy } = await calendarRequest<{ busy: BusyInterval[] }>(
+    `/busy?${range}`,
+    { cache: "no-store" },
+  );
+  return busy;
 }
 
 /** Adds a one-hour event to the connected user's primary calendar. */
@@ -160,7 +177,7 @@ export async function addToCal(
     },
   };
   try {
-    const response = await calendarRequest<{ id?: string }>("", {
+    const response = await calendarRequest<{ id?: string }>("/events", {
       method: "POST",
       body: JSON.stringify(event),
     });
@@ -174,7 +191,7 @@ export async function addToCal(
 export async function deleteFromCal(eventId: string): Promise<boolean> {
   if (!eventId || eventId === "None") return false;
   try {
-    await calendarRequest(`/${encodeURIComponent(eventId)}`, {
+    await calendarRequest(`/events/${encodeURIComponent(eventId)}`, {
       method: "DELETE",
     });
     return true;
@@ -190,7 +207,7 @@ export async function updateEvent(
 ): Promise<unknown> {
   if (!eventId || eventId === "None") return null;
   try {
-    return await calendarRequest(`/${encodeURIComponent(eventId)}`, {
+    return await calendarRequest(`/events/${encodeURIComponent(eventId)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     });

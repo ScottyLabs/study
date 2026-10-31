@@ -1,3 +1,4 @@
+import type { BusyInterval } from "~/helpers/calendar_helper";
 import { isInThePast } from "~/helpers/date_helper";
 import type { DateFilterRange, StudyGroup } from "~/types";
 
@@ -11,7 +12,20 @@ type FeedGroupFilterInput = GroupFilterInput & {
   joinedGroups?: string[] | null;
   blockedUsers?: string[];
   showFullFilter: boolean;
+  busyIntervals?: BusyInterval[] | null;
 };
+
+// Groups have no end time; the Calendar events created for them last one hour.
+const GROUP_DURATION_MS = 60 * 60_000;
+
+function conflictsWithBusy(group: StudyGroup, busy: BusyInterval[]) {
+  const start = group.startTime.getTime();
+  const end = start + GROUP_DURATION_MS;
+  return busy.some(
+    (interval) =>
+      Date.parse(interval.start) < end && Date.parse(interval.end) > start,
+  );
+}
 
 function isSameCalendarDate(firstDate: Date, secondDate: Date) {
   return (
@@ -86,6 +100,7 @@ export function shouldHideFeedGroup({
   joinedGroups,
   blockedUsers,
   showFullFilter,
+  busyIntervals,
   selectedDateRange,
   selectedCourseValues,
 }: FeedGroupFilterInput) {
@@ -97,6 +112,14 @@ export function shouldHideFeedGroup({
   }
 
   if (isFull && !showFullFilter && !isParticipant) {
+    return true;
+  }
+
+  if (
+    busyIntervals &&
+    !isParticipant &&
+    conflictsWithBusy(group, busyIntervals)
+  ) {
     return true;
   }
 
