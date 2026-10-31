@@ -17,7 +17,8 @@ export default function PrivacyPage() {
           <p className="text-center text-lg opacity-90">
             <strong>CMU Study</strong> (&quot;we,&quot; &quot;our,&quot; or &quot;the app&quot;) uses the
             Google Calendar API solely to help users create and manage
-            study-related events on their Google Calendar. This Privacy Policy
+            study-related events on their Google Calendar and, when they ask,
+            to hide study groups at times they are busy. This Privacy Policy
             explains what data we access, how we use it, how we store and
             protect it, and what control users have over their information.
           </p>
@@ -35,6 +36,10 @@ export default function PrivacyPage() {
             <ul className="mt-2 list-disc space-y-2 pl-6">
               <li>Permission to create new events on your Google Calendar</li>
               <li>Permission to delete events previously created by the app</li>
+              <li>
+                Permission to see when your primary calendar is busy, as time
+                ranges only
+              </li>
             </ul>
 
             <h3 className="mt-4 font-semibold">Data We Do Not Access</h3>
@@ -42,8 +47,7 @@ export default function PrivacyPage() {
               We do <strong>not</strong> read, view, or access:
             </p>
             <ul className="mt-2 list-disc space-y-2 pl-6">
-              <li>Existing events on your calendar</li>
-              <li>Event titles, descriptions, times, or locations</li>
+              <li>Titles, descriptions, or locations of your events</li>
               <li>Attendee information</li>
               <li>Any other personal Google Calendar data</li>
             </ul>
@@ -67,13 +71,20 @@ export default function PrivacyPage() {
               <li>
                 Delete events created by CMU Study if you choose to remove them
               </li>
+              <li>
+                Check your busy times when you turn on the &quot;Only times
+                I&apos;m free&quot; filter, to hide study groups that overlap them
+              </li>
             </ul>
 
             <p className="mt-4 opacity-90">
               We do <strong>not</strong>:
             </p>
             <ul className="mt-2 list-disc space-y-2 pl-6">
-              <li>Process, analyze, or scan your events</li>
+              <li>
+                Process, analyze, or scan your events beyond comparing busy
+                times with study group times when you use that filter
+              </li>
               <li>Use your data for advertising or marketing</li>
               <li>Combine calendar data with any other data sources</li>
             </ul>
@@ -95,7 +106,10 @@ export default function PrivacyPage() {
               refresh tokens, their expiration information, granted permissions,
               and a Google account identifier when provided. These credentials
               let the server perform Calendar actions you request without asking
-              you to reconnect each time an access token expires.
+              you to reconnect each time an access token expires. Busy times
+              are kept only in server memory for up to one minute, to avoid
+              repeating the same request to Google, and are never saved to our
+              database.
             </p>
 
             <p className="mt-4 opacity-90">

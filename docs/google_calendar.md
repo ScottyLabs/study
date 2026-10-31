@@ -44,6 +44,25 @@ Future changes must preserve these properties:
   connection for later actions; request consent again only when connecting or
   reconnecting, not for every group.
 
+### Availability filter
+
+The feed's "Only times I'm free" filter calls `GET /api/v1/calendar/busy` with
+`from` and `to`. The server calls Google's FreeBusy API for the user's primary
+calendar with the existing `calendar.freebusy` scope and returns busy intervals
+only. A group counts as one hour from its start time, matching the events the
+app creates, and groups the user joined are never hidden.
+
+The endpoint is limited in `src/server/calendar/rateLimit.ts`, in memory, which
+is correct because Kennel runs one app instance per environment:
+
+- Ranges must start no earlier than now and span at most 60 days.
+- Each user may trigger 10 Google calls per minute, and all users together
+  1,000 per minute. Extra requests return 429.
+- A user's last result is reused for 60 seconds when it covers the requested
+  range. Busy times are never written to the database.
+
+A per-calendar error or malformed response is an error, never free time.
+
 ### Configuration and rollout
 
 Before implementation or rollout, confirm that the deployed client belongs to
