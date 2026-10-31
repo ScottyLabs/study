@@ -31,6 +31,10 @@ function apiFixture() {
         calls.push(args);
         return { id: "event-1" };
       },
+      getBusyIntervals: async (...args) => {
+        calls.push(args);
+        return [{ start: "2026-11-02T15:00:00Z", end: "2026-11-02T16:00:00Z" }];
+      },
     },
   });
   return {
@@ -104,6 +108,35 @@ test("event routes validate input before invoking Google with the current user",
     200,
   );
   assert.deepEqual(f.calls[1], ["student-1", "delete", "event-1"]);
+});
+
+test("availability route validates the range before asking Google for the current user", async () => {
+  const f = apiFixture();
+  const day = 24 * 3600_000;
+  const from = new Date(Date.now() + 60_000);
+  const query = (start, end) =>
+    `/busy?${new URLSearchParams({ from: start, to: end })}`;
+  for (const path of [
+    "/busy",
+    query("tomorrow", from.toISOString()),
+    query(from.toISOString(), from.toISOString()),
+    query(new Date(Date.now() - day).toISOString(), from.toISOString()),
+    query(
+      from.toISOString(),
+      new Date(from.getTime() + 61 * day).toISOString(),
+    ),
+  ])
+    assert.equal((await f.api.request(path)).status, 400);
+  assert.equal(f.calls.length, 0);
+  const to = new Date(from.getTime() + 7 * day);
+  const response = await f.api.request(
+    query(from.toISOString(), to.toISOString()),
+  );
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    busy: [{ start: "2026-11-02T15:00:00Z", end: "2026-11-02T16:00:00Z" }],
+  });
+  assert.deepEqual(f.calls[0], ["student-1", from, to]);
 });
 
 test("callback requires a session and removes codes from the result URL", async () => {

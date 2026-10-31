@@ -16,6 +16,7 @@ import {
   hasRequiredScopes,
   readRelayState,
 } from "./security";
+import { createBusyLimiter, type BusyInterval } from "./rateLimit";
 
 export const calendarOrigin = () => new URL(env.SERVER_URL).origin;
 const callbackURL = () => `${calendarOrigin()}/api/calendar/oauth/callback`;
@@ -278,14 +279,16 @@ function providerError(error: unknown) {
   const scopeError = z
     .object({ errors: z.array(z.object({ reason: z.string() })) })
     .safeParse(response?.data?.error);
+  const reasons = scopeError.success
+    ? scopeError.data.errors.map((item) => item.reason)
+    : [];
   return {
     status: response?.status,
     code: response?.data?.error,
-    scopeDenied:
-      scopeError.success &&
-      scopeError.data.errors.some(
-        (item) => item.reason === "insufficientPermissions",
-      ),
+    scopeDenied: reasons.includes("insufficientPermissions"),
+    rateLimited:
+      reasons.includes("rateLimitExceeded") ||
+      reasons.includes("userRateLimitExceeded"),
   };
 }
 
@@ -404,4 +407,74 @@ export async function calendarEventRequest(
       502,
     );
   }
+}
+
+const busyLimiter = createBusyLimiter();
+const busyIntervalsSchema = z.array(
+  z.object({
+    start: z.string().datetime({ offset: true }),
+    end: z.string().datetime({ offset: true }),
+  }),
+);
+
+function rateLimited(): never {
+  throw new CalendarError(
+    "Too many availability checks. Try again in a minute.",
+    "rate_limited",
+    429,
+  );
+}
+
+/** Returns busy times on the user's primary calendar, limited per user and app. */
+export async function getBusyIntervals(
+  userId: string,
+  from: Date,
+  to: Date,
+): Promise<BusyInterval[]> {
+  const now = Date.now();
+  const cached = busyLimiter.cached(userId, from.getTime(), to.getTime(), now);
+  if (cached) return cached;
+  // Count before connecting, because a token refresh is also a Google call.
+  if (!busyLimiter.acquire(userId, now)) rateLimited();
+  const { connection, calendar } = await calendarClient(userId);
+  let primary: calendar_v3.Schema$FreeBusyCalendar | undefined;
+  try {
+    const { data } = await calendar.freebusy.query(
+      {
+        requestBody: {
+          timeMin: from.toISOString(),
+          timeMax: to.toISOString(),
+          items: [{ id: "primary" }],
+        },
+      },
+      { timeout: 8_000, retry: false },
+    );
+    primary = data.calendars?.primary;
+  } catch (error) {
+    const {
+      status,
+      scopeDenied,
+      rateLimited: googleLimited,
+    } = providerError(error);
+    if (status === 401 || (status === 403 && scopeDenied))
+      return requireReconnection(connection);
+    if (googleLimited) rateLimited();
+    console.warn("Calendar availability request failed", { status });
+    throw new CalendarError(
+      "Calendar availability request failed. Please retry.",
+      "provider_error",
+      502,
+    );
+  }
+  const busy = busyIntervalsSchema.safeParse(primary?.busy);
+  if (!busy.success || primary?.errors?.length) {
+    console.warn("Calendar availability response was incomplete");
+    throw new CalendarError(
+      "Calendar availability is unavailable. Please retry.",
+      "provider_error",
+      502,
+    );
+  }
+  busyLimiter.store(userId, from.getTime(), to.getTime(), busy.data, now);
+  return busy.data;
 }

@@ -5,6 +5,7 @@ import {
   calendarOrigin,
   calendarEventRequest,
   getCalendarAttemptStatus,
+  getBusyIntervals,
   getCalendarStatus,
   startCalendarAuthorization,
 } from "~/server/calendar/service";
@@ -15,6 +16,22 @@ import {
 } from "~/server/calendar/security";
 
 export const calendarApi = new Hono<ApiEnvironment>();
+
+const MAX_BUSY_RANGE_MS = 60 * 24 * 60 * 60_000;
+const busyDate = z
+  .string()
+  .datetime({ offset: true })
+  .transform((value) => new Date(value));
+const busyRangeSchema = z.object({ from: busyDate, to: busyDate });
+
+// Checked after parsing: zod still runs object refinements on invalid fields.
+function isAllowedBusyRange({ from, to }: { from: Date; to: Date }) {
+  return (
+    from.getTime() >= Date.now() - 60_000 &&
+    to > from &&
+    to.getTime() - from.getTime() <= MAX_BUSY_RANGE_MS
+  );
+}
 
 calendarApi.use("*", requireEligibleSession);
 calendarApi.use("*", async (context, next) => {
@@ -60,6 +77,19 @@ calendarApi.get("/attempts/:id", async (context) => {
       id.data,
     ),
   );
+});
+
+calendarApi.get("/busy", async (context) => {
+  const range = busyRangeSchema.safeParse(context.req.query());
+  if (!range.success || !isAllowedBusyRange(range.data))
+    return context.json({ error: "Invalid availability range" }, 400);
+  return context.json({
+    busy: await getBusyIntervals(
+      context.var.userId,
+      range.data.from,
+      range.data.to,
+    ),
+  });
 });
 
 calendarApi.post("/events", async (context) => {

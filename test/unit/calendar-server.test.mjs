@@ -17,6 +17,12 @@ const config = {
 };
 const userId = "student-1";
 const sessionId = "session-1";
+const busyInterval = {
+  start: "2026-11-02T15:00:00Z",
+  end: "2026-11-02T16:00:00Z",
+};
+const day = 24 * 3600_000;
+const from = new Date("2026-11-02T00:00:00Z");
 
 function fixture(settings = {}) {
   const attempts = new Map();
@@ -151,6 +157,17 @@ function fixture(settings = {}) {
           },
         ]),
       );
+      this.freebusy = {
+        async query(params, options) {
+          requests.push({ operation: "freebusy", params, options });
+          if (settings.freebusyError) throw settings.freebusyError;
+          return {
+            data: settings.freebusyData ?? {
+              calendars: { primary: { busy: [busyInterval] } },
+            },
+          };
+        },
+      };
     }
   }
   const load = typescriptLoader(
@@ -572,4 +589,83 @@ test("credentials encrypted with an old key require reconnection", async () => {
     { code: "reconnect_required" },
   );
   assert.equal(changedKey.connection.requiresReconnection, true);
+});
+
+async function connected(settings) {
+  const f = fixture(settings);
+  await f.service.completeCalendarAuthorization(
+    userId,
+    sessionId,
+    (await f.authorize()).params,
+  );
+  return f;
+}
+
+test("free/busy reads only the primary calendar and reuses the result within a minute", async () => {
+  const f = await connected();
+  const to = new Date(from.getTime() + 7 * day);
+  assert.deepEqual(await f.service.getBusyIntervals(userId, from, to), [
+    busyInterval,
+  ]);
+  assert.deepEqual(await f.service.getBusyIntervals(userId, from, to), [
+    busyInterval,
+  ]);
+  assert.equal(f.requests.length, 1);
+  assert.deepEqual(f.requests[0].params.requestBody, {
+    timeMin: from.toISOString(),
+    timeMax: to.toISOString(),
+    items: [{ id: "primary" }],
+  });
+  assert.equal(f.requests[0].options.retry, false);
+});
+
+test("each user is stopped before an eleventh Google call in a minute", async () => {
+  const f = await connected();
+  for (let days = 1; days <= 10; days++)
+    await f.service.getBusyIntervals(
+      userId,
+      from,
+      new Date(from.getTime() + days * day),
+    );
+  await assert.rejects(
+    f.service.getBusyIntervals(
+      userId,
+      from,
+      new Date(from.getTime() + 11 * day),
+    ),
+    { status: 429, code: "rate_limited" },
+  );
+  assert.equal(f.requests.length, 10);
+});
+
+test("Google limits, calendar errors, and revoked access never read as free time", async () => {
+  const to = new Date(from.getTime() + day);
+  const limited = await connected({
+    freebusyError: {
+      response: {
+        status: 429,
+        data: { error: { errors: [{ reason: "rateLimitExceeded" }] } },
+      },
+    },
+  });
+  await assert.rejects(limited.service.getBusyIntervals(userId, from, to), {
+    status: 429,
+    code: "rate_limited",
+  });
+  const calendarError = await connected({
+    freebusyData: {
+      calendars: { primary: { busy: [], errors: [{ reason: "notFound" }] } },
+    },
+  });
+  await assert.rejects(
+    calendarError.service.getBusyIntervals(userId, from, to),
+    { status: 502 },
+  );
+  const revoked = await connected({
+    freebusyError: { response: { status: 401 } },
+  });
+  await assert.rejects(revoked.service.getBusyIntervals(userId, from, to), {
+    code: "reconnect_required",
+  });
+  assert.equal(revoked.connection.requiresReconnection, true);
 });

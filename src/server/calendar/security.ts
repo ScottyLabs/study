@@ -15,7 +15,7 @@ export class CalendarError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly status: 400 | 401 | 403 | 404 | 409 | 502 | 503 = 400,
+    public readonly status: 400 | 401 | 403 | 404 | 409 | 429 | 502 | 503 = 400,
   ) {
     super(message);
     this.name = "CalendarError";
