@@ -91,12 +91,6 @@ export default function MyGroupsPage() {
             <div className="workspace-actions">
               <div className="workspace-stat">
                 <div className="workspace-stat-value">
-                  {visibleGroups.length}
-                </div>
-                <div className="workspace-stat-label">Showing</div>
-              </div>
-              <div className="workspace-stat">
-                <div className="workspace-stat-value">
                   {joinedGroups?.length ?? 0}
                 </div>
                 <div className="workspace-stat-label">Joined</div>
