@@ -100,6 +100,12 @@ interface TopFilterBarProps {
   setSelectedDateRange: (dateRange: DateFilterRange) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  availability?: {
+    checked: boolean;
+    loading: boolean;
+    status: string | null;
+    onChange: (enabled: boolean) => void;
+  };
 }
 
 function TopFilterBar({
@@ -110,6 +116,7 @@ function TopFilterBar({
   setSelectedDateRange,
   searchQuery,
   setSearchQuery,
+  availability,
 }: TopFilterBarProps) {
   return (
     <div className="top-bar">
@@ -153,6 +160,22 @@ function TopFilterBar({
             />
           </div>
         </div>
+        {availability && (
+          <div className="filter-availability">
+            <label>
+              <input
+                type="checkbox"
+                checked={availability.checked}
+                disabled={availability.loading}
+                onChange={(event) =>
+                  availability.onChange(event.target.checked)
+                }
+              />
+              Only times I&apos;m free
+            </label>
+            {availability.status && <span>{availability.status}</span>}
+          </div>
+        )}
       </div>
     </div>
   );

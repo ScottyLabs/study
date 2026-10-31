@@ -8,6 +8,8 @@ type CachedBusy = {
 };
 
 const WINDOW_MS = 60_000;
+// Longest availability range a client may request, shared with the browser.
+export const MAX_BUSY_RANGE_MS = 60 * 24 * 60 * 60_000;
 
 // In memory, because Kennel runs one app instance per environment.
 export function createBusyLimiter({ perUser = 10, global = 1_000 } = {}) {

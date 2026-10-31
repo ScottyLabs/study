@@ -14,10 +14,10 @@ import {
   calendarEventIdSchema,
   calendarEventSchema,
 } from "~/server/calendar/security";
+import { MAX_BUSY_RANGE_MS } from "~/server/calendar/rateLimit";
 
 export const calendarApi = new Hono<ApiEnvironment>();
 
-const MAX_BUSY_RANGE_MS = 60 * 24 * 60 * 60_000;
 const busyDate = z
   .string()
   .datetime({ offset: true })

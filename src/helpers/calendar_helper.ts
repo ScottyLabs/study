@@ -1,8 +1,10 @@
 import { apiRequest, ApiRequestError } from "~/lib/api/client";
+import type { BusyInterval } from "~/server/calendar/rateLimit";
+
+export type { BusyInterval };
 
 type CalendarDate = Date | { toDate: () => Date; toMillis: () => number };
 type ConnectionStatus = { configured: boolean; connected: boolean };
-export type BusyInterval = { start: string; end: string };
 const CALENDAR_API = "/api/v1/calendar";
 
 let configured = false;

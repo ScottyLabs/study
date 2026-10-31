@@ -1245,6 +1245,18 @@
   @apply font-semibold text-lightSelected underline dark:text-darkSelected;
 }
 
+.filter-availability {
+  @apply mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-black/60 dark:text-white/60;
+}
+
+.filter-availability label {
+  @apply flex cursor-pointer items-center gap-1.5 font-semibold;
+}
+
+.filter-availability input {
+  @apply h-3.5 w-3.5 accent-lightSelected dark:accent-darkSelected;
+}
+
 @screen compact {
   .profile-section {
     display: none;

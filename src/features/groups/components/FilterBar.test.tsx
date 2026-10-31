@@ -100,4 +100,43 @@ describe("TopFilterBar", () => {
       screen.getByDisplayValue("10/02/2026 - 10/05/2026"),
     ).toBeInTheDocument();
   });
+
+  test("shows the availability toggle only when the page provides it", () => {
+    const { rerender } = render(<TopFilterBar {...defaultProps} />);
+    expect(screen.queryByLabelText("Only times I'm free")).toBeNull();
+
+    rerender(
+      <TopFilterBar
+        {...defaultProps}
+        availability={{
+          checked: false,
+          loading: false,
+          status: "Calendar not connected",
+          onChange: vi.fn(),
+        }}
+      />,
+    );
+    expect(screen.getByLabelText("Only times I'm free")).not.toBeChecked();
+    expect(screen.getByText("Calendar not connected")).toBeVisible();
+  });
+
+  test("turning the availability toggle on calls its handler", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <TopFilterBar
+        {...defaultProps}
+        availability={{
+          checked: false,
+          loading: false,
+          status: null,
+          onChange,
+        }}
+      />,
+    );
+
+    await user.click(screen.getByLabelText("Only times I'm free"));
+
+    expect(onChange).toHaveBeenCalledWith(true);
+  });
 });

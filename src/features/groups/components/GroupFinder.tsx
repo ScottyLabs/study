@@ -11,6 +11,7 @@ import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
 import { usePostHog } from "posthog-js/react";
 
 import Card from "~/features/groups/components/Card";
+import { useAvailabilityFilter } from "~/features/groups/hooks/useAvailabilityFilter";
 import { useStudyGroups } from "~/features/groups/hooks/useStudyGroups";
 import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
 import { shouldHideFeedGroup } from "~/features/groups/utils/groupFilters";
@@ -53,6 +54,7 @@ export function GroupFinder({
     initialGroup ?? null,
   );
   const showFullFilter = false;
+  const availability = useAvailabilityFilter(groups);
   const dispatch = useDispatch();
   const posthog = usePostHog();
 
@@ -86,6 +88,7 @@ export function GroupFinder({
         joinedGroups,
         blockedUsers,
         showFullFilter,
+        busyIntervals: availability.busyIntervals,
         selectedDateRange,
         selectedCourseValues: selectedCourses.map((course) => course.value),
       })
@@ -121,6 +124,12 @@ export function GroupFinder({
         setSelectedDateRange={setSelectedDateRange}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        availability={{
+          checked: availability.busyIntervals !== null,
+          loading: availability.loading,
+          status: availability.status,
+          onChange: (enabled) => void availability.setEnabled(enabled),
+        }}
       />
 
       <main className="content-page">
