@@ -1237,6 +1237,14 @@
   @apply text-xs text-black/45 dark:text-white/45;
 }
 
+.calendar-status {
+  @apply mt-4 text-xs text-black/50 dark:text-white/50;
+}
+
+.calendar-status button {
+  @apply font-semibold text-lightSelected underline dark:text-darkSelected;
+}
+
 @screen compact {
   .profile-section {
     display: none;
