@@ -19,6 +19,7 @@ import {
 import { SignOutButton, useUser } from "~/lib/auth-client";
 import { useUserTheme } from "~/features/profile/hooks/useUserTheme";
 import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
+import Link from "next/link";
 
 const bottomItems = [
   { href: "/feed", label: "Find", page: "feed", icon: Search },
@@ -50,9 +51,14 @@ export default function MobileNavBar() {
         >
           {isDrawerOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
-        <a href="/feed" className="mobile-brand" aria-label="CMU Study home">
+        <Link
+          href="/feed"
+          className="mobile-brand"
+          aria-label="CMU Study home"
+          onClick={() => setIsDrawerOpen(false)}
+        >
           <span>CMU</span> Study
-        </a>
+        </Link>
         {page === "profile" && (
           <SignOutButton>
             <button type="button" className="mobile-logout-quick">
@@ -92,34 +98,42 @@ export default function MobileNavBar() {
           <Plus size={19} /> New group
         </button>
         <nav className="mobile-drawer-links">
-          <a href="/feed" className="nav-link" tabIndex={isDrawerOpen ? 0 : -1}>
+          <Link
+            href="/feed"
+            className="nav-link"
+            tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
+          >
             <Search className="nav-link-icon" /> Group Finder
-          </a>
-          <a
+          </Link>
+          <Link
             href="/my-groups"
             className="nav-link"
             tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
           >
             <Users className="nav-link-icon" /> My Groups
-          </a>
+          </Link>
           <a
             href="https://forms.gle/MEQ7miCZCrC48P6y8"
             target="_blank"
             rel="noopener noreferrer"
             className="nav-link"
             tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
           >
             <MessageSquare className="nav-link-icon" /> Feedback
           </a>
-          <a
+          <Link
             href="/privacy"
             target="_blank"
             rel="noopener noreferrer"
             className="nav-link"
             tabIndex={isDrawerOpen ? 0 : -1}
+            onClick={() => setIsDrawerOpen(false)}
           >
             <FileText className="nav-link-icon" /> Privacy
-          </a>
+          </Link>
           <button
             type="button"
             onClick={toggleTheme}
@@ -150,15 +164,16 @@ export default function MobileNavBar() {
           const Icon = item.icon;
           const active = page === item.page;
           return (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className={`mobile-bottom-link ${active ? "mobile-bottom-link-active" : ""}`}
               aria-current={active ? "page" : undefined}
+              onClick={() => setIsDrawerOpen(false)}
             >
               <Icon size={22} />
               <span>{item.label}</span>
-            </a>
+            </Link>
           );
         })}
       </nav>

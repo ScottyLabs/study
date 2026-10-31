@@ -6,6 +6,7 @@ import darkLogo from "~/image/darkLogoLarge.png";
 import lightLogo from "~/image/lightLogoLarge.png";
 import { ShieldAlert } from "lucide-react";
 import { SignOutButton } from "~/lib/auth-client";
+import Link from "next/link";
 
 export default function AccessRestrictedPage() {
   return (

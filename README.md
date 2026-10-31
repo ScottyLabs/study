@@ -139,12 +139,26 @@ commit statuses.
 
 ## Project structure
 
+## Project structure
+
 - `src/app` contains Next.js routes and route layouts.
+
 - `src/features/groups` contains study-group components, hooks, services, filters, and constants.
+
 - `src/features/profile` contains profile components, hooks, services, and profile-specific types.
+
 - `src/components` contains shared layout, provider, and UI components.
+
 - `src/helpers` contains external integration helpers such as calendar/date utilities.
+
 - `src/server/api` contains the Hono API application and route composition.
+
 - `src/styles` contains global and component-level CSS.
+
 - `flake.nix` builds the deployable package
+
+- `devenv.nix` declares the development environment and what kennel deploys.
+
+- `flake.nix` builds the deployable package
+
 - `devenv.nix` declares the development environment and what kennel deploys.

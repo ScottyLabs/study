@@ -164,14 +164,34 @@
 }
 
 .filter-course-select {
-  --filter-input-background: #ffffff;
-  --filter-border-color: rgb(0 0 0 / 0.15);
+  --filter-input-background: var(--color-light-input);
+  --filter-menu-background: var(--color-light-sidebar);
+  --filter-border-color: var(--color-light-subtle-border);
+  --filter-text-color: var(--color-light-text);
+  --filter-placeholder-color: var(--color-light-text);
+  --filter-chip-background: var(--color-light-accent);
+  --filter-chip-text: var(--color-light-text);
+  --filter-option-hover-background: var(--color-light-accent);
+  --filter-option-selected-background: var(--color-light-accent);
+  --filter-option-selected-text: var(--color-light-selected);
+  --filter-selected-color: var(--color-light-selected);
+  --filter-menu-shadow: 0 8px 20px var(--color-light-dropdown-shadow);
   min-width: 0;
 }
 
 .dark .filter-course-select {
-  --filter-input-background: #202328;
-  --filter-border-color: rgb(255 255 255 / 0.15);
+  --filter-input-background: var(--color-dark-input);
+  --filter-menu-background: var(--color-dark-input);
+  --filter-border-color: var(--color-dark-subtle-border);
+  --filter-text-color: var(--color-dark-text);
+  --filter-placeholder-color: var(--color-dark-text);
+  --filter-chip-background: var(--color-dark-accent);
+  --filter-chip-text: var(--color-dark-text);
+  --filter-option-hover-background: var(--color-dark-accent);
+  --filter-option-selected-background: var(--color-dark-accent);
+  --filter-option-selected-text: var(--color-dark-selected);
+  --filter-selected-color: var(--color-dark-selected);
+  --filter-menu-shadow: 0 8px 20px var(--color-dark-dropdown-shadow);
 }
 
 .filter-date-control {
@@ -469,7 +489,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background-color: rgb(0 0 0 / 0.45);
+  background-color: var(--color-overlay);
   backdrop-filter: blur(6px);
 }
 
@@ -648,7 +668,7 @@
 }
 
 .workspace-stat {
-  @apply hidden border-0 bg-transparent px-2 py-0 desktop:block min-w-28 rounded-lg;
+  @apply hidden min-w-28 rounded-lg border-0 bg-transparent px-2 py-0 desktop:block;
 }
 
 .workspace-stat-value {
@@ -676,7 +696,15 @@
 }
 
 .group-grid-wide {
-  @apply grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4;
+  @apply grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4 desktop:grid-cols-3;
+}
+
+.app-empty {
+  @apply flex min-h-[13rem] flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-black/15 bg-lightSidebar px-6 text-center text-sm font-medium text-black/55 dark:border-white/15 dark:bg-darkSidebar dark:text-white/55;
+}
+
+.study-card {
+  @apply relative flex min-h-[12rem] w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-black/10 bg-lightSidebar p-5 text-lightText shadow-sm transition hover:-translate-y-0.5 hover:border-lightSelected hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkSidebar dark:text-darkText dark:hover:border-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .study-card::before {
@@ -734,7 +762,7 @@
 }
 
 .joined-badge {
-  @apply rounded-md bg-joined px-2.5 py-1 text-xs font-semibold text-joinedText;
+  @apply rounded-md bg-lightJoined px-2.5 py-1 text-xs font-semibold text-lightJoinedText dark:bg-darkJoined dark:text-darkJoinedText;
 }
 
 /* Approved responsive redesign */
@@ -748,7 +776,7 @@
 
 /* Full-width content for app shells without the authenticated sidebar. */
 .app-standalone-content {
-  @apply min-w-0 w-full;
+  @apply w-full min-w-0;
 }
 
 .sidebar-shell {
@@ -776,7 +804,7 @@
 }
 
 .sidebar-create-button {
-  @apply mb-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-lightButton px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#a80f28] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:bg-darkButton dark:hover:bg-[#ef5268] dark:focus-visible:ring-darkSelected;
+  @apply mb-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-lightButton px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-lightButtonHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:bg-darkButton dark:hover:bg-darkButtonHover dark:focus-visible:ring-darkSelected;
 }
 
 .sidebar-nav,
@@ -964,7 +992,7 @@
 
 .group-grid,
 .group-grid-wide {
-  @apply grid grid-cols-1 gap-4 desktop:grid-cols-2 2xl:grid-cols-3;
+  @apply grid grid-cols-1 gap-4 2xl:grid-cols-3 desktop:grid-cols-2;
 }
 
 @media (min-width: 1280px) {
@@ -991,6 +1019,10 @@
 
 .study-card-course {
   @apply bg-transparent p-0 text-sm font-semibold text-lightSelected dark:bg-transparent dark:text-darkSelected;
+}
+
+.study-card-purpose {
+  @apply max-w-[55%] truncate rounded bg-lightSuccessBackground px-2 py-1 text-[10px] font-semibold uppercase text-lightSuccessText dark:bg-darkSuccessBackground dark:text-darkSuccessText;
 }
 
 .study-card-title {
@@ -1035,7 +1067,7 @@
 }
 
 .study-card-action-joined {
-  @apply border-[#9DD7D3] bg-[#E9F7F6] text-[#087B76] dark:border-[#356D69] dark:bg-[#173B3A] dark:text-[#71D4CF];
+  @apply border-lightSuccessBorder bg-lightSuccessBackground text-lightSuccessText dark:border-darkSuccessBorder dark:bg-darkSuccessBackground dark:text-darkSuccessText;
 }
 
 .app-empty {
@@ -1081,7 +1113,7 @@
 }
 
 .profile-header-details span:last-child {
-  @apply text-[#A96500] dark:text-[#F2B84B];
+  @apply text-lightWarningAccent dark:text-darkWarningAccent;
 }
 
 .profile-header-email {
@@ -1194,7 +1226,7 @@
 }
 
 .unblock-text-button {
-  @apply flex min-h-10 flex-none items-center gap-2 rounded-md border border-[#16827D] px-3 text-xs font-semibold text-[#087B76] dark:border-[#71D4CF] dark:text-[#71D4CF];
+  @apply flex min-h-10 flex-none items-center gap-2 rounded-md border border-lightSuccessStrongBorder px-3 text-xs font-semibold text-lightSuccessText dark:border-darkSuccessStrongBorder dark:text-darkSuccessText;
 }
 
 .blocked-empty {
@@ -1285,7 +1317,7 @@
 
 .button-primary,
 .button-large {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-lightButton px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#a80f28] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:bg-darkButton dark:text-white dark:hover:bg-[#ef5268];
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-lightButton px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-lightButtonHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:bg-darkButton dark:text-white dark:hover:bg-darkButtonHover;
 }
 
 .button-large {
@@ -1302,6 +1334,10 @@
 
 .landing-browser {
   @apply mb-8 w-full;
+}
+
+.landing-browser-preview {
+  @apply cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
 }
 
 .landing-browser-heading h2 {
@@ -1352,11 +1388,11 @@
 }
 
 .status-open {
-  @apply bg-[#DDF4F2] text-[#087B76];
+  @apply bg-lightSuccessHighlight text-lightSuccessText dark:bg-darkSuccessHighlight dark:text-darkSuccessText;
 }
 
 .status-filling {
-  @apply bg-[#FFF0D4] text-[#A45B00];
+  @apply bg-lightWarningBackground text-lightWarningText dark:bg-darkWarningBackground dark:text-darkWarningText;
 }
 
 .landing-group-meta {
@@ -1375,7 +1411,7 @@
   @apply -ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-lightAccent text-[9px] font-semibold not-italic text-lightSelected first:ml-0 dark:border-darkSidebar dark:bg-darkAccent dark:text-darkSelected;
 }
 
-.landing-group-row > button {
+.landing-view-group {
   @apply col-start-2 justify-self-start rounded-md border border-lightSelected px-3 py-2 text-xs font-semibold text-lightSelected dark:border-darkSelected dark:text-darkSelected sm:col-start-auto sm:justify-self-end;
 }
 
@@ -1428,7 +1464,7 @@
 }
 
 .study-card-joined {
-  @apply flex items-center gap-1 rounded bg-[#E9F7F6] px-2 py-1 text-[11px] font-semibold text-[#087B76] dark:bg-[#173B3A] dark:text-[#71D4CF];
+  @apply flex items-center gap-1 rounded bg-lightSuccessBackground px-2 py-1 text-[11px] font-semibold text-lightSuccessText dark:bg-darkSuccessBackground dark:text-darkSuccessText;
 }
 
 .study-card-copy {
@@ -1489,7 +1525,15 @@
 }
 
 .study-card-accent {
-  @apply border-[#9DD7D3] bg-white dark:border-[#356D69] dark:bg-darkSidebar;
+  @apply border-lightSuccessBorder bg-white dark:border-darkSuccessBorder dark:bg-darkSidebar;
+}
+
+.study-card-loading {
+  @apply w-fit bg-[#bbb9b9] !text-transparent dark:bg-[#313132];
+}
+
+.study-card-loading-sub {
+  @apply w-fit bg-[#e0e0e0] !text-transparent dark:bg-[#2c2c2d];
 }
 
 .study-card-loading {
@@ -1623,7 +1667,7 @@
 }
 
 .join-button-inactive {
-  @apply bg-lightButton text-white hover:bg-[#a80f28] dark:bg-darkButton dark:text-white dark:hover:bg-[#ef5268];
+  @apply bg-lightButton text-white hover:bg-lightButtonHover dark:bg-darkButton dark:text-white dark:hover:bg-darkButtonHover;
 }
 
 .join-button-active {
@@ -1659,7 +1703,7 @@
 }
 
 .react-datepicker__time-list-item {
-  @apply flex items-center justify-center border-[#aeaeae] p-0 dark:border-r-[1px];
+  @apply flex items-center justify-center border-lightControlBorder p-0 dark:border-r-[1px] dark:border-darkControlBorder;
 }
 
 .react-datepicker__day--selected,

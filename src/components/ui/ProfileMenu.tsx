@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SignOutButton, useUser } from "~/lib/auth-client";
 import { UserAvatar } from "./UserAvatar";
+import Link from "next/link";
 
 type ProfileMenuProps = {
   containerClassName?: string;
@@ -43,13 +44,13 @@ export function ProfileMenu({
       </button>
       {isOpen && (
         <div className="profile-menu">
-          <a
+          <Link
             href="/profile"
             className="profile-menu-item"
             onClick={() => setIsOpen(false)}
           >
             Profile
-          </a>
+          </Link>
           <SignOutButton>
             <button type="button" className="profile-menu-item">
               Logout

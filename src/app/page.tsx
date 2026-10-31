@@ -16,11 +16,12 @@ import {
 import { SignedIn, SignedOut, SignInButton, useUser } from "~/lib/auth-client";
 
 import { destinationQuery, groupDestination } from "~/lib/group-destination";
+import Link from "next/link";
 
 const previewGroups = [
   {
     course: "15-112",
-    title: "Principles of Imperative Computation",
+    title: "Fundamentals of Programming and Computer Science",
     schedule: "Tue 7:00 - 8:30 PM",
     location: "Wean 5213",
     seats: "12 / 16",
@@ -28,19 +29,19 @@ const previewGroups = [
   },
   {
     course: "21-127",
-    title: "Great Theoretical Ideas in CS",
+    title: "Concepts of Mathematics",
     schedule: "Wed 6:00 - 7:30 PM",
     location: "GHC 4401",
     seats: "9 / 14",
     status: "Open",
   },
   {
-    course: "36-200",
-    title: "Probability & Statistics",
+    course: "36-235",
+    title: "Probability and Statistical Inference I",
     schedule: "Thu 7:30 - 9:00 PM",
     location: "Posner 413",
     seats: "7 / 12",
-    status: "Filling",
+    status: "Open",
   },
 ];
 
@@ -61,9 +62,9 @@ function HomePageContent() {
     <div className="landing-page">
       <SignedOut>
         <header className="landing-nav">
-          <a href="/" className="landing-brand">
+          <Link href="/" className="landing-brand">
             <span>CMU</span> Study
-          </a>
+          </Link>
           <nav className="landing-nav-actions">
             <SignInButton forceRedirectUrl={loginUrl}>
               <button type="button" className="landing-signin">
@@ -108,57 +109,70 @@ function HomePageContent() {
             </div>
           </section>
 
-          <section className="landing-browser" aria-label="Study group preview">
-            <div className="landing-browser-heading">
-              <h2>Browse study groups</h2>
-            </div>
-            <div className="landing-browser-tools">
-              <div className="landing-search">
-                <Search size={18} />
-                <span>Search courses or keywords</span>
+          <SignInButton forceRedirectUrl={loginUrl}>
+            <section
+              aria-label="Browse study groups preview. Sign in to explore study groups."
+              className="landing-browser landing-browser-preview"
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" && event.key !== " ") return;
+
+                event.preventDefault();
+                event.currentTarget.click();
+              }}
+              role="button"
+              tabIndex={0}
+            >
+              <div className="landing-browser-heading">
+                <h2>Browse study groups</h2>
               </div>
-              <div className="landing-filter">All courses</div>
-              <div className="landing-filter">Upcoming</div>
-            </div>
-            <div className="landing-group-list">
-              {previewGroups.map((group) => (
-                <article key={group.course} className="landing-group-row">
-                  <div className="landing-course-code">{group.course}</div>
-                  <div className="landing-group-name">
-                    <strong>{group.title}</strong>
-                    <span>
-                      <span
-                        className={
-                          group.status === "Filling"
-                            ? "status-filling"
-                            : "status-open"
-                        }
-                      >
-                        {group.status}
-                      </span>{" "}
-                      {group.seats} members
-                    </span>
-                  </div>
-                  <div className="landing-group-meta">
-                    <span>
-                      <Clock size={16} />
-                      {group.schedule}
-                    </span>
-                    <span>
-                      <MapPin size={16} />
-                      {group.location}
-                    </span>
-                  </div>
-                  <div className="landing-avatar-stack">
-                    <i>AK</i>
-                    <i>MS</i>
-                    <i>JL</i>
-                  </div>
-                  <button type="button">View group</button>
-                </article>
-              ))}
-            </div>
-          </section>
+              <div className="landing-browser-tools">
+                <div className="landing-search">
+                  <Search size={18} />
+                  <span>Search courses or keywords</span>
+                </div>
+                <div className="landing-filter">All courses</div>
+                <div className="landing-filter">Upcoming</div>
+              </div>
+              <div className="landing-group-list">
+                {previewGroups.map((group) => (
+                  <article key={group.course} className="landing-group-row">
+                    <div className="landing-course-code">{group.course}</div>
+                    <div className="landing-group-name">
+                      <strong>{group.title}</strong>
+                      <span>
+                        <span
+                          className={
+                            group.status === "Filling"
+                              ? "status-filling"
+                              : "status-open"
+                          }
+                        >
+                          {group.status}
+                        </span>{" "}
+                        {group.seats} members
+                      </span>
+                    </div>
+                    <div className="landing-group-meta">
+                      <span>
+                        <Clock size={16} />
+                        {group.schedule}
+                      </span>
+                      <span>
+                        <MapPin size={16} />
+                        {group.location}
+                      </span>
+                    </div>
+                    <div className="landing-avatar-stack">
+                      <i>AK</i>
+                      <i>MS</i>
+                      <i>JL</i>
+                    </div>
+                    <span className="landing-view-group">View group</span>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </SignInButton>
 
           <section className="landing-features">
             <article>
@@ -193,7 +207,7 @@ function HomePageContent() {
         </main>
         <footer className="landing-footer">
           <span>CMU Study</span>
-          <a href="/privacy">Privacy</a>
+          <Link href="/privacy">Privacy</Link>
         </footer>
       </SignedOut>
 

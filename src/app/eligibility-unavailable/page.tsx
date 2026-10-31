@@ -4,6 +4,7 @@ import "~/styles/globals.css";
 import { RefreshCw, ShieldAlert } from "lucide-react";
 
 import { SignOutButton } from "~/lib/auth-client";
+import Link from "next/link";
 
 export default function EligibilityUnavailablePage() {
   return (
@@ -21,10 +22,10 @@ export default function EligibilityUnavailablePage() {
           again in a few minutes.
         </p>
         <div className="mt-8 flex justify-end gap-3">
-          <a href="/login" className="button-primary">
+          <Link href="/login" className="button-primary">
             <RefreshCw className="nav-link-icon" />
             Try again
-          </a>
+          </Link>
           <SignOutButton>
             <button className="button-outline">Sign out</button>
           </SignOutButton>

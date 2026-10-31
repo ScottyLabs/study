@@ -108,8 +108,8 @@ export default function EditGroupModal({ group }: EditGroupModalProps) {
         icon: "👏",
         style: {
           borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
+          background: "var(--color-toast-background)",
+          color: "var(--color-toast-text)",
         },
       },
     );
