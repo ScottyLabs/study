@@ -6,6 +6,8 @@ export type StudyGroupParticipant = {
   event?: string;
 };
 
+export type DateFilterRange = readonly [Date | null, Date | null];
+
 export interface StudyGroup {
   title: string;
   id: string;

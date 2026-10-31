@@ -1,6 +1,6 @@
 "use client";
 import GroupDetails from "~/features/groups/components/GroupDetails";
-import type { StudyGroup } from "~/types";
+import type { DateFilterRange, StudyGroup } from "~/types";
 import React, { useState } from "react";
 import { useUser } from "~/lib/auth-client";
 import { formatDateTime } from "~/helpers/date_helper";
@@ -26,7 +26,10 @@ export default function MyGroupsPage() {
   const [selectedCourses, setSelectedCourses] = useState<
     MultiValue<{ value: string; label: string }>
   >([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDateRange, setSelectedDateRange] = useState<DateFilterRange>([
+    null,
+    null,
+  ]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showDetails, setShowDetails] = useState<StudyGroup | null>(null);
 
@@ -43,7 +46,7 @@ export default function MyGroupsPage() {
       matchesSearch &&
       !shouldHideBySharedFilters({
         group,
-        selectedDate,
+        selectedDateRange,
         selectedCourseValues: selectedCourses.map((course) => course.value),
       })
     );
@@ -70,8 +73,8 @@ export default function MyGroupsPage() {
         courseOptions={classOptions}
         selectedCourses={selectedCourses}
         setSelectedCourses={setSelectedCourses}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
+        selectedDateRange={selectedDateRange}
+        setSelectedDateRange={setSelectedDateRange}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />

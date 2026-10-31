@@ -20,8 +20,8 @@ const defaultProps = {
   courseOptions,
   selectedCourses: [],
   setSelectedCourses: vi.fn(),
-  selectedDate: null,
-  setSelectedDate: vi.fn(),
+  selectedDateRange: [null, null] as [Date | null, Date | null],
+  setSelectedDateRange: vi.fn(),
   searchQuery: "",
   setSearchQuery: vi.fn(),
 };
@@ -31,12 +31,7 @@ describe("TopFilterBar", () => {
     const user = userEvent.setup();
     const setSearchQuery = vi.fn();
 
-    render(
-      <TopFilterBar
-        {...defaultProps}
-        setSearchQuery={setSearchQuery}
-      />,
-    );
+    render(<TopFilterBar {...defaultProps} setSearchQuery={setSearchQuery} />);
 
     const searchInput = screen.getByRole("searchbox", {
       name: "Search groups",
@@ -73,23 +68,36 @@ describe("TopFilterBar", () => {
 
     expect(setSelectedCourses).toHaveBeenCalledOnce();
     expect(setSelectedCourses).toHaveBeenCalledWith(
-        [{ value: "15-122", label: "15-122" }],
-        expect.objectContaining({
-            action: "select-option",
-        }),
+      [{ value: "15-122", label: "15-122" }],
+      expect.objectContaining({
+        action: "select-option",
+      }),
     );
   });
 
-  test("renders the selected date", () => {
+  test("renders a single selected date", () => {
     const selectedDate = new Date(2026, 9, 2);
 
     render(
       <TopFilterBar
         {...defaultProps}
-        selectedDate={selectedDate}
+        selectedDateRange={[selectedDate, null]}
       />,
     );
 
-    expect(screen.getByDisplayValue("10/02/2026")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("10/02/2026 -")).toBeInTheDocument();
+  });
+
+  test("renders a selected date range", () => {
+    render(
+      <TopFilterBar
+        {...defaultProps}
+        selectedDateRange={[new Date(2026, 9, 2), new Date(2026, 9, 5)]}
+      />,
+    );
+
+    expect(
+      screen.getByDisplayValue("10/02/2026 - 10/05/2026"),
+    ).toBeInTheDocument();
   });
 });
