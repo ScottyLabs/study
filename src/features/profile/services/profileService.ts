@@ -1,17 +1,7 @@
 import axios from "axios";
 
-import {
-  fetchProfile,
-  fetchTheme,
-  updateProfile,
-  updateTheme,
-} from "./profileApi";
-import type {
-  Course,
-  ProfileDetails,
-  ProfileSummary,
-  ThemePreference,
-} from "../types";
+import { fetchProfile, fetchTheme, updateProfile, updateTheme } from "./profileApi";
+import type { Course, ProfileDetails, ProfileSummary, ThemePreference } from "../types";
 
 export const defaultProfileDetails: ProfileDetails = {
   year: "default",
@@ -37,20 +27,16 @@ export async function getUserProfileSummary(): Promise<ProfileSummary> {
   };
 }
 
-export async function updateUserProfileDetails(
-  updates: Partial<ProfileDetails>,
-) {
+export async function updateUserProfileDetails(updates: Partial<ProfileDetails>) {
   await updateProfile(updates);
 }
 
 export async function getAllCourses(): Promise<Course[]> {
-  const response = await axios.get<Course[]>(
-    "https://course.apis.scottylabs.org/courses/all",
-  );
+  const response = await axios.get<Course[]>("https://course.apis.scottylabs.org/courses/all");
   return response.data;
 }
 
-export async function getUserTheme(): Promise<ThemePreference> {
+export function getUserTheme(): Promise<ThemePreference> {
   return fetchTheme();
 }
 

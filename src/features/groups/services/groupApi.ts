@@ -6,7 +6,7 @@ const GROUPS_CHANNEL_NAME = "study-groups";
 let groupsChannel: BroadcastChannel | null = null;
 
 function getGroupsChannel() {
-  if (typeof window === "undefined" || !window.BroadcastChannel) {
+  if (typeof window === "undefined" || !("BroadcastChannel" in window)) {
     return null;
   }
 
@@ -22,9 +22,11 @@ export function notifyGroupsChanged() {
 }
 
 export function subscribeToGroupChanges(listener: () => void) {
-  if (typeof window === "undefined") return () => undefined;
+  if (typeof window === "undefined") return () => {};
 
-  const handleMessage = () => listener();
+  const handleMessage = () => {
+    listener();
+  };
   const channel = getGroupsChannel();
   window.addEventListener(GROUPS_CHANGED_EVENT, listener);
   channel?.addEventListener("message", handleMessage);
@@ -91,13 +93,13 @@ function toStudyGroup(group: ApiGroup): StudyGroup {
 }
 
 export async function fetchGroups(courseCode?: string) {
-  const query = courseCode
-    ? `?courseCode=${encodeURIComponent(courseCode)}`
-    : "";
-  const response = await apiRequest<{ groups: ApiGroup[] }>(
-    `/api/v1/groups${query}`,
-    { cache: "no-store" },
-  );
+  const query =
+    courseCode === undefined || courseCode === ""
+      ? ""
+      : `?courseCode=${encodeURIComponent(courseCode)}`;
+  const response = await apiRequest<{ groups: ApiGroup[] }>(`/api/v1/groups${query}`, {
+    cache: "no-store",
+  });
 
   return response.groups.map(toStudyGroup);
 }
@@ -154,13 +156,7 @@ export async function joinGroup({
   notifyGroupsChanged();
 }
 
-export async function updateGroup({
-  group,
-  input,
-}: {
-  group: StudyGroup;
-  input: GroupFormInput;
-}) {
+export async function updateGroup({ group, input }: { group: StudyGroup; input: GroupFormInput }) {
   const response = await apiRequest<{ group: ApiGroup }>(
     `/api/v1/groups/${encodeURIComponent(group.id)}`,
     {

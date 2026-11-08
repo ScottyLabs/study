@@ -1,6 +1,74 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Keep in sync with DESKTOP_LAYOUT_QUERY and MOBILE_LAYOUT_QUERY in src/lib/responsive.ts */
+@custom-variant desktop {
+  @media (min-width: 1024px) and (orientation: landscape), (min-width: 1440px) {
+    @slot;
+  }
+}
+
+@custom-variant compact {
+  @media (max-width: 1023px), (max-width: 1439px) and (orientation: portrait) {
+    @slot;
+  }
+}
+
+/* Inline so utilities read the :root variables below, as they did in Tailwind 3 */
+@theme inline {
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-white: rgb(var(--color-white-rgb));
+  --color-black: rgb(var(--color-black-rgb));
+  --color-lightText: var(--color-light-text);
+  --color-darkText: var(--color-dark-text);
+
+  --color-lightbg: rgb(var(--color-light-background-rgb));
+  --color-lightSidebar: var(--color-light-sidebar);
+  --color-lightAccent: var(--color-light-accent);
+  --color-lightSelected: rgb(var(--color-light-selected-rgb));
+  --color-lightButton: var(--color-light-button);
+  --color-lightButtonHover: var(--color-light-button-hover);
+  --color-lightInput: var(--color-light-input);
+  --color-lightSubtleBorder: var(--color-light-subtle-border);
+
+  --color-darkbg: rgb(var(--color-dark-background-rgb));
+  --color-darkSidebar: rgb(var(--color-dark-sidebar-rgb));
+  --color-darkAccent: var(--color-dark-accent);
+  --color-darkSelected: rgb(var(--color-dark-selected-rgb));
+  --color-darkButton: var(--color-dark-button);
+  --color-darkButtonHover: var(--color-dark-button-hover);
+  --color-darkInput: var(--color-dark-input);
+  --color-darkSubtleBorder: var(--color-dark-subtle-border);
+
+  --color-lightSuccessBackground: var(--color-light-success-background);
+  --color-darkSuccessBackground: var(--color-dark-success-background);
+  --color-lightSuccessBorder: var(--color-light-success-border);
+  --color-darkSuccessBorder: var(--color-dark-success-border);
+  --color-lightSuccessText: var(--color-light-success-text);
+  --color-darkSuccessText: var(--color-dark-success-text);
+  --color-lightSuccessHighlight: var(--color-light-success-highlight);
+  --color-darkSuccessHighlight: var(--color-dark-success-highlight);
+  --color-lightSuccessStrongBorder: var(--color-light-success-strong-border);
+  --color-darkSuccessStrongBorder: var(--color-dark-success-strong-border);
+  --color-lightJoined: var(--color-light-joined-background);
+  --color-darkJoined: var(--color-dark-joined-background);
+  --color-lightJoinedText: var(--color-light-joined-text);
+  --color-darkJoinedText: var(--color-dark-joined-text);
+  --color-lightWarningBackground: var(--color-light-warning-background);
+  --color-darkWarningBackground: var(--color-dark-warning-background);
+  --color-lightWarningText: var(--color-light-warning-text);
+  --color-darkWarningText: var(--color-dark-warning-text);
+  --color-lightWarningAccent: var(--color-light-warning-accent);
+  --color-darkWarningAccent: var(--color-dark-warning-accent);
+  --color-lightControlBorder: var(--color-light-control-border);
+  --color-darkControlBorder: var(--color-dark-control-border);
+}
 
 :root {
   --color-white: #ffffff;
@@ -73,39 +141,54 @@
   --color-overlay: var(--color-dark-overlay);
 }
 
-body {
-  font-family: var(--font-geist-sans), sans-serif;
-  margin: 0;
-  background-color: var(--color-light-background);
-  color: var(--color-light-text);
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+/* Layer element rules so utilities override them, as they did in Tailwind 3 */
+@layer base {
+  body {
+    font-family: var(--font-geist-sans), sans-serif;
+    margin: 0;
+    background-color: var(--color-light-background);
+    color: var(--color-light-text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .dark body {
+    background-color: var(--color-dark-background);
+    color: var(--color-dark-text);
+  }
+
+  * {
+    letter-spacing: 0;
+    box-sizing: border-box;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  ::selection {
+    background-color: var(--color-light-selection);
+  }
+
+  .dark ::selection {
+    background-color: var(--color-dark-selection);
+  }
+
+  /* Restore Tailwind 3 preflight defaults that the components rely on */
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ca3af;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
-.dark body {
-  background-color: var(--color-dark-background);
-  color: var(--color-dark-text);
-}
-
-* {
-  letter-spacing: 0;
-  box-sizing: border-box;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-::selection {
-  background-color: var(--color-light-selection);
-}
-
-.dark ::selection {
-  background-color: var(--color-dark-selection);
-}
 .container {
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox */

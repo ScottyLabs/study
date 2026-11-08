@@ -9,17 +9,14 @@ export default function PrivacyPage() {
     <main className="privacy-page">
       <div className="privacy-card">
         <h1 className="privacy-title">Privacy Policy</h1>
-        <p className="mb-12 text-center text-sm opacity-70">
-          Effective Date: October 3, 2026
-        </p>
+        <p className="mb-12 text-center text-sm opacity-70">Effective Date: October 3, 2026</p>
 
         <section className="privacy-content">
           <p className="text-center text-lg opacity-90">
-            <strong>CMU Study</strong> (&quot;we,&quot; &quot;our,&quot; or &quot;the app&quot;) uses the
-            Google Calendar API solely to help users create and manage
-            study-related events on their Google Calendar. This Privacy Policy
-            explains what data we access, how we use it, how we store and
-            protect it, and what control users have over their information.
+            <strong>CMU Study</strong> (&quot;we,&quot; &quot;our,&quot; or &quot;the app&quot;)
+            uses the Google Calendar API solely to help users create and manage study-related events
+            on their Google Calendar. This Privacy Policy explains what data we access, how we use
+            it, how we store and protect it, and what control users have over their information.
           </p>
 
           {/* Data Accessed */}
@@ -27,8 +24,7 @@ export default function PrivacyPage() {
             <h2 className="privacy-section-title">Data Accessed</h2>
 
             <p>
-              CMU Study only requests the minimum Google Calendar permissions
-              necessary to function.
+              CMU Study only requests the minimum Google Calendar permissions necessary to function.
             </p>
 
             <h3 className="mt-4 font-semibold">Google User Data Accessed</h3>
@@ -49,24 +45,19 @@ export default function PrivacyPage() {
             </ul>
 
             <p className="mt-3 opacity-90">
-              No other Google user data is accessed beyond the limited scope
-              described above.
+              No other Google user data is accessed beyond the limited scope described above.
             </p>
           </div>
 
           {/* How We Use Data */}
           <div className="privacy-section">
-            <h2 className="privacy-section-title">
-              How We Use Google User Data
-            </h2>
+            <h2 className="privacy-section-title">How We Use Google User Data</h2>
 
             <p>We use your granted calendar access solely to:</p>
 
             <ul className="mt-3 list-disc space-y-2 pl-6">
               <li>Create events on your Google Calendar when you request it</li>
-              <li>
-                Delete events created by CMU Study if you choose to remove them
-              </li>
+              <li>Delete events created by CMU Study if you choose to remove them</li>
             </ul>
 
             <p className="mt-4 opacity-90">
@@ -79,8 +70,7 @@ export default function PrivacyPage() {
             </ul>
 
             <p className="mt-4 opacity-90">
-              All event creation and deletion occurs only when you explicitly
-              request it.
+              All event creation and deletion occurs only when you explicitly request it.
             </p>
           </div>
 
@@ -89,13 +79,12 @@ export default function PrivacyPage() {
             <h2 className="privacy-section-title">Data We Store</h2>
 
             <p>
-              We store the <strong>event ID</strong> for each event created by
-              CMU Study so the app can modify or delete it later. When you
-              connect Google Calendar, we also store encrypted access and
-              refresh tokens, their expiration information, granted permissions,
-              and a Google account identifier when provided. These credentials
-              let the server perform Calendar actions you request without asking
-              you to reconnect each time an access token expires.
+              We store the <strong>event ID</strong> for each event created by CMU Study so the app
+              can modify or delete it later. When you connect Google Calendar, we also store
+              encrypted access and refresh tokens, their expiration information, granted
+              permissions, and a Google account identifier when provided. These credentials let the
+              server perform Calendar actions you request without asking you to reconnect each time
+              an access token expires.
             </p>
 
             <p className="mt-4 opacity-90">
@@ -114,8 +103,8 @@ export default function PrivacyPage() {
           <div className="privacy-section">
             <h2 className="privacy-section-title">Data Sharing</h2>
             <p>
-              We <strong>do not</strong> share, sell, or transmit any Google
-              user data or stored event IDs to third parties.
+              We <strong>do not</strong> share, sell, or transmit any Google user data or stored
+              event IDs to third parties.
             </p>
 
             <p className="mt-4">Your data is never shared with:</p>
@@ -127,8 +116,8 @@ export default function PrivacyPage() {
             </ul>
 
             <p className="mt-4 opacity-90">
-              CMU Study operates independently and does not integrate with any
-              third-party system that uses your data.
+              CMU Study operates independently and does not integrate with any third-party system
+              that uses your data.
             </p>
           </div>
 
@@ -137,8 +126,8 @@ export default function PrivacyPage() {
             <h2 className="privacy-section-title">Data Storage & Protection</h2>
 
             <p>
-              We use reasonable industry security measures to protect stored
-              event IDs and Calendar connections, including:
+              We use reasonable industry security measures to protect stored event IDs and Calendar
+              connections, including:
             </p>
 
             <ul className="mt-3 list-disc space-y-2 pl-6">
@@ -149,9 +138,8 @@ export default function PrivacyPage() {
             </ul>
 
             <p className="mt-4 opacity-90">
-              Google access and refresh tokens remain on the server and are
-              never sent to your browser. Calendar requests use your connected
-              account only for actions you initiate.
+              Google access and refresh tokens remain on the server and are never sent to your
+              browser. Calendar requests use your connected account only for actions you initiate.
             </p>
           </div>
 
@@ -161,28 +149,24 @@ export default function PrivacyPage() {
 
             <h3 className="font-semibold">How Long We Retain Data</h3>
             <p className="mt-2">
-              Event IDs are retained only as long as needed to allow users to
-              modify or delete events created by the app. They may be removed
-              automatically when no longer necessary.
-              Calendar connection credentials are retained to support those
-              actions until deleted. Temporary authorization attempts expire
-              after ten minutes and are removed during subsequent connection
-              requests.
+              Event IDs are retained only as long as needed to allow users to modify or delete
+              events created by the app. They may be removed automatically when no longer necessary.
+              Calendar connection credentials are retained to support those actions until deleted.
+              Temporary authorization attempts expire after ten minutes and are removed during
+              subsequent connection requests.
             </p>
 
             <h3 className="mt-4 font-semibold">User Data Deletion</h3>
             <p className="mt-2">
-              You may request deletion of stored event IDs and Calendar
-              connection credentials at any time by
-              contacting:
+              You may request deletion of stored event IDs and Calendar connection credentials at
+              any time by contacting:
               <br />
               <strong>cmustudy.help@gmail.com</strong>
             </p>
 
             <h3 className="mt-4 font-semibold">Revoking Access</h3>
             <p className="mt-2">
-              You can revoke the app&apos;s access to your Google Account at any
-              time via your{" "}
+              You can revoke the app&apos;s access to your Google Account at any time via your{" "}
               <a
                 href="https://myaccount.google.com/permissions"
                 className="text-lightSelected hover:underline dark:text-darkSelected"
@@ -191,8 +175,8 @@ export default function PrivacyPage() {
               >
                 Google Account Permissions
               </a>{" "}
-              page. After access is revoked, the app will no longer be able to
-              create or delete events.
+              page. After access is revoked, the app will no longer be able to create or delete
+              events.
             </p>
           </div>
 
@@ -200,8 +184,8 @@ export default function PrivacyPage() {
           <div className="privacy-section">
             <h2 className="privacy-section-title">Changes to This Policy</h2>
             <p>
-              We may update this Privacy Policy from time to time. Any revisions
-              will be posted on this page with a new effective date.
+              We may update this Privacy Policy from time to time. Any revisions will be posted on
+              this page with a new effective date.
             </p>
           </div>
 

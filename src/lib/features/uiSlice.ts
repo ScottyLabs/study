@@ -28,9 +28,6 @@ const uiSlice = createSlice({
   },
 });
 
-export const {
-  setIsCreateGroupModalOpen,
-  setIsEditGroupModalOpen,
-  setIsViewProfileOpen,
-} = uiSlice.actions;
+export const { setIsCreateGroupModalOpen, setIsEditGroupModalOpen, setIsViewProfileOpen } =
+  uiSlice.actions;
 export default uiSlice.reducer;

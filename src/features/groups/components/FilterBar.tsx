@@ -4,7 +4,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { CalendarDays, Search } from "lucide-react";
 import type { DateFilterRange } from "~/types";
 
-type FilterOption = { value: string; label: string };
+export type FilterOption = { value: string; label: string };
 
 const customSelectComponents = {
   ClearIndicator: () => null,
@@ -20,9 +20,7 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
     height: "44px",
     minHeight: "44px",
     backgroundColor: "var(--filter-input-background)",
-    borderColor: state.isFocused
-      ? "var(--filter-selected-color)"
-      : "var(--filter-border-color)",
+    borderColor: state.isFocused ? "var(--filter-selected-color)" : "var(--filter-border-color)",
     boxShadow: "none",
     borderRadius: "8px",
     padding: "0 4px",
@@ -40,9 +38,7 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
   }),
   multiValueRemove: (provided, state) => ({
     ...provided,
-    color: state.isFocused
-      ? "var(--filter-option-selected-text)"
-      : "var(--filter-chip-text)",
+    color: state.isFocused ? "var(--filter-option-selected-text)" : "var(--filter-chip-text)",
     ":hover": {
       backgroundColor: "var(--filter-option-selected-background)",
       color: "var(--filter-option-selected-text)",
@@ -79,9 +75,7 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
       : state.isFocused
         ? "var(--filter-option-hover-background)"
         : "transparent",
-    color: state.isSelected
-      ? "var(--filter-option-selected-text)"
-      : "var(--filter-text-color)",
+    color: state.isSelected ? "var(--filter-option-selected-text)" : "var(--filter-text-color)",
     ":active": {
       backgroundColor: "var(--filter-option-selected-background)",
     },
@@ -92,7 +86,7 @@ const customSelectStyles: StylesConfig<FilterOption, true> = {
   }),
 };
 
-interface TopFilterBarProps {
+export interface TopFilterBarProps {
   courseOptions: FilterOption[];
   selectedCourses: MultiValue<FilterOption>;
   setSelectedCourses: (selected: MultiValue<FilterOption>) => void;
@@ -100,6 +94,29 @@ interface TopFilterBarProps {
   setSelectedDateRange: (dateRange: DateFilterRange) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+}
+
+type DateRangeFilterProps = Pick<TopFilterBarProps, "selectedDateRange" | "setSelectedDateRange">;
+
+function DateRangeFilter({ selectedDateRange, setSelectedDateRange }: DateRangeFilterProps) {
+  return (
+    <div className="filter-date-control">
+      <CalendarDays className="filter-date-icon" size={17} />
+      <DatePicker
+        selectsRange
+        startDate={selectedDateRange[0] ?? undefined}
+        endDate={selectedDateRange[1] ?? undefined}
+        onChange={(dateRange) => {
+          setSelectedDateRange(dateRange);
+        }}
+        customInput={<input />}
+        popperClassName="custom-popper"
+        wrapperClassName="filter-date-wrapper"
+        placeholderText="Any date or range"
+        className="filter-date-input"
+      />
+    </div>
+  );
 }
 
 function TopFilterBar({
@@ -120,7 +137,9 @@ function TopFilterBar({
             <input
               type="search"
               value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
+              onChange={(event) => {
+                setSearchQuery(event.target.value);
+              }}
               placeholder="Search by course, title, or topic"
               aria-label="Search groups"
             />
@@ -138,20 +157,10 @@ function TopFilterBar({
             components={customSelectComponents}
           />
 
-          <div className="filter-date-control">
-            <CalendarDays className="filter-date-icon" size={17} />
-            <DatePicker
-              selectsRange
-              startDate={selectedDateRange[0] ?? undefined}
-              endDate={selectedDateRange[1] ?? undefined}
-              onChange={(dateRange) => setSelectedDateRange(dateRange)}
-              customInput={<input />}
-              popperClassName="custom-popper"
-              wrapperClassName="filter-date-wrapper"
-              placeholderText="Any date or range"
-              className="filter-date-input"
-            />
-          </div>
+          <DateRangeFilter
+            selectedDateRange={selectedDateRange}
+            setSelectedDateRange={setSelectedDateRange}
+          />
         </div>
       </div>
     </div>

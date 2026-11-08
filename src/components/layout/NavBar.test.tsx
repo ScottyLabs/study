@@ -33,16 +33,8 @@ test("does not render a duplicate Profile link in the sidebar navigation", () =>
   const sidebar = screen.getByRole("complementary", {
     name: "Primary navigation",
   });
-  const primaryLinks = within(
-    sidebar.querySelector(".sidebar-nav")!,
-  ).getAllByRole("link");
+  const primaryLinks = within(sidebar.querySelector(".sidebar-nav")!).getAllByRole("link");
 
-  expect(primaryLinks.map((link) => link.getAttribute("href"))).toEqual([
-    "/feed",
-    "/my-groups",
-  ]);
-  expect(sidebar.querySelector(".sidebar-account")).toHaveAttribute(
-    "href",
-    "/profile",
-  );
+  expect(primaryLinks.map((link) => link.getAttribute("href"))).toEqual(["/feed", "/my-groups"]);
+  expect(sidebar.querySelector(".sidebar-account")).toHaveAttribute("href", "/profile");
 });

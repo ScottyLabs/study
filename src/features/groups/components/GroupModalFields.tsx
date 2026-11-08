@@ -1,49 +1,19 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { DatePickerInput } from "~/components/ui/DatePickerInput";
+import type { GroupFormValues } from "../hooks/useGroupForm";
 
 type GroupModalFieldsProps = {
-  title: string;
-  setTitle: Dispatch<SetStateAction<string>>;
-  titleMaxLength: number;
-  course: string;
-  setCourse: Dispatch<SetStateAction<string>>;
+  values: GroupFormValues;
+  onChange: (patch: Partial<GroupFormValues>) => void;
   classes: string[];
-  purpose: string;
-  setPurpose: Dispatch<SetStateAction<string>>;
-  date: Date | null | undefined;
-  setDate: Dispatch<SetStateAction<Date | null | undefined>>;
-  location: string;
-  setLocation: Dispatch<SetStateAction<string>>;
+  titleMaxLength: number;
   locationMaxLength: number;
-  seats: string;
-  setSeats: Dispatch<SetStateAction<string>>;
-  details: string;
-  setDetails: Dispatch<SetStateAction<string>>;
 };
 
-export function GroupModalFields({
-  title,
-  setTitle,
-  titleMaxLength,
-  course,
-  setCourse,
-  classes,
-  purpose,
-  setPurpose,
-  date,
-  setDate,
-  location,
-  setLocation,
-  locationMaxLength,
-  seats,
-  setSeats,
-  details,
-  setDetails,
-}: GroupModalFieldsProps) {
+function GroupBasicsFields({ values, onChange, classes, titleMaxLength }: GroupModalFieldsProps) {
   return (
     <>
       <input
@@ -51,8 +21,10 @@ export function GroupModalFields({
         type="text"
         aria-label="Group title"
         placeholder="Title"
-        value={title}
-        onChange={(event) => setTitle(event.target.value)}
+        value={values.title}
+        onChange={(event) => {
+          onChange({ title: event.target.value });
+        }}
         required
         maxLength={titleMaxLength}
       />
@@ -60,8 +32,10 @@ export function GroupModalFields({
         className="form-control"
         id="classSelect"
         aria-label="Course"
-        value={course}
-        onChange={(event) => setCourse(event.target.value)}
+        value={values.course}
+        onChange={(event) => {
+          onChange({ course: event.target.value });
+        }}
         required
       >
         <option value="" disabled>
@@ -78,31 +52,51 @@ export function GroupModalFields({
         type="text"
         aria-label="Purpose"
         placeholder="Purpose"
-        value={purpose}
-        onChange={(event) => setPurpose(event.target.value)}
+        value={values.purpose}
+        onChange={(event) => {
+          onChange({ purpose: event.target.value });
+        }}
         required
         maxLength={50}
       />
-      <DatePicker
-        selected={date}
-        onChange={(selectedDate) => setDate(selectedDate)}
-        ariaLabelledBy="Date and time"
-        showTimeSelect
-        dateFormat="Pp"
-        placeholderText="Date/Time"
-        popperClassName="custom-popper"
-        customInput={<DatePickerInput />}
-        wrapperClassName="w-full"
-        className="w-full"
-        required
-      />
+    </>
+  );
+}
+
+function GroupDateField({ values, onChange }: GroupModalFieldsProps) {
+  return (
+    <DatePicker
+      selected={values.date}
+      onChange={(date) => {
+        onChange({ date });
+      }}
+      ariaLabelledBy="Date and time"
+      showTimeSelect
+      dateFormat="Pp"
+      placeholderText="Date/Time"
+      popperClassName="custom-popper"
+      customInput={<DatePickerInput />}
+      wrapperClassName="w-full"
+      className="w-full"
+      required
+    />
+  );
+}
+
+function GroupLogisticsFields(props: GroupModalFieldsProps) {
+  const { values, onChange, locationMaxLength } = props;
+  return (
+    <>
+      <GroupDateField {...props} />
       <input
         className="form-control"
         type="text"
         aria-label="Location"
         placeholder="Location"
-        value={location}
-        onChange={(event) => setLocation(event.target.value)}
+        value={values.location}
+        onChange={(event) => {
+          onChange({ location: event.target.value });
+        }}
         required
         maxLength={locationMaxLength}
       />
@@ -111,8 +105,10 @@ export function GroupModalFields({
         type="number"
         aria-label="Maximum seats"
         placeholder="Max Seats"
-        value={seats}
-        onChange={(event) => setSeats(event.target.value)}
+        value={values.seats}
+        onChange={(event) => {
+          onChange({ seats: event.target.value });
+        }}
         required
         min="2"
         max="100"
@@ -122,10 +118,21 @@ export function GroupModalFields({
         type="text"
         aria-label="Details"
         placeholder="Details"
-        value={details}
+        value={values.details}
         maxLength={200}
-        onChange={(event) => setDetails(event.target.value)}
+        onChange={(event) => {
+          onChange({ details: event.target.value });
+        }}
       />
+    </>
+  );
+}
+
+export function GroupModalFields(props: GroupModalFieldsProps) {
+  return (
+    <>
+      <GroupBasicsFields {...props} />
+      <GroupLogisticsFields {...props} />
     </>
   );
 }

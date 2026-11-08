@@ -4,16 +4,10 @@ import { useEffect, useState } from "react";
 import { Link2, Share } from "lucide-react";
 import toast from "react-hot-toast";
 import type { StudyGroup } from "~/types";
-import {
-  groupLink,
-  invitationMessage,
-  nativeInvitation,
-} from "../utils/groupSharing";
+import { groupLink, invitationMessage, nativeInvitation } from "../utils/groupSharing";
 
 // iPads can identify as Macs when requesting desktop websites.
-export function usesMobileInvitations(
-  device: Pick<Navigator, "userAgent" | "maxTouchPoints">,
-) {
+export function usesMobileInvitations(device: Pick<Navigator, "userAgent" | "maxTouchPoints">) {
   return (
     /Android|iPhone|iPad|iPod/i.test(device.userAgent) ||
     (/Macintosh/i.test(device.userAgent) && device.maxTouchPoints > 1)
@@ -44,13 +38,9 @@ export function GroupShareAction({
     if (typeof navigator.share !== "function") {
       try {
         await navigator.clipboard.writeText(message);
-        toast.success(
-          "Invitation copied. Paste it into your messaging or email app.",
-        );
+        toast.success("Invitation copied. Paste it into your messaging or email app.");
       } catch {
-        toast.error(
-          "Sharing is unavailable and the invitation could not be copied.",
-        );
+        toast.error("Sharing is unavailable and the invitation could not be copied.");
       }
       return;
     }
@@ -68,9 +58,7 @@ export function GroupShareAction({
   };
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(
-        groupLink(window.location.origin, group.id),
-      );
+      await navigator.clipboard.writeText(groupLink(window.location.origin, group.id));
       toast.success("Study group link copied");
     } catch {
       toast.error("Could not copy the link. Please try again.");
@@ -90,14 +78,8 @@ export function GroupShareAction({
           else void copyLink();
         }}
       >
-        {mobile ? (
-          <Share size={18} aria-hidden="true" />
-        ) : (
-          <Link2 size={18} aria-hidden="true" />
-        )}
-        {(!compact || !mobile) && (
-          <span>{mobile ? mobileLabel : desktopLabel}</span>
-        )}
+        {mobile ? <Share size={18} aria-hidden="true" /> : <Link2 size={18} aria-hidden="true" />}
+        {(!compact || !mobile) && <span>{mobile ? mobileLabel : desktopLabel}</span>}
       </button>
     </>
   );

@@ -1,12 +1,11 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
-// Integration tests opt in with DATABASE_URL_TEST. Never reuse the
-// development DATABASE_URL for a destructive test-database reset.
+// Integration tests opt in with DATABASE_URL_TEST. Never reuse the development DATABASE_URL for a destructive test-database reset.
 const testDatabaseUrl = process.env.DATABASE_URL_TEST;
 if (process.env.DATABASE_TEST_REQUIRED === "true") {
   if (!testDatabaseUrl) {
@@ -39,5 +38,6 @@ export default defineConfig({
     restoreMocks: true,
     unstubEnvs: true,
     fileParallelism: false,
+    exclude: [...configDefaults.exclude, ".scottylabs/**"],
   },
 });

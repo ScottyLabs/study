@@ -19,15 +19,9 @@ export function useUserGroupState(userId?: string) {
         .then(({ joinedGroups, blockedByMe, blockedByThem }) => {
           if (cancelled || currentRequest !== requestVersion) return;
           setJoinedGroups(joinedGroups);
-          setBlockedUsers(
-            blockedByMe
-              .concat(blockedByThem)
-              .map((email) => email.toLowerCase()),
-          );
+          setBlockedUsers(blockedByMe.concat(blockedByThem).map((email) => email.toLowerCase()));
         })
-        .catch((error) =>
-          console.error("Error getting blocking state:", error),
-        );
+        .catch((error) => console.error("Error getting blocking state:", error));
     };
 
     loadState();

@@ -8,12 +8,7 @@ const toDate = (date: AppDate) => (date instanceof Date ? date : date.toDate());
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
-export function formatDateTime(
-  timestamp: AppDate,
-): [string | null, string | null] {
-  if (!timestamp) {
-    return [null, null];
-  }
+export function formatDateTime(timestamp: AppDate): [string, string] {
   const date = toDate(timestamp);
   const weekday = WEEKDAYS[date.getDay()];
   const month = String(date.getMonth() + 1).padStart(2, "0");

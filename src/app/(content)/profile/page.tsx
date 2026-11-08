@@ -21,11 +21,7 @@ export default function ProfilePage() {
         <h1 className="workspace-title profile-page-title">Profile</h1>
         <ProfileHeader user={user} />
 
-        <div
-          className="profile-tabs"
-          role="tablist"
-          aria-label="Profile sections"
-        >
+        <div className="profile-tabs" role="tablist" aria-label="Profile sections">
           {(["account", "courses", "blocked"] as const).map((tab) => (
             <button
               key={tab}
@@ -35,11 +31,7 @@ export default function ProfilePage() {
               className={activeTab === tab ? "profile-tab-active" : ""}
               onClick={() => setActiveTab(tab)}
             >
-              {tab === "courses"
-                ? "Courses"
-                : tab === "blocked"
-                  ? "Blocked"
-                  : "Account"}
+              {tab === "courses" ? "Courses" : tab === "blocked" ? "Blocked" : "Account"}
             </button>
           ))}
         </div>

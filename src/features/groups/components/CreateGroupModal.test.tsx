@@ -22,9 +22,9 @@ vi.mock("posthog-js/react", () => ({
   usePostHog: () => ({ capture: mocks.capture }),
 }));
 vi.mock("~/helpers/calendar_helper", () => ({
-  setupGoogleApi: async () => undefined,
-  requestCalendarAccessInteractive: async () => undefined,
-  addToCal: async () => "event",
+  setupGoogleApi: () => Promise.resolve(),
+  requestCalendarAccessInteractive: () => Promise.resolve(),
+  addToCal: () => Promise.resolve("event"),
   deleteFromCal: vi.fn(),
 }));
 vi.mock("~/features/profile/hooks/useUserCourses", () => ({
@@ -32,8 +32,13 @@ vi.mock("~/features/profile/hooks/useUserCourses", () => ({
 }));
 vi.mock("../services/groupApi", () => ({ createGroup: mocks.create }));
 vi.mock("./GroupModalFields", () => ({
-  GroupModalFields: ({ setDate }: { setDate: (date: Date) => void }) => (
-    <button type="button" onClick={() => setDate(new Date("2099-01-01"))}>
+  GroupModalFields: ({ onChange }: { onChange: (patch: { date: Date }) => void }) => (
+    <button
+      type="button"
+      onClick={() => {
+        onChange({ date: new Date("2099-01-01") });
+      }}
+    >
       Set date
     </button>
   ),
@@ -42,7 +47,7 @@ beforeEach(() => {
   vi.spyOn(navigator, "userAgent", "get").mockReturnValue("iPhone");
   Object.defineProperty(navigator, "share", {
     configurable: true,
-    value: mocks.share.mockResolvedValue(undefined),
+    value: mocks.share.mockReturnValue(Promise.resolve()),
   });
   mocks.create.mockResolvedValue({
     id: "created-id",
@@ -59,11 +64,9 @@ test("creation offers optional invitations and preserves created group data", as
   const { container } = render(<CreateGroupModal />);
   await user.click(screen.getByRole("button", { name: "Set date" }));
   fireEvent.submit(container.querySelector("form")!);
-  expect(
-    await screen.findByRole("heading", { name: "Group created!" }),
-  ).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Group created!" })).toBeVisible();
   expect(mocks.dispatch).not.toHaveBeenCalled();
-  await user.click(screen.getByRole("button", { name: "Invite classmates" }));
+  await user.click(await screen.findByRole("button", { name: "Invite classmates" }));
   expect(mocks.share).toHaveBeenCalledWith({
     title: "Study 15-213 with me",
     text: "Anyone want to study for the 15-213 exam? Join here:",
@@ -72,9 +75,7 @@ test("creation offers optional invitations and preserves created group data", as
   expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "Group created!" })).toBeVisible();
   await user.click(screen.getByRole("button", { name: "Done" }));
-  expect(mocks.dispatch).toHaveBeenCalledWith(
-    expect.objectContaining({ payload: false }),
-  );
+  expect(mocks.dispatch).toHaveBeenCalledWith(expect.objectContaining({ payload: false }));
   expect(mocks.create).toHaveBeenCalledOnce();
 });
 test("success step can be dismissed", async () => {
@@ -84,28 +85,18 @@ test("success step can be dismissed", async () => {
   fireEvent.submit(container.querySelector("form")!);
   await screen.findByRole("heading", { name: "Group created!" });
   await user.keyboard("{Escape}");
-  expect(mocks.dispatch).toHaveBeenCalledWith(
-    expect.objectContaining({ payload: false }),
-  );
+  expect(mocks.dispatch).toHaveBeenCalledWith(expect.objectContaining({ payload: false }));
 });
 
 test("desktop creation offers copying the link without an invitation editor", async () => {
   vi.spyOn(navigator, "userAgent", "get").mockReturnValue("Macintosh");
   const user = userEvent.setup();
-  const writeText = vi
-    .spyOn(navigator.clipboard, "writeText")
-    .mockResolvedValue();
+  const writeText = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue();
   const { container } = render(<CreateGroupModal />);
   await user.click(screen.getByRole("button", { name: "Set date" }));
   fireEvent.submit(container.querySelector("form")!);
-  await user.click(
-    await screen.findByRole("button", { name: "Copy link to study group" }),
-  );
-  expect(writeText).toHaveBeenCalledWith(
-    `${window.location.origin}/groups/created-id`,
-  );
+  await user.click(await screen.findByRole("button", { name: "Copy link to study group" }));
+  expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/groups/created-id`);
   expect(screen.queryByLabelText("Message")).not.toBeInTheDocument();
-  expect(
-    screen.queryByRole("button", { name: "Invite classmates" }),
-  ).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Invite classmates" })).not.toBeInTheDocument();
 });

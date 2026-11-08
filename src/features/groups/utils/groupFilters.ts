@@ -22,21 +22,13 @@ function isSameCalendarDate(firstDate: Date, secondDate: Date) {
 }
 
 function isCalendarDateInRange(date: Date, startDate: Date, endDate: Date) {
-  const calendarDate = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-  );
+  const calendarDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const firstCalendarDate = new Date(
     startDate.getFullYear(),
     startDate.getMonth(),
     startDate.getDate(),
   );
-  const lastCalendarDate = new Date(
-    endDate.getFullYear(),
-    endDate.getMonth(),
-    endDate.getDate(),
-  );
+  const lastCalendarDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
 
   return (
     calendarDate.getTime() >= firstCalendarDate.getTime() &&
@@ -45,11 +37,13 @@ function isCalendarDateInRange(date: Date, startDate: Date, endDate: Date) {
 }
 
 function hasSelectedValue(selectedValues: string[] | undefined, value: string) {
-  return !selectedValues?.length || selectedValues.includes(value);
+  return (
+    selectedValues === undefined || selectedValues.length === 0 || selectedValues.includes(value)
+  );
 }
 
 function hasBlockedParticipant(group: StudyGroup, blockedUsers: string[] = []) {
-  if (!blockedUsers.length) return false;
+  if (blockedUsers.length === 0) return false;
 
   return group.participantDetails.some((participant) =>
     blockedUsers.includes(participant.email?.toLowerCase() || ""),
@@ -90,7 +84,7 @@ export function shouldHideFeedGroup({
   selectedCourseValues,
 }: FeedGroupFilterInput) {
   const isFull = group.participantDetails.length >= group.totalSeats;
-  const isParticipant = joinedGroups?.includes(group.id);
+  const isParticipant = joinedGroups?.includes(group.id) === true;
 
   if (hasBlockedParticipant(group, blockedUsers)) {
     return true;

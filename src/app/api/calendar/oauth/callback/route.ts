@@ -1,8 +1,5 @@
-import { auth } from "~/lib/auth";
-import {
-  calendarOrigin,
-  completeCalendarAuthorization,
-} from "~/server/calendar/service";
+import { getSession } from "~/lib/auth";
+import { calendarOrigin, completeCalendarAuthorization } from "~/server/calendar/service";
 import { CalendarError } from "~/server/calendar/security";
 import { getUserEligibility } from "~/server/eligibility/service";
 
@@ -12,19 +9,11 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   let status = "failed";
   try {
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session)
-      throw new CalendarError("Session required", "missing_session", 401);
-    const eligibility = await getUserEligibility(
-      session.user.id,
-      session.user.andrewID,
-    );
+    const session = await getSession(request.headers);
+    if (!session) throw new CalendarError("Session required", "missing_session", 401);
+    const eligibility = await getUserEligibility(session.user.id, session.user.andrewID);
     if (eligibility !== "ELIGIBLE")
-      throw new CalendarError(
-        "Student eligibility required",
-        "ineligible",
-        403,
-      );
+      throw new CalendarError("Student eligibility required", "ineligible", 403);
     await completeCalendarAuthorization(
       session.user.id,
       session.session.id,

@@ -30,21 +30,13 @@ export function GroupDetailsHeader({
       </div>
       <div className="group-details-actions">
         {canEdit ? (
-          <button
-            className="group-details-action"
-            onClick={onEdit}
-            aria-label="Edit group"
-          >
+          <button className="group-details-action" onClick={onEdit} aria-label="Edit group">
             <Pencil size={18} />
           </button>
         ) : (
           <div />
         )}
-        <button
-          className="group-details-action"
-          onClick={onClose}
-          aria-label="Close details"
-        >
+        <button className="group-details-action" onClick={onClose} aria-label="Close details">
           <X size={18} />
         </button>
       </div>

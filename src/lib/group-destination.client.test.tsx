@@ -14,14 +14,10 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("~/lib/auth-client", () => ({
   useUser: () => ({
-    user: mocks.signedIn
-      ? { emailAddresses: [{ emailAddress: "student@cmu.edu" }] }
-      : null,
+    user: mocks.signedIn ? { emailAddresses: [{ emailAddress: "student@cmu.edu" }] } : null,
   }),
-  SignedIn: ({ children }: { children: ReactNode }) =>
-    mocks.signedIn ? children : null,
-  SignedOut: ({ children }: { children: ReactNode }) =>
-    mocks.signedIn ? null : children,
+  SignedIn: ({ children }: { children: ReactNode }) => (mocks.signedIn ? children : null),
+  SignedOut: ({ children }: { children: ReactNode }) => (mocks.signedIn ? null : children),
   SignInButton: ({
     children,
     forceRedirectUrl,
@@ -60,10 +56,7 @@ beforeEach(() => {
 test("every landing-page sign-in action carries the group destination", () => {
   render(<HomePage />);
   for (const button of screen.getAllByTestId("signin")) {
-    expect(button).toHaveAttribute(
-      "data-callback",
-      "/login?next=%2Fgroups%2Fabc-123",
-    );
+    expect(button).toHaveAttribute("data-callback", "/login?next=%2Fgroups%2Fabc-123");
   }
 });
 test("the study group preview is a sign-in action", () => {
@@ -73,26 +66,19 @@ test("the study group preview is a sign-in action", () => {
   });
 
   expect(preview).toHaveAttribute("tabindex", "0");
-  expect(preview.parentElement).toHaveAttribute(
-    "data-callback",
-    "/login?next=%2Fgroups%2Fabc-123",
-  );
+  expect(preview.parentElement).toHaveAttribute("data-callback", "/login?next=%2Fgroups%2Fabc-123");
 });
 test("signed-in landing redirect preserves the destination", async () => {
   mocks.signedIn = true;
   render(<HomePage />);
   await waitFor(() =>
-    expect(mocks.replace).toHaveBeenCalledWith(
-      "/login?next=%2Fgroups%2Fabc-123",
-    ),
+    expect(mocks.replace).toHaveBeenCalledWith("/login?next=%2Fgroups%2Fabc-123"),
   );
 });
 test("account setup Continue returns to the group", async () => {
   render(<CreateAccountPage />);
   fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-  await waitFor(() =>
-    expect(mocks.push).toHaveBeenCalledWith("/groups/abc-123"),
-  );
+  await waitFor(() => expect(mocks.push).toHaveBeenCalledWith("/groups/abc-123"));
 });
 test("unsafe destinations fall back to feed after setup", async () => {
   mocks.next = "//evil.test";

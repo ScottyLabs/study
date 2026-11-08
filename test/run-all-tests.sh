@@ -26,11 +26,11 @@ test_count() {
   fi
 }
 
-npm run test:unit -- "$@" 2>&1 | tee "$unit_log"
+deno task test:unit "$@" 2>&1 | tee "$unit_log"
 unit_status=${PIPESTATUS[0]}
 
 if [ "$unit_status" -eq 0 ]; then
-  npm run test:integration -- "$@" 2>&1 | tee "$integration_log"
+  deno task test:integration "$@" 2>&1 | tee "$integration_log"
   integration_status=${PIPESTATUS[0]}
 else
   integration_ran=false

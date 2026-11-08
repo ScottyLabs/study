@@ -16,6 +16,7 @@ model User {
   directoryCheckedAt      DateTime?
   directoryCheckExpiresAt DateTime?
   andrewID                String?              @map("andrew_id")
+  oidcSubject             String?              @unique @map("oidc_subject")
   image                   String?
   academicYear            String?
   majors                  String?
@@ -24,7 +25,6 @@ model User {
   courseCodes             String[]             @default([])
   createdAt               DateTime             @default(now()) @db.Timestamptz(3)
   updatedAt               DateTime             @updatedAt @db.Timestamptz(3)
-  accounts                Account[]
   sessions                Session[]
   memberships             GroupMembership[]
   blocksCreated           Block[]              @relation("Blocker")
@@ -87,38 +87,6 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([expiresAt])
-}
-
-model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
-  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([providerId, accountId])
-  @@index([userId])
-}
-
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime @db.Timestamptz(3)
-  createdAt  DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
-
-  @@index([identifier, createdAt(sort: Desc)])
   @@index([expiresAt])
 }
 

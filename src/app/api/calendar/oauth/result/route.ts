@@ -5,9 +5,7 @@ export const dynamic = "force-dynamic";
 
 export function GET(request: Request) {
   const success = new URL(request.url).searchParams.get("status") === "success";
-  const message = success
-    ? "Google Calendar connected"
-    : "Google Calendar connection failed";
+  const message = success ? "Google Calendar connected" : "Google Calendar connection failed";
   const script = "window.close();";
   const scriptHash = createHash("sha256").update(script).digest("base64");
   return new Response(

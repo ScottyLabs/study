@@ -1,8 +1,6 @@
 import { db } from "~/server/db";
 
-export const integrationDatabaseConfigured = Boolean(
-  process.env.DATABASE_URL_TEST,
-);
+export const integrationDatabaseConfigured = Boolean(process.env.DATABASE_URL_TEST);
 
 export async function resetTestDatabase() {
   if (!integrationDatabaseConfigured) {
@@ -13,9 +11,7 @@ export async function resetTestDatabase() {
     db.block.deleteMany(),
     db.groupMembership.deleteMany(),
     db.studyGroup.deleteMany(),
-    db.account.deleteMany(),
     db.session.deleteMany(),
-    db.verification.deleteMany(),
     db.user.deleteMany(),
   ]);
 }

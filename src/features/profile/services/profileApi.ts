@@ -34,10 +34,9 @@ export async function updateTheme(theme: ThemePreference) {
 }
 
 export async function fetchCourseCodes() {
-  const response = await apiRequest<{ courseCodes: string[] }>(
-    "/api/v1/me/courses",
-    { cache: "no-store" },
-  );
+  const response = await apiRequest<{ courseCodes: string[] }>("/api/v1/me/courses", {
+    cache: "no-store",
+  });
   return response.courseCodes;
 }
 
@@ -54,7 +53,7 @@ export async function deleteCourseCode(courseCode: string) {
   });
 }
 
-export async function fetchBlockingState() {
+export function fetchBlockingState() {
   return apiRequest<{
     blockedByMe: string[];
     blockedByThem: string[];
@@ -62,7 +61,7 @@ export async function fetchBlockingState() {
   }>("/api/v1/me/blocking", { cache: "no-store" });
 }
 
-export async function fetchBlockImpact(email: string) {
+export function fetchBlockImpact(email: string) {
   return apiRequest<{ sharedGroupCount: number }>(
     `/api/v1/me/blocks/${encodeURIComponent(email)}/impact`,
     { cache: "no-store" },
@@ -70,13 +69,10 @@ export async function fetchBlockImpact(email: string) {
 }
 
 export async function blockEmail(email: string) {
-  const response = await apiRequest<{ calendarEventIds: string[] }>(
-    "/api/v1/me/blocks",
-    {
+  const response = await apiRequest<{ calendarEventIds: string[] }>("/api/v1/me/blocks", {
     method: "POST",
     body: JSON.stringify({ email }),
-    },
-  );
+  });
   notifyGroupsChanged();
   return response;
 }

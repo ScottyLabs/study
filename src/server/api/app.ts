@@ -3,10 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { calendarApi } from "./calendar";
 
-import {
-  requireEligibleSession,
-  type ApiEnvironment,
-} from "~/server/api/auth-middleware";
+import { requireEligibleSession, type ApiEnvironment } from "~/server/api/auth-middleware";
 import {
   createGroup,
   getGroup,
@@ -38,10 +35,7 @@ api.onError((error, context) => {
     error,
   });
 
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2034"
-  ) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2034") {
     return context.json({ error: "Please retry the request" }, 409);
   }
 
@@ -132,10 +126,7 @@ api.post("/groups/:groupId/join", requireEligibleSession, async (context) => {
 });
 
 api.delete("/groups/:groupId/join", requireEligibleSession, async (context) => {
-  const result = await leaveGroup(
-    context.req.param("groupId"),
-    context.var.userId,
-  );
+  const result = await leaveGroup(context.req.param("groupId"), context.var.userId);
 
   if (!result.left) {
     return context.json({ error: "Membership not found" }, 404);
@@ -151,11 +142,7 @@ api.patch("/groups/:groupId", requireEligibleSession, async (context) => {
     return context.json({ error: "Invalid group input" }, 400);
   }
 
-  const group = await updateGroup(
-    context.req.param("groupId"),
-    context.var.userId,
-    input.data,
-  );
+  const group = await updateGroup(context.req.param("groupId"), context.var.userId, input.data);
 
   if (!group) {
     return context.json({ error: "Group membership required" }, 403);
@@ -187,9 +174,7 @@ api.patch("/me/profile", requireEligibleSession, async (context) => {
 });
 
 api.patch("/me/theme", requireEligibleSession, async (context) => {
-  const input = z
-    .object({ theme: z.enum(["light", "dark"]) })
-    .safeParse(await context.req.json());
+  const input = z.object({ theme: z.enum(["light", "dark"]) }).safeParse(await context.req.json());
 
   if (!input.success) {
     return context.json({ error: "Invalid theme" }, 400);
@@ -218,14 +203,10 @@ api.post("/me/courses", requireEligibleSession, async (context) => {
   return context.json({ added: true }, 201);
 });
 
-api.delete(
-  "/me/courses/:courseCode",
-  requireEligibleSession,
-  async (context) => {
-    await deleteCourseCode(context.var.userId, context.req.param("courseCode"));
-    return context.json({ deleted: true });
-  },
-);
+api.delete("/me/courses/:courseCode", requireEligibleSession, async (context) => {
+  await deleteCourseCode(context.var.userId, context.req.param("courseCode"));
+  return context.json({ deleted: true });
+});
 
 api.get("/me/blocking", requireEligibleSession, async (context) => {
   return context.json(await getBlockingState(context.var.userId));
@@ -233,7 +214,7 @@ api.get("/me/blocking", requireEligibleSession, async (context) => {
 
 api.post("/me/blocks", requireEligibleSession, async (context) => {
   const input = z
-    .object({ email: z.string().trim().email() })
+    .object({ email: z.string().trim().pipe(z.email()) })
     .safeParse(await context.req.json());
 
   if (!input.success) {
@@ -254,10 +235,7 @@ api.post("/me/blocks", requireEligibleSession, async (context) => {
 });
 
 api.delete("/me/blocks/:email", requireEligibleSession, async (context) => {
-  const deleted = await unblockUser(
-    context.var.userId,
-    context.req.param("email"),
-  );
+  const deleted = await unblockUser(context.var.userId, context.req.param("email"));
 
   if (!deleted) {
     return context.json({ error: "Block not found" }, 404);
@@ -267,10 +245,7 @@ api.delete("/me/blocks/:email", requireEligibleSession, async (context) => {
 });
 
 api.get("/me/blocks/:email/impact", requireEligibleSession, async (context) => {
-  const impact = await getBlockImpact(
-    context.var.userId,
-    context.req.param("email"),
-  );
+  const impact = await getBlockImpact(context.var.userId, context.req.param("email"));
 
   return context.json(impact);
 });

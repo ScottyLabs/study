@@ -10,11 +10,7 @@ const DIRECTORY_UNAVAILABLE_TTL_MS = 1 * 60 * 1000;
 
 export type UserEligibility = "ELIGIBLE" | "INELIGIBLE" | "UNAVAILABLE";
 
-function isCachedEligibility(
-  eligibility: DirectoryEligibility,
-  expiresAt: Date | null,
-  now: Date,
-) {
+function isCachedEligibility(eligibility: DirectoryEligibility, expiresAt: Date | null, now: Date) {
   return eligibility !== "UNCHECKED" && Boolean(expiresAt && expiresAt > now);
 }
 
@@ -22,7 +18,7 @@ export async function getUserEligibility(
   userId: string,
   andrewID: string | null | undefined,
 ): Promise<UserEligibility> {
-  if (!andrewID) return "UNAVAILABLE";
+  if (andrewID === null || andrewID === undefined || andrewID === "") return "UNAVAILABLE";
 
   const user = await db.user.findUnique({
     where: { id: userId },
@@ -35,23 +31,14 @@ export async function getUserEligibility(
   if (!user) return "UNAVAILABLE";
 
   const now = new Date();
-  if (
-    isCachedEligibility(
-      user.directoryEligibility,
-      user.directoryCheckExpiresAt,
-      now,
-    )
-  ) {
+  if (isCachedEligibility(user.directoryEligibility, user.directoryCheckExpiresAt, now)) {
     if (user.directoryEligibility === "ELIGIBLE") return "ELIGIBLE";
     if (user.directoryEligibility === "INELIGIBLE") return "INELIGIBLE";
     return "UNAVAILABLE";
   }
 
   const eligibility = await checkDirectoryEligibility(andrewID);
-  const ttl =
-    eligibility === "UNAVAILABLE"
-      ? DIRECTORY_UNAVAILABLE_TTL_MS
-      : DIRECTORY_CHECK_TTL_MS;
+  const ttl = eligibility === "UNAVAILABLE" ? DIRECTORY_UNAVAILABLE_TTL_MS : DIRECTORY_CHECK_TTL_MS;
 
   await db.user.update({
     where: { id: userId },

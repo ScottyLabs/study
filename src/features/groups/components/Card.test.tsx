@@ -64,8 +64,7 @@ describe("Card.test", () => {
   });
 });
 
-const renderCard = (onClick = vi.fn()) =>
-  render(<Card {...cardDummy} onClick={onClick} />);
+const renderCard = (onClick = vi.fn()) => render(<Card {...cardDummy} onClick={onClick} />);
 beforeEach(() => {
   vi.spyOn(navigator, "userAgent", "get").mockReturnValue("Macintosh");
   Object.defineProperty(navigator, "maxTouchPoints", {
@@ -75,9 +74,7 @@ beforeEach(() => {
 });
 test("desktop card copies its group link without opening details or native sharing", async () => {
   const user = userEvent.setup();
-  const writeText = vi
-    .spyOn(navigator.clipboard, "writeText")
-    .mockResolvedValue();
+  const writeText = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue();
   const share = vi.fn();
   Object.defineProperty(navigator, "share", {
     configurable: true,

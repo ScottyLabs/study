@@ -15,15 +15,10 @@ type ProfileHeaderProps = {
     emailAddresses?: { emailAddress?: string }[];
   } | null;
   showLogout?: boolean;
-
 };
 
-export function ProfileHeader({
-  user,
-  showLogout = false,
-}: ProfileHeaderProps) {
-  const displayName =
-    user?.fullName ?? user?.firstName ?? user?.username ?? "User";
+export function ProfileHeader({ user, showLogout = false }: ProfileHeaderProps) {
+  const displayName = user?.fullName ?? user?.firstName ?? user?.username ?? "User";
   const emailAddress = user?.emailAddresses?.[0]?.emailAddress;
   const profile = useProfileSummary(emailAddress);
 
@@ -42,8 +37,7 @@ export function ProfileHeader({
             {profile.year && profile.year != "default" && (
               <span>
                 <CalendarDays size={17} />{" "}
-                {profile.year === "Masters Student" ||
-                  profile.year === "PhD Student"
+                {profile.year === "Masters Student" || profile.year === "PhD Student"
                   ? profile.year
                   : `Class of ${profile.year}`}
               </span>

@@ -1,14 +1,11 @@
 "use client";
 
-import type { ReactElement, ReactNode } from "react";
-import { cloneElement, isValidElement, useMemo, useState } from "react";
-import { createAuthClient } from "better-auth/react";
-import {
-  genericOAuthClient,
-  inferAdditionalFields,
-} from "better-auth/client/plugins";
+import type { ReactNode } from "react";
+import { cloneElement, isValidElement, useEffect, useMemo, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+
+import { apiRequest } from "~/lib/api/client";
 
 type CompatUser = {
   emailAddresses: Array<{ emailAddress: string }>;
@@ -36,57 +33,61 @@ type SignInElementProps = {
   onClick?: () => void;
 };
 
-export const authClient = createAuthClient({
-  baseURL:
-    typeof window !== "undefined"
-      ? `${window.location.origin}/api/auth`
-      : `${process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? process.env.BETTER_AUTH_URL ?? "http://localhost:3000"}/api/auth`,
-  plugins: [
-    genericOAuthClient(),
-    inferAdditionalFields({
-      user: {
-        andrewID: {
-          type: "string",
-          required: false,
-        },
-      },
-    }),
-  ],
-});
+type SessionUser = {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  andrewID: string | null;
+};
 
-function getCompatUser(
-  session: ReturnType<typeof authClient.useSession>["data"],
-): CompatUser | null {
-  if (!session?.user) {
+// one request per page load, shared by every useUser caller
+let sessionUser: Promise<SessionUser | null> | undefined;
+
+function loadSessionUser() {
+  sessionUser ??= apiRequest<{ user: SessionUser | null }>("/api/auth/session", {
+    cache: "no-store",
+  })
+    .then((body) => body.user)
+    .catch((error: unknown) => {
+      sessionUser = undefined;
+      console.error("Session lookup failed:", error);
+      return null;
+    });
+  return sessionUser;
+}
+
+function forgetSessionUser() {
+  sessionUser = undefined;
+}
+
+function getCompatUser(user: SessionUser | null): CompatUser | null {
+  if (!user) {
     return null;
   }
 
-  const name = session.user.name ?? "";
-  const firstName = name.split(" ").filter(Boolean)[0];
-  const andrewID = session.user.andrewID ?? undefined;
+  const firstName = user.name.split(" ").find((part) => part !== "");
+  const andrewID = user.andrewID ?? undefined;
 
   return {
-    id: session.user.id,
-    fullName: name,
+    id: user.id,
+    fullName: user.name,
     firstName,
     andrewID,
     username: andrewID,
-    imageUrl: session.user.image ?? undefined,
-    emailAddresses: [{ emailAddress: session.user.email }],
+    imageUrl: user.image ?? undefined,
+    emailAddresses: [{ emailAddress: user.email }],
   };
 }
 
-function withClickHandler(
-  children: ReactNode,
-  onClick: () => void | Promise<void>,
-): ReactNode {
+function withClickHandler(children: ReactNode, onClick: () => void | Promise<void>): ReactNode {
   const runClickHandler = () => {
     void Promise.resolve(onClick()).catch((error) => {
       console.error("Auth click handler failed:", error);
     });
   };
 
-  if (!isValidElement(children)) {
+  if (!isValidElement<{ onClick?: () => void }>(children)) {
     return (
       <button type="button" onClick={runClickHandler}>
         {children}
@@ -94,23 +95,35 @@ function withClickHandler(
     );
   }
 
-  const element = children as ReactElement<{ onClick?: () => void }>;
-
-  return cloneElement(element, {
+  return cloneElement(children, {
     onClick: () => {
-      element.props.onClick?.();
+      children.props.onClick?.();
       runClickHandler();
     },
   });
 }
 
 export function useUser() {
-  const session = authClient.useSession();
-  const user = useMemo(() => getCompatUser(session.data), [session.data]);
+  const [session, setSession] = useState<{
+    isLoaded: boolean;
+    user: SessionUser | null;
+  }>({ isLoaded: false, user: null });
+
+  useEffect(() => {
+    let active = true;
+    void loadSessionUser().then((user) => {
+      if (active) setSession({ isLoaded: true, user });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const user = useMemo(() => getCompatUser(session.user), [session.user]);
 
   return {
     user,
-    isLoaded: !session.isPending,
+    isLoaded: session.isLoaded,
     isSignedIn: Boolean(user),
   };
 }
@@ -122,7 +135,7 @@ export function SignedIn({ children }: ButtonProps) {
     return null;
   }
 
-  return <>{children}</>;
+  return children;
 }
 
 export function SignedOut({ children }: ButtonProps) {
@@ -132,39 +145,26 @@ export function SignedOut({ children }: ButtonProps) {
     return null;
   }
 
-  return <>{children}</>;
+  return children;
 }
 
-export function SignInButton({
-  children,
-  forceRedirectUrl = "/login",
-}: SignInButtonProps) {
+export function SignInButton({ children, forceRedirectUrl = "/login" }: SignInButtonProps) {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
-  const handleSignIn = async () => {
+  const handleSignIn = () => {
     if (isSigningIn) return;
 
     setIsSigningIn(true);
-    try {
-      await authClient.signIn.oauth2({
-        providerId: "keycloak",
-        callbackURL: forceRedirectUrl,
-      });
-    } catch (error) {
-      console.error("Auth click handler failed:", error);
-      setIsSigningIn(false);
-    }
+    window.location.assign(`/api/auth/login?next=${encodeURIComponent(forceRedirectUrl)}`);
   };
 
-  const spinner = (
-    <LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true" />
-  );
+  const spinner = <LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true" />;
 
-  if (!isValidElement(children)) {
+  if (!isValidElement<SignInElementProps>(children)) {
     return (
       <button
         type="button"
-        onClick={() => void handleSignIn()}
+        onClick={handleSignIn}
         disabled={isSigningIn}
         aria-busy={isSigningIn}
         aria-label={isSigningIn ? "Signing in" : undefined}
@@ -174,18 +174,16 @@ export function SignInButton({
     );
   }
 
-  const element = children as ReactElement<SignInElementProps>;
-
-  return cloneElement(element, {
+  return cloneElement(children, {
     "aria-busy": isSigningIn,
     "aria-label": isSigningIn ? "Signing in" : undefined,
-    disabled: Boolean(element.props.disabled) || isSigningIn,
+    disabled: Boolean(children.props.disabled) || isSigningIn,
     onClick: () => {
       if (isSigningIn) return;
-      element.props.onClick?.();
-      void handleSignIn();
+      children.props.onClick?.();
+      handleSignIn();
     },
-    children: isSigningIn ? spinner : element.props.children,
+    children: isSigningIn ? spinner : children.props.children,
   });
 }
 
@@ -193,10 +191,11 @@ export function SignOutButton({ children }: ButtonProps) {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await authClient.signOut();
+    await fetch("/api/auth/logout", { method: "POST" });
+    forgetSessionUser();
     router.push("/");
     router.refresh();
   };
 
-  return <>{withClickHandler(children, handleSignOut)}</>;
+  return withClickHandler(children, handleSignOut);
 }

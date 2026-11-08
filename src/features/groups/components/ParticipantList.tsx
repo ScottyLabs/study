@@ -13,10 +13,7 @@ type ParticipantListProps = {
   onViewProfile: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
-export function ParticipantList({
-  participants,
-  onViewProfile,
-}: ParticipantListProps) {
+export function ParticipantList({ participants, onViewProfile }: ParticipantListProps) {
   return (
     <div className="participant-list">
       {participants.map((participant) => (

@@ -1,9 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import React, { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useUser } from "~/lib/auth-client";
 import { getAllCourses } from "../services/profileService";
 import { useUserCourses } from "../hooks/useUserCourses";
@@ -17,55 +12,55 @@ type CoursesProps = {
   addCourse: (course: Course) => Promise<void>;
 };
 
-function Courses({ userId, classes, setClasses, addCourse }: CoursesProps) {
+// Typing "15112" searches for "15-112"
+function courseSearchValue(query: string) {
+  return /^\d{3}/u.test(query) ? `${query.slice(0, 2)}-${query.slice(2)}` : query;
+}
+
+function matchCourses(courses: Course[], searchValue: string, selected: Course[]) {
+  const selectedIds = new Set(selected.map((course) => course.courseID));
+  return courses
+    .filter(
+      (course) =>
+        (course.name.toLowerCase().includes(searchValue) ||
+          course.courseID.toLowerCase().includes(searchValue)) &&
+        !selectedIds.has(course.courseID),
+    )
+    .slice(0, 10);
+}
+
+function useCourseCatalog() {
   const [courses, setCourses] = useState<Course[]>([]);
-  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const courses = await getAllCourses();
-        setCourses(courses);
-        setLoading(false);
-      } catch (err) {
+    void getAllCourses()
+      .then(setCourses)
+      .catch((err: unknown) => {
         console.error(err);
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
-    void fetchCourses();
+      });
   }, []);
+
+  return { courses, loading };
+}
+
+function useCourseSearch({ userId, classes, setClasses, addCourse }: CoursesProps) {
+  const { courses, loading } = useCourseCatalog();
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const updateFilteredCourses = (query: string, selectedClasses: Course[]) => {
     const normalizedQuery = query.trim();
-    if (!normalizedQuery) {
+    if (normalizedQuery === "") {
       setFilteredCourses([]);
       return;
     }
-
-    let searchValue = normalizedQuery;
-    if (
-      searchValue.length >= 3 &&
-      "0123456789".includes(searchValue.charAt(0)) &&
-      "0123456789".includes(searchValue.charAt(1)) &&
-      "0123456789".includes(searchValue.charAt(2))
-    ) {
-      searchValue = `${searchValue.substring(0, 2)}-${searchValue.substring(2)}`;
-      setSearchQuery(searchValue);
-    }
-
-    const selectedCourseIds = selectedClasses.map((course) => course.courseID);
-    const filtered = courses
-      .filter(
-        (course) =>
-          (course.name.toLowerCase().includes(searchValue) ||
-            course.courseID.toLowerCase().includes(searchValue)) &&
-          !selectedCourseIds.includes(course.courseID),
-      )
-      .slice(0, 10);
-
-    setFilteredCourses(filtered);
+    const searchValue = courseSearchValue(normalizedQuery);
+    if (searchValue !== normalizedQuery) setSearchQuery(searchValue);
+    setFilteredCourses(matchCourses(courses, searchValue, selectedClasses));
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,10 +70,8 @@ function Courses({ userId, classes, setClasses, addCourse }: CoursesProps) {
   };
 
   const addClass = async (course: Course) => {
+    if (userId === undefined || userId === "") return;
     try {
-      if (!userId) {
-        return;
-      }
       await addCourse(course);
       const nextClasses = [...classes, course];
       setClasses(nextClasses);
@@ -88,19 +81,48 @@ function Courses({ userId, classes, setClasses, addCourse }: CoursesProps) {
     }
   };
 
-  const handleSearchKeyDown = async (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === "Enter" && filteredCourses.length > 0) {
-      event.preventDefault();
-      const firstFilteredCourse = filteredCourses[0];
-      if (firstFilteredCourse) {
-        await addClass(firstFilteredCourse);
-      }
-    }
+  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const [firstFilteredCourse] = filteredCourses;
+    if (event.key !== "Enter" || firstFilteredCourse === undefined) return;
+    event.preventDefault();
+    void addClass(firstFilteredCourse);
   };
 
-  if (loading) return <p className="text-default">Loading...</p>;
+  return { loading, searchQuery, filteredCourses, handleSearch, handleSearchKeyDown, addClass };
+}
+
+type CourseResultsProps = {
+  courses: Course[];
+  onAdd: (course: Course) => Promise<void>;
+};
+
+function CourseResults({ courses, onAdd }: CourseResultsProps) {
+  return (
+    <ul className="list-none pl-0 text-black dark:text-white">
+      {courses.map((course) => (
+        <li className="my-2 flex items-center" key={course.id}>
+          <button
+            onClick={() => {
+              void onAdd(course);
+            }}
+            className="course-search-result"
+          >
+            <Plus className="h-4 w-4 shrink-0" />
+
+            <span className="course-search-text" title={`${course.courseID} ${course.name}`}>
+              {course.courseID} {course.name}
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Courses(props: CoursesProps) {
+  const search = useCourseSearch(props);
+
+  if (search.loading) return <p className="text-default">Loading...</p>;
 
   return (
     <div className="course-picker">
@@ -109,36 +131,18 @@ function Courses({ userId, classes, setClasses, addCourse }: CoursesProps) {
         <input
           type="search"
           placeholder="Search courses..."
-          value={searchQuery}
-          onChange={handleSearch}
-          onKeyDown={handleSearchKeyDown}
+          value={search.searchQuery}
+          onChange={search.handleSearch}
+          onKeyDown={search.handleSearchKeyDown}
           className="course-search-input"
           id="searchBar"
         />
       </label>
 
-      {filteredCourses.length > 0 ? (
-        <ul className="list-none pl-0 text-black dark:text-white">
-          {filteredCourses.map((course) => (
-            <li className="my-2 flex items-center" key={course.id}>
-              <button
-                onClick={async () => await addClass(course)}
-                className="course-search-result"
-              >
-                <Plus className="h-4 w-4 flex-shrink-0" />
-
-                <span
-                  className="course-search-text"
-                  title={`${course.courseID} ${course.name}`}
-                >
-                  {course.courseID} {course.name}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      {search.filteredCourses.length > 0 ? (
+        <CourseResults courses={search.filteredCourses} onAdd={search.addClass} />
       ) : (
-        searchQuery && <p className="form-empty-copy">No courses found.</p>
+        search.searchQuery && <p className="form-empty-copy">No courses found.</p>
       )}
     </div>
   );
@@ -147,17 +151,11 @@ function Courses({ userId, classes, setClasses, addCourse }: CoursesProps) {
 export function ClassList() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
-  const { classes, setClasses, addCourse, deleteCourse } =
-    useUserCourses(userId);
+  const { classes, setClasses, addCourse, deleteCourse } = useUserCourses(userId);
 
   return (
     <div className="class-list">
-      <Courses
-        userId={userId}
-        classes={classes}
-        setClasses={setClasses}
-        addCourse={addCourse}
-      />
+      <Courses userId={userId} classes={classes} setClasses={setClasses} addCourse={addCourse} />
       <ul className="class-list-items">
         {classes.map((cls) => (
           <li key={cls.courseID} className="class-list-item">
@@ -166,7 +164,9 @@ export function ClassList() {
               <span>{cls.name}</span>
             </div>
             <button
-              onClick={async () => await deleteCourse(cls.courseID)}
+              onClick={() => {
+                void deleteCourse(cls.courseID);
+              }}
               className="row-icon-button"
               aria-label={`Remove ${cls.courseID}`}
             >

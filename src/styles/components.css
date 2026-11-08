@@ -1,3 +1,5 @@
+@reference "./globals.css";
+
 .app-shell {
   @apply flex h-screen w-screen bg-lightbg text-lightText dark:bg-darkbg dark:text-darkText;
 }
@@ -31,23 +33,23 @@
 }
 
 .sidebar-content {
-  @apply grid h-screen grid-rows-[auto,1fr,auto] gap-y-8 overflow-hidden px-5 py-6 text-lightText dark:text-darkText;
+  @apply grid h-screen grid-rows-[auto_1fr_auto] gap-y-8 overflow-hidden px-5 py-6 text-lightText dark:text-darkText;
 }
 
 .sidebar-logo-link {
-  @apply flex h-14 items-center rounded-lg px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:focus-visible:ring-darkSelected;
+  @apply flex h-14 items-center rounded-lg px-2 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:focus-visible:ring-darkSelected;
 }
 
 .sidebar-utility-panel {
-  @apply rounded-lg border border-black/10 bg-lightbg p-3 shadow-sm dark:border-white/10 dark:bg-darkbg;
+  @apply rounded-lg border border-black/10 bg-lightbg p-3 shadow-xs dark:border-white/10 dark:bg-darkbg;
 }
 
 .mobile-nav-bar {
-  @apply sticky top-0 z-20 flex w-full items-center justify-between border-b border-black/10 bg-lightSidebar px-4 py-3 text-lightText shadow-sm dark:border-white/10 dark:bg-darkSidebar dark:text-darkText desktop:hidden;
+  @apply sticky top-0 z-20 flex w-full items-center justify-between border-b border-black/10 bg-lightSidebar px-4 py-3 text-lightText shadow-xs dark:border-white/10 dark:bg-darkSidebar dark:text-darkText desktop:hidden;
 }
 
 .mobile-menu-button {
-  @apply inline-flex h-10 w-10 items-center justify-center rounded-lg border border-black/10 bg-lightInput text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkInput dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex h-10 w-10 items-center justify-center rounded-lg border border-black/10 bg-lightInput text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkInput dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .mobile-nav-list {
@@ -63,7 +65,7 @@
 }
 
 .nav-link {
-  @apply flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-black/70 transition-colors hover:bg-lightAccent hover:text-lightText focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/70 dark:hover:bg-darkAccent dark:hover:text-darkText dark:focus-visible:ring-darkSelected;
+  @apply flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-black/70 transition-colors hover:bg-lightAccent hover:text-lightText focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/70 dark:hover:bg-darkAccent dark:hover:text-darkText dark:focus-visible:ring-darkSelected;
 }
 
 .nav-link-active {
@@ -75,11 +77,11 @@
 }
 
 .nav-link-subtle {
-  @apply flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-center text-xs font-medium text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-center text-xs font-medium text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .button-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-lightButton px-4 py-2 text-sm font-semibold text-white transition hover:bg-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:bg-darkButton dark:text-darkbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-lightButton px-4 py-2 text-sm font-semibold text-white transition hover:bg-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:bg-darkButton dark:text-darkbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
 }
 
 .feedback-button {
@@ -87,24 +89,24 @@
 }
 
 .button-large {
-  @apply inline-flex min-h-12 items-center justify-center rounded-lg bg-lightButton px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:bg-darkButton dark:text-darkbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
+  @apply inline-flex min-h-12 items-center justify-center rounded-lg bg-lightButton px-6 py-3 text-base font-semibold text-white shadow-xs transition hover:bg-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:bg-darkButton dark:text-darkbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
 }
 
 .button-outline {
-  @apply inline-flex items-center justify-center rounded-lg border border-black/15 bg-lightInput px-4 py-2 text-sm font-semibold text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex items-center justify-center rounded-lg border border-black/15 bg-lightInput px-4 py-2 text-sm font-semibold text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .button-inverse {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-black/10 bg-lightAccent px-3 py-2 text-sm font-semibold text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkAccent dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-black/10 bg-lightAccent px-3 py-2 text-sm font-semibold text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkAccent dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .icon-button {
-  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .form-control,
 .form-control-accent {
-  @apply mb-3 min-h-11 w-full rounded-lg border border-black/15 bg-lightInput px-3 py-2 text-sm text-lightText outline-none transition placeholder:text-black/40 focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/20 dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:placeholder:text-white/40 dark:focus:border-darkSelected dark:focus:ring-darkSelected/20;
+  @apply mb-3 min-h-11 w-full rounded-lg border border-black/15 bg-lightInput px-3 py-2 text-sm text-lightText outline-hidden transition placeholder:text-black/40 focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/20 dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:placeholder:text-white/40 dark:focus:border-darkSelected dark:focus:ring-darkSelected/20;
 }
 
 .form-control-accent {
@@ -116,7 +118,7 @@
 .profile-input,
 .profile-input-compact,
 .course-search-input {
-  @apply mb-0 min-h-11 rounded-lg border border-black/15 bg-lightInput px-3 py-2 text-sm text-lightText outline-none transition placeholder:text-black/40 focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/20 dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:placeholder:text-white/40 dark:focus:border-darkSelected dark:focus:ring-darkSelected/20;
+  @apply mb-0 min-h-11 rounded-lg border border-black/15 bg-lightInput px-3 py-2 text-sm text-lightText outline-hidden transition placeholder:text-black/40 focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/20 dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:placeholder:text-white/40 dark:focus:border-darkSelected dark:focus:ring-darkSelected/20;
 }
 
 .profile-select,
@@ -131,15 +133,15 @@
 }
 
 .course-search-result {
-  @apply flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-lightText transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkText dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-lightText transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkText dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .course-search-text {
-  @apply block flex-grow overflow-hidden text-ellipsis whitespace-nowrap font-medium;
+  @apply block grow overflow-hidden text-ellipsis whitespace-nowrap font-medium;
 }
 
 .class-list-item {
-  @apply flex w-full items-center justify-between gap-3 rounded-lg border border-black/10 bg-lightSidebar px-3 py-2 text-sm text-lightText shadow-sm dark:border-white/10 dark:bg-darkSidebar dark:text-darkText;
+  @apply flex w-full items-center justify-between gap-3 rounded-lg border border-black/10 bg-lightSidebar px-3 py-2 text-sm text-lightText shadow-xs dark:border-white/10 dark:bg-darkSidebar dark:text-darkText;
 }
 
 .class-list-text {
@@ -152,7 +154,7 @@
 }
 
 .filter-bar {
-  @apply w-full border-b border-black/10 bg-lightbg/95 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-darkbg/95 sm:px-6 lg:px-8;
+  @apply w-full border-b border-black/10 bg-lightbg/95 px-4 py-3 backdrop-blur-sm dark:border-white/10 dark:bg-darkbg/95 sm:px-6 lg:px-8;
 }
 
 .filter-controls {
@@ -209,7 +211,7 @@
 }
 
 .filter-date-input {
-  @apply h-11 w-full rounded-lg border border-black/15 bg-lightInput px-3 text-sm text-lightText outline-none transition placeholder:text-black/40 focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/20 dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:placeholder:text-white/40 dark:focus:border-darkSelected dark:focus:ring-darkSelected/20;
+  @apply h-11 w-full rounded-lg border border-black/15 bg-lightInput px-3 text-sm text-lightText outline-hidden transition placeholder:text-black/40 focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/20 dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:placeholder:text-white/40 dark:focus:border-darkSelected dark:focus:ring-darkSelected/20;
 }
 
 .profile-menu-container {
@@ -223,7 +225,7 @@
 }
 
 .avatar-button {
-  @apply flex h-11 w-11 items-center justify-center rounded-full bg-lightInput text-lg text-lightText shadow-sm ring-1 ring-black/10 transition hover:ring-lightSelected dark:bg-darkInput dark:text-darkText dark:ring-white/10 dark:hover:ring-darkSelected;
+  @apply flex h-11 w-11 items-center justify-center rounded-full bg-lightInput text-lg text-lightText shadow-xs ring-1 ring-black/10 transition hover:ring-lightSelected dark:bg-darkInput dark:text-darkText dark:ring-white/10 dark:hover:ring-darkSelected;
 }
 
 .avatar-button > .avatar-small,
@@ -232,7 +234,7 @@
   @apply h-full w-full;
 }
 
-@screen desktop {
+@media (min-width: 1024px) and (orientation: landscape), (min-width: 1440px) {
   .filter-controls {
     grid-template-columns: minmax(12rem, 24rem) minmax(10rem, 16rem) 44px;
   }
@@ -282,7 +284,7 @@
 }
 
 .settings-panel {
-  @apply rounded-lg border border-black/10 bg-lightSidebar p-5 shadow-sm dark:border-white/10 dark:bg-darkSidebar;
+  @apply rounded-lg border border-black/10 bg-lightSidebar p-5 shadow-xs dark:border-white/10 dark:bg-darkSidebar;
 }
 
 .settings-panel-spaced {
@@ -290,7 +292,7 @@
 }
 
 .profile-header {
-  @apply mb-6 flex items-center gap-4 rounded-lg border border-black/10 bg-lightSidebar p-4 shadow-sm dark:border-white/10 dark:bg-darkSidebar;
+  @apply mb-6 flex items-center gap-4 rounded-lg border border-black/10 bg-lightSidebar p-4 shadow-xs dark:border-white/10 dark:bg-darkSidebar;
 }
 
 .profile-header-meta {
@@ -314,7 +316,7 @@
 }
 
 .landing-content {
-  @apply mx-auto flex min-h-screen w-full max-w-[96rem] flex-col px-4 py-8 sm:px-6 lg:px-8;
+  @apply mx-auto flex min-h-screen w-full max-w-384 flex-col px-4 py-8 sm:px-6 lg:px-8;
 }
 
 .landing-hero {
@@ -330,7 +332,7 @@
 }
 
 .landing-title {
-  @apply mb-5 text-4xl font-semibold leading-tight text-lightText dark:text-darkText md:text-6xl;
+  @apply mb-5 text-4xl font-semibold leading-tight text-lightText dark:text-darkText md:text-6xl md:leading-none;
 }
 
 .landing-subtitle {
@@ -386,7 +388,7 @@
 }
 
 .feature-card {
-  @apply rounded-lg border border-black/10 bg-lightSidebar p-5 shadow-sm dark:border-white/10 dark:bg-darkSidebar;
+  @apply rounded-lg border border-black/10 bg-lightSidebar p-5 shadow-xs dark:border-white/10 dark:bg-darkSidebar;
 }
 
 .feature-icon {
@@ -410,7 +412,7 @@
 }
 
 .center-panel {
-  @apply w-full max-w-2xl rounded-lg border border-black/10 bg-lightSidebar p-8 text-center shadow-sm dark:border-white/10 dark:bg-darkSidebar;
+  @apply w-full max-w-2xl rounded-lg border border-black/10 bg-lightSidebar p-8 text-center shadow-xs dark:border-white/10 dark:bg-darkSidebar;
 }
 
 .access-title {
@@ -430,7 +432,7 @@
 }
 
 .privacy-card {
-  @apply w-full max-w-4xl rounded-lg border border-black/10 bg-lightSidebar p-6 shadow-sm dark:border-white/10 dark:bg-darkSidebar sm:p-10;
+  @apply w-full max-w-4xl rounded-lg border border-black/10 bg-lightSidebar p-6 shadow-xs dark:border-white/10 dark:bg-darkSidebar sm:p-10;
 }
 
 .privacy-title {
@@ -450,11 +452,11 @@
 }
 
 .unblock-button {
-  @apply inline-flex h-8 w-8 items-center justify-center rounded-lg text-black/45 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/45 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex h-8 w-8 items-center justify-center rounded-lg text-black/45 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/45 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .profile-popup-overlay {
-  @apply absolute inset-0 z-50 flex items-center justify-center bg-black/20 p-4 backdrop-blur-sm;
+  @apply absolute inset-0 z-50 flex items-center justify-center bg-black/20 p-4 backdrop-blur-xs;
 }
 
 .profile-popup-panel {
@@ -466,11 +468,11 @@
 }
 
 .profile-popup-close {
-  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .create-card {
-  @apply my-2 flex min-h-[13rem] w-full cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-lg border border-dashed border-black/20 bg-lightSidebar px-5 py-4 text-center text-black/50 shadow-sm transition hover:border-lightSelected hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/20 dark:bg-darkSidebar dark:text-white/50 dark:hover:border-darkSelected dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply my-2 flex min-h-52 w-full cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-lg border border-dashed border-black/20 bg-lightSidebar px-5 py-4 text-center text-black/50 shadow-xs transition hover:border-lightSelected hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/20 dark:bg-darkSidebar dark:text-white/50 dark:hover:border-darkSelected dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .create-card-icon {
@@ -493,7 +495,7 @@
   backdrop-filter: blur(6px);
 }
 
-@screen desktop {
+@media (min-width: 1024px) and (orientation: landscape), (min-width: 1440px) {
   .details-overlay {
     position: static;
     inset: auto;
@@ -512,7 +514,7 @@
 }
 
 .group-details-card {
-  @apply my-2 w-full overflow-auto rounded-lg border border-black/10 bg-lightSidebar px-5 text-lightText shadow-lg dark:border-white/10 dark:bg-darkSidebar dark:text-darkText;
+  @apply static my-2 w-full overflow-auto rounded-lg border border-black/10 bg-lightSidebar px-5 text-lightText shadow-lg dark:border-white/10 dark:bg-darkSidebar dark:text-darkText;
 }
 
 .group-details-header {
@@ -520,7 +522,7 @@
 }
 
 .group-details-title {
-  @apply min-w-0 flex-1 whitespace-normal break-words text-xl font-semibold leading-7;
+  @apply min-w-0 flex-1 whitespace-normal wrap-break-word text-xl font-semibold leading-7;
 }
 
 .group-details-actions {
@@ -528,7 +530,7 @@
 }
 
 .group-details-action {
-  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .group-details-body {
@@ -552,7 +554,7 @@
 }
 
 .participants-toggle {
-  @apply inline-flex h-7 w-7 items-center justify-center rounded-lg text-black/50 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/50 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex h-7 w-7 items-center justify-center rounded-lg text-black/50 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/50 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .participant-list {
@@ -560,7 +562,7 @@
 }
 
 .participant-row {
-  @apply flex w-full items-center gap-3 rounded-lg p-2 text-left transition hover:bg-lightAccent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:hover:bg-darkAccent dark:focus-visible:ring-darkSelected;
+  @apply flex w-full items-center gap-3 rounded-lg p-2 text-left transition hover:bg-lightAccent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:hover:bg-darkAccent dark:focus-visible:ring-darkSelected;
 }
 
 .participant-avatar {
@@ -576,7 +578,7 @@
 }
 
 .join-button {
-  @apply sticky bottom-4 float-end mt-3 inline-flex min-w-[7rem] items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:focus-visible:ring-darkSelected;
+  @apply sticky bottom-4 float-end mt-3 inline-flex min-w-28 items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold shadow-xs transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:focus-visible:ring-darkSelected;
 }
 
 .join-button-active {
@@ -588,11 +590,12 @@
 }
 
 .modal-overlay {
-  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm;
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-xs;
 }
 
 .modal-panel {
-  @apply max-h-[90vh] w-full max-w-md overflow-auto rounded-lg border border-black/10 bg-lightSidebar p-5 shadow-xl dark:border-white/10 dark:bg-darkSidebar;
+  color: inherit;
+  @apply static m-0 max-h-[90vh] w-full max-w-md overflow-auto rounded-lg border border-black/10 bg-lightSidebar p-5 shadow-xl dark:border-white/10 dark:bg-darkSidebar;
 }
 
 .modal-header {
@@ -604,7 +607,7 @@
 }
 
 .modal-close {
-  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-black/60 transition hover:bg-lightAccent hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/60 dark:hover:bg-darkAccent dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .modal-submit-button {
@@ -612,11 +615,11 @@
 }
 
 .modal-submit-interactive {
-  @apply hover:bg-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
+  @apply hover:bg-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
 }
 
 .confirm-overlay {
-  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm;
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-xs;
 }
 
 .confirm-panel {
@@ -632,11 +635,11 @@
 }
 
 .confirm-button-cancel {
-  @apply inline-flex items-center justify-center rounded-lg border border-black/15 bg-lightInput px-4 py-2 text-sm font-semibold text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply inline-flex items-center justify-center rounded-lg border border-black/15 bg-lightInput px-4 py-2 text-sm font-semibold text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .confirm-button-continue {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-lightButton px-4 py-2 text-sm font-semibold text-white transition hover:bg-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:bg-darkButton dark:text-darkbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-lightButton px-4 py-2 text-sm font-semibold text-white transition hover:bg-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 focus-visible:ring-offset-lightbg dark:bg-darkButton dark:text-darkbg dark:hover:bg-darkSelected dark:hover:text-white dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
 }
 
 .content-page {
@@ -700,11 +703,11 @@
 }
 
 .app-empty {
-  @apply flex min-h-[13rem] flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-black/15 bg-lightSidebar px-6 text-center text-sm font-medium text-black/55 dark:border-white/15 dark:bg-darkSidebar dark:text-white/55;
+  @apply flex min-h-52 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-black/15 bg-lightSidebar px-6 text-center text-sm font-medium text-black/55 dark:border-white/15 dark:bg-darkSidebar dark:text-white/55;
 }
 
 .study-card {
-  @apply relative flex min-h-[12rem] w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-black/10 bg-lightSidebar p-5 text-lightText shadow-sm transition hover:-translate-y-0.5 hover:border-lightSelected hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkSidebar dark:text-darkText dark:hover:border-darkSelected dark:focus-visible:ring-darkSelected;
+  @apply relative flex min-h-48 w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-black/10 bg-lightSidebar p-5 text-lightText shadow-xs transition hover:-translate-y-0.5 hover:border-lightSelected hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkSidebar dark:text-darkText dark:hover:border-darkSelected dark:focus-visible:ring-darkSelected;
 }
 
 .study-card::before {
@@ -804,7 +807,7 @@
 }
 
 .sidebar-create-button {
-  @apply mb-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-lightButton px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-lightButtonHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:bg-darkButton dark:hover:bg-darkButtonHover dark:focus-visible:ring-darkSelected;
+  @apply mb-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-lightButton px-4 text-sm font-semibold text-white shadow-xs transition hover:bg-lightButtonHover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:bg-darkButton dark:hover:bg-darkButtonHover dark:focus-visible:ring-darkSelected;
 }
 
 .sidebar-nav,
@@ -814,7 +817,7 @@
 }
 
 .nav-link {
-  @apply flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-sm font-medium text-black/65 transition-colors hover:bg-black/[0.035] hover:text-lightText focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/65 dark:hover:bg-white/[0.06] dark:hover:text-darkText dark:focus-visible:ring-darkSelected;
+  @apply flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-sm font-medium text-black/65 transition-colors hover:bg-black/[0.035] hover:text-lightText focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-white/65 dark:hover:bg-white/6 dark:hover:text-darkText dark:focus-visible:ring-darkSelected;
 }
 
 .nav-link-active {
@@ -839,7 +842,7 @@
 }
 
 .sidebar-account {
-  @apply flex items-center gap-3 rounded-md p-2 text-lightText transition hover:bg-black/[0.035] dark:text-darkText dark:hover:bg-white/[0.06];
+  @apply flex items-center gap-3 rounded-md p-2 text-lightText transition hover:bg-black/[0.035] dark:text-darkText dark:hover:bg-white/6;
 }
 
 .sidebar-account-copy {
@@ -860,7 +863,7 @@
 }
 
 .sidebar-logout {
-  @apply flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold text-lightSelected transition hover:bg-lightAccent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected dark:hover:bg-darkAccent;
+  @apply flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold text-lightSelected transition hover:bg-lightAccent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected dark:hover:bg-darkAccent;
 }
 
 .mobile-nav-bar {
@@ -868,11 +871,11 @@
 }
 
 .mobile-menu-button {
-  @apply flex h-11 w-11 items-center justify-center rounded-md text-lightText focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkText;
+  @apply flex h-11 w-11 items-center justify-center rounded-md text-lightText focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkText;
 }
 
 .mobile-logout-quick {
-  @apply flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected;
+  @apply flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected;
 }
 
 .mobile-drawer-backdrop {
@@ -909,7 +912,7 @@
 }
 
 .mobile-bottom-link {
-  @apply relative flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lightSelected dark:text-white/55;
+  @apply relative flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-black/55 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lightSelected dark:text-white/55;
 }
 
 .mobile-bottom-link-active {
@@ -926,7 +929,7 @@
 }
 
 .filter-bar {
-  @apply border-b border-black/10 bg-white/95 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-darkSidebar/95 sm:px-6 lg:px-7;
+  @apply border-b border-black/10 bg-white/95 px-4 py-3 backdrop-blur-sm dark:border-white/10 dark:bg-darkSidebar/95 sm:px-6 lg:px-7;
 }
 
 .filter-controls {
@@ -938,7 +941,7 @@
 }
 
 .filter-search input {
-  @apply h-full min-w-0 flex-1 bg-transparent text-sm text-lightText outline-none placeholder:text-black/40 dark:text-darkText dark:placeholder:text-white/40;
+  @apply h-full min-w-0 flex-1 bg-transparent text-sm text-lightText outline-hidden placeholder:text-black/40 dark:text-darkText dark:placeholder:text-white/40;
 }
 
 .filter-course-select {
@@ -954,7 +957,7 @@
 }
 
 .filter-date-input {
-  @apply h-11 w-full rounded-lg border border-black/15 bg-lightInput pl-10 pr-3 text-sm text-lightText outline-none transition focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/15 dark:border-white/15 dark:bg-darkInput dark:text-darkText;
+  @apply h-11 w-full rounded-lg border border-black/15 bg-lightInput pl-10 pr-3 text-sm text-lightText outline-hidden transition focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/15 dark:border-white/15 dark:bg-darkInput dark:text-darkText;
 }
 
 .filter-mobile-button {
@@ -979,7 +982,7 @@
 }
 
 .workspace-subtitle {
-  @apply mt-1.5 text-sm text-black/55 dark:text-white/55;
+  @apply mt-1.5 text-sm leading-5 text-black/55 dark:text-white/55;
 }
 
 .workspace-actions {
@@ -1002,7 +1005,7 @@
 }
 
 .study-card {
-  @apply relative flex min-h-[320px] w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-black/10 bg-white p-5 text-lightText shadow-sm transition hover:border-lightSelected/60 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkSidebar dark:text-darkText dark:hover:border-darkSelected;
+  @apply relative flex min-h-[320px] w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-black/10 bg-white p-5 text-lightText shadow-xs transition hover:border-lightSelected/60 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/10 dark:bg-darkSidebar dark:text-darkText dark:hover:border-darkSelected;
 }
 
 .study-card::before {
@@ -1022,7 +1025,7 @@
 }
 
 .study-card-purpose {
-  @apply max-w-[55%] truncate rounded bg-lightSuccessBackground px-2 py-1 text-[10px] font-semibold uppercase text-lightSuccessText dark:bg-darkSuccessBackground dark:text-darkSuccessText;
+  @apply max-w-[55%] truncate rounded-sm bg-lightSuccessBackground px-2 py-1 text-[10px] font-semibold uppercase text-lightSuccessText dark:bg-darkSuccessBackground dark:text-darkSuccessText;
 }
 
 .study-card-title {
@@ -1087,7 +1090,7 @@
 }
 
 .profile-header {
-  @apply relative mb-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5 rounded-lg border border-black/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-darkSidebar desktop:grid-cols-[auto_minmax(0,1fr)_auto];
+  @apply relative mb-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5 rounded-lg border border-black/10 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-darkSidebar desktop:grid-cols-[auto_minmax(0,1fr)_auto];
 }
 
 .profile-header .avatar-large,
@@ -1137,7 +1140,7 @@
 }
 
 .settings-panel {
-  @apply rounded-lg border border-black/10 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-darkSidebar;
+  @apply rounded-lg border border-black/10 bg-white p-5 shadow-xs dark:border-white/10 dark:bg-darkSidebar;
 }
 
 .profile-section-account {
@@ -1169,7 +1172,7 @@
 .profile-input,
 .profile-input-compact,
 .course-search-input {
-  @apply mb-0 min-h-11 w-full rounded-md border border-black/15 bg-white px-3 py-2 text-sm text-lightText outline-none transition placeholder:text-black/35 focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/15 dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:placeholder:text-white/35 dark:focus:border-darkSelected;
+  @apply mb-0 min-h-11 w-full rounded-md border border-black/15 bg-white px-3 py-2 text-sm text-lightText outline-hidden transition placeholder:text-black/35 focus:border-lightSelected focus:ring-2 focus:ring-lightSelected/15 dark:border-white/15 dark:bg-darkInput dark:text-darkText dark:placeholder:text-white/35 dark:focus:border-darkSelected;
 }
 
 .class-list,
@@ -1237,7 +1240,7 @@
   @apply text-xs text-black/45 dark:text-white/45;
 }
 
-@screen compact {
+@media (max-width: 1023px), (max-width: 1439px) and (orientation: portrait) {
   .profile-section {
     display: none;
   }
@@ -1267,7 +1270,7 @@
 }
 
 .landing-nav {
-  @apply mx-auto flex h-16 w-[calc(100%_-_2.5rem)] max-w-[1344px] items-center justify-between border-b border-black/10 dark:border-white/10 sm:w-[calc(100%_-_4rem)] lg:w-[calc(100%_-_6rem)];
+  @apply mx-auto flex h-16 w-[calc(100%-2.5rem)] max-w-[1344px] items-center justify-between border-b border-black/10 dark:border-white/10 sm:w-[calc(100%-4rem)] lg:w-[calc(100%-6rem)];
 }
 
 .landing-nav-actions {
@@ -1287,7 +1290,7 @@
 }
 
 .landing-main {
-  @apply mx-auto w-[calc(100%_-_2.5rem)] max-w-[1344px] sm:w-[calc(100%_-_4rem)] lg:w-[calc(100%_-_6rem)];
+  @apply mx-auto w-[calc(100%-2.5rem)] max-w-[1344px] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-6rem)];
 }
 
 .landing-hero {
@@ -1313,7 +1316,7 @@
 
 .button-primary,
 .button-large {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-lightButton px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-lightButtonHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:bg-darkButton dark:text-white dark:hover:bg-darkButtonHover;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-lightButton px-5 text-sm font-semibold text-white shadow-xs transition hover:bg-lightButtonHover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:bg-darkButton dark:text-white dark:hover:bg-darkButtonHover;
 }
 
 .button-large {
@@ -1321,7 +1324,7 @@
 }
 
 .button-outline {
-  @apply inline-flex min-h-11 items-center justify-center rounded-md border border-black/25 bg-white px-4 text-sm font-semibold text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/25 dark:bg-darkInput dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected;
+  @apply inline-flex min-h-11 items-center justify-center rounded-md border border-black/25 bg-white px-4 text-sm font-semibold text-lightText transition hover:border-lightSelected hover:text-lightSelected focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:border-white/25 dark:bg-darkInput dark:text-darkText dark:hover:border-darkSelected dark:hover:text-darkSelected;
 }
 
 .landing-secondary {
@@ -1333,7 +1336,7 @@
 }
 
 .landing-browser-preview {
-  @apply cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
+  @apply cursor-pointer rounded-lg focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected focus-visible:ring-offset-2 dark:focus-visible:ring-darkSelected dark:focus-visible:ring-offset-darkbg;
 }
 
 .landing-browser-heading h2 {
@@ -1380,7 +1383,7 @@
 
 .status-open,
 .status-filling {
-  @apply mr-2 rounded px-1.5 py-0.5 font-medium;
+  @apply mr-2 rounded-sm px-1.5 py-0.5 font-medium;
 }
 
 .status-open {
@@ -1416,7 +1419,7 @@
 }
 
 .landing-features article {
-  @apply flex gap-4 border-b border-black/10 px-4 py-6 last:border-0 dark:border-white/10 sm:border-r lg:border-b-0 sm:[&:nth-child(2)]:border-r-0 lg:[&:nth-child(2)]:border-r;
+  @apply flex gap-4 border-b border-black/10 px-4 py-6 last:border-0 dark:border-white/10 sm:border-r lg:border-b-0 sm:nth-2:border-r-0 lg:nth-2:border-r;
 }
 
 .landing-features svg {
@@ -1432,7 +1435,7 @@
 }
 
 .landing-footer {
-  @apply mx-auto flex w-[calc(100%_-_2.5rem)] max-w-[1344px] items-center justify-between py-7 text-xs text-black/45 dark:text-white/45 sm:w-[calc(100%_-_4rem)] lg:w-[calc(100%_-_6rem)];
+  @apply mx-auto flex w-[calc(100%-2.5rem)] max-w-[1344px] items-center justify-between py-7 text-xs text-black/45 dark:text-white/45 sm:w-[calc(100%-4rem)] lg:w-[calc(100%-6rem)];
 }
 
 @media (max-width: 389px) {
@@ -1455,15 +1458,15 @@
 }
 
 .study-card-header {
-  @apply mb-0 flex min-h-12 items-center justify-between border-b border-black/[0.07] px-4 dark:border-white/[0.08];
+  @apply mb-0 flex min-h-12 items-center justify-between border-b border-black/[0.07] px-4 dark:border-white/8;
 }
 
 .study-card-course {
-  @apply rounded bg-lightAccent px-2 py-1 text-xs font-bold text-lightSelected dark:bg-darkAccent dark:text-darkSelected;
+  @apply rounded-sm bg-lightAccent px-2 py-1 text-xs font-bold text-lightSelected dark:bg-darkAccent dark:text-darkSelected;
 }
 
 .study-card-joined {
-  @apply flex items-center gap-1 rounded bg-lightSuccessBackground px-2 py-1 text-[11px] font-semibold text-lightSuccessText dark:bg-darkSuccessBackground dark:text-darkSuccessText;
+  @apply flex items-center gap-1 rounded-sm bg-lightSuccessBackground px-2 py-1 text-[11px] font-semibold text-lightSuccessText dark:bg-darkSuccessBackground dark:text-darkSuccessText;
 }
 
 .study-card-copy {
@@ -1479,11 +1482,11 @@
 }
 
 .study-card-meta {
-  @apply grid grid-cols-2 gap-0 border-y border-black/[0.07] bg-black/[0.018] dark:border-white/[0.08] dark:bg-white/[0.025];
+  @apply grid grid-cols-2 gap-0 border-y border-black/[0.07] bg-black/[0.018] dark:border-white/8 dark:bg-white/2.5;
 }
 
 .study-card-row {
-  @apply min-h-[68px] gap-2.5 border-r border-black/[0.07] px-4 py-3 last:border-r-0 dark:border-white/[0.08];
+  @apply min-h-[68px] gap-2.5 border-r border-black/[0.07] px-4 py-3 last:border-r-0 dark:border-white/8;
 }
 
 .study-card-icon {
@@ -1554,7 +1557,7 @@
 }
 
 .group-details-eyebrow span:first-child {
-  @apply rounded bg-lightAccent px-2 py-1 text-[11px] font-bold text-lightSelected dark:bg-darkAccent dark:text-darkSelected;
+  @apply rounded-sm bg-lightAccent px-2 py-1 text-[11px] font-bold text-lightSelected dark:bg-darkAccent dark:text-darkSelected;
 }
 
 .group-details-eyebrow span:last-child {
@@ -1566,7 +1569,7 @@
 }
 
 .group-details-action {
-  @apply h-10 w-10 rounded-md border border-transparent hover:border-black/10 hover:bg-black/[0.035] dark:hover:border-white/10 dark:hover:bg-white/[0.05];
+  @apply h-10 w-10 rounded-md border border-transparent hover:border-black/10 hover:bg-black/[0.035] dark:hover:border-white/10 dark:hover:bg-white/5;
 }
 
 .group-details-scroll {
@@ -1584,7 +1587,7 @@
 }
 
 .group-details-text {
-  @apply flex min-h-[64px] items-center gap-2 rounded-lg border border-black/[0.08] bg-transparent px-3 py-3 dark:border-white/10 dark:bg-transparent;
+  @apply flex min-h-[64px] items-center gap-2 rounded-lg border border-black/8 bg-transparent px-3 py-3 dark:border-white/10 dark:bg-transparent;
 }
 
 .group-details-info-icon {
@@ -1601,7 +1604,7 @@
 }
 
 .group-details-label {
-  @apply text-[10px] font-semibold uppercase text-black/40 dark:text-white/40;
+  @apply text-[10px] font-semibold uppercase leading-4 text-black/40 dark:text-white/40;
 }
 
 .group-details-value {
@@ -1609,11 +1612,11 @@
 }
 
 .group-details-section {
-  @apply overflow-hidden rounded-lg border border-black/[0.08] dark:border-white/10;
+  @apply overflow-hidden rounded-lg border border-black/8 dark:border-white/10;
 }
 
 .group-details-section-heading {
-  @apply flex min-h-12 items-center justify-between gap-3 border-b border-black/[0.07] px-4 text-sm font-semibold dark:border-white/[0.08];
+  @apply flex min-h-12 items-center justify-between gap-3 border-b border-black/[0.07] px-4 text-sm font-semibold dark:border-white/8;
 }
 
 .group-details-section-heading > span,
@@ -1630,7 +1633,7 @@
 }
 
 .participant-list {
-  @apply max-h-none divide-y divide-black/[0.06] overflow-visible rounded-none border-0 bg-transparent p-1 dark:divide-white/[0.07] dark:bg-transparent;
+  @apply max-h-none divide-y divide-black/6 overflow-visible rounded-none border-0 bg-transparent p-1 dark:divide-white/[0.07] dark:bg-transparent;
 }
 
 .participant-row {
@@ -1646,7 +1649,7 @@
 }
 
 .join-button {
-  @apply static m-4 mt-0 min-h-12 w-[calc(100%_-_2rem)] flex-none rounded-md px-4 text-sm font-semibold shadow-none;
+  @apply static m-4 mt-0 min-h-12 w-[calc(100%-2rem)] flex-none rounded-md px-4 text-sm font-semibold shadow-none;
 }
 
 .join-button-inactive {
@@ -1669,7 +1672,7 @@
 .react-datepicker__day:not([aria-disabled="true"]):hover,
 .react-datepicker__time-list-item:not([aria-disabled="true"]):hover,
 .react-datepicker__day--keyboard-selected {
-  @apply !bg-darkSelected !text-white;
+  @apply !bg-darkSelected text-white!;
 }
 
 .react-datepicker__day {
@@ -1686,7 +1689,7 @@
 }
 
 .react-datepicker__time-list-item {
-  @apply flex items-center justify-center border-lightControlBorder p-0 dark:border-r-[1px] dark:border-darkControlBorder;
+  @apply flex items-center justify-center border-lightControlBorder p-0 dark:border-r dark:border-darkControlBorder;
 }
 
 .react-datepicker__day--selected,
@@ -1706,7 +1709,7 @@
   }
 
   .study-card-row {
-    @apply min-h-[58px] border-b border-r-0 border-black/[0.07] py-2.5 last:border-b-0 dark:border-white/[0.08];
+    @apply min-h-[58px] border-b border-r-0 border-black/[0.07] py-2.5 last:border-b-0 dark:border-white/8;
   }
 }
 
@@ -1723,7 +1726,7 @@
 }
 
 .study-card-details-trigger {
-  @apply absolute inset-0 z-10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lightSelected dark:focus-visible:ring-darkSelected;
+  @apply absolute inset-0 z-10 rounded-lg focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lightSelected dark:focus-visible:ring-darkSelected;
 }
 
 .study-card-footer-actions {
@@ -1731,7 +1734,7 @@
 }
 
 .study-card-share {
-  @apply relative z-20 inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-semibold text-lightSelected hover:bg-lightAccent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected dark:hover:bg-darkAccent dark:focus-visible:ring-darkSelected;
+  @apply relative z-20 inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-semibold text-lightSelected hover:bg-lightAccent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lightSelected dark:text-darkSelected dark:hover:bg-darkAccent dark:focus-visible:ring-darkSelected;
 }
 
 .study-card-footer {

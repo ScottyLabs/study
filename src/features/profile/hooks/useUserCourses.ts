@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  addCourseCode,
-  deleteCourseCode,
-  fetchCourseCodes,
-} from "../services/profileApi";
+import { addCourseCode, deleteCourseCode, fetchCourseCodes } from "../services/profileApi";
 import { getAllCourses } from "../services/profileService";
 import type { Course } from "../types";
 
@@ -20,9 +16,7 @@ export function useUserCourses(userId?: string) {
     void Promise.all([fetchCourseCodes(), getAllCourses()])
       .then(([courseCodes, catalog]) => {
         if (cancelled) return;
-        const catalogByCode = new Map(
-          catalog.map((course) => [course.courseID, course]),
-        );
+        const catalogByCode = new Map(catalog.map((course) => [course.courseID, course]));
         setClasses(
           courseCodes.map(
             (courseCode) =>
@@ -49,9 +43,7 @@ export function useUserCourses(userId?: string) {
   const deleteCourse = async (courseID: string) => {
     if (!userId) return;
     await deleteCourseCode(courseID);
-    setClasses((currentClasses) =>
-      currentClasses.filter((course) => course.courseID !== courseID),
-    );
+    setClasses((currentClasses) => currentClasses.filter((course) => course.courseID !== courseID));
   };
 
   return { classes, setClasses, addCourse, deleteCourse };

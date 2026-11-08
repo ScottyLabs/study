@@ -1,9 +1,4 @@
-import {
-  createCipheriv,
-  createDecipheriv,
-  createHash,
-  randomBytes,
-} from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
 
 export const CALENDAR_SCOPES = [
@@ -22,43 +17,27 @@ export class CalendarError extends Error {
   }
 }
 
-export function encryptCredential(
-  value: string,
-  key: string,
-  context: string,
-): string {
+export function encryptCredential(value: string, key: string, context: string): string {
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", Buffer.from(key, "hex"), iv);
   cipher.setAAD(Buffer.from(context));
-  const encrypted = Buffer.concat([
-    cipher.update(value, "utf8"),
-    cipher.final(),
-  ]);
-  return [iv, cipher.getAuthTag(), encrypted]
-    .map((part) => part.toString("base64url"))
-    .join(".");
+  const encrypted = Buffer.concat([cipher.update(value, "utf8"), cipher.final()]);
+  return [iv, cipher.getAuthTag(), encrypted].map((part) => part.toString("base64url")).join(".");
 }
 
-export function decryptCredential(
-  value: string,
-  key: string,
-  context: string,
-): string {
+export function decryptCredential(value: string, key: string, context: string): string {
   const parts = value.split(".");
-  if (parts.length !== 3)
-    throw new Error("Invalid encrypted Calendar credential");
-  const [iv, tag, encrypted] = parts.map((part) =>
-    Buffer.from(part, "base64url"),
-  );
+  if (parts.length !== 3) throw new Error("Invalid encrypted Calendar credential");
+  const [iv, tag, encrypted] = parts.map((part) => Buffer.from(part, "base64url"));
   if (!iv || iv.length !== 12 || !tag || tag.length !== 16 || !encrypted) {
     throw new Error("Invalid encrypted Calendar credential");
   }
-  const decipher = createDecipheriv("aes-256-gcm", Buffer.from(key, "hex"), iv);
+  const decipher = createDecipheriv("aes-256-gcm", Buffer.from(key, "hex"), iv, {
+    authTagLength: 16,
+  });
   decipher.setAAD(Buffer.from(context));
   decipher.setAuthTag(tag);
-  return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString(
-    "utf8",
-  );
+  return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString("utf8");
 }
 
 export function hashState(state: string): string {
@@ -67,22 +46,17 @@ export function hashState(state: string): string {
 
 export function readRelayState(state: string, callbackURL: string): void {
   try {
-    if (state.length > 2048 || !/^[A-Za-z0-9_-]+$/.test(state))
-      throw new Error();
+    if (state.length > 2048 || !/^[\w-]+$/u.test(state)) throw new Error();
     const parsed = z
       .object({
         return_to: z.literal(callbackURL),
-        csrf: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+        csrf: z.string().regex(/^[\w-]{43}$/u),
       })
       .strict()
       .parse(JSON.parse(Buffer.from(state, "base64url").toString("utf8")));
-    if (Buffer.from(JSON.stringify(parsed)).toString("base64url") !== state)
-      throw new Error();
+    if (Buffer.from(JSON.stringify(parsed)).toString("base64url") !== state) throw new Error();
   } catch {
-    throw new CalendarError(
-      "Invalid Calendar authorization state",
-      "invalid_state",
-    );
+    throw new CalendarError("Invalid Calendar authorization state", "invalid_state");
   }
 }
 
@@ -92,7 +66,7 @@ export function hasRequiredScopes(scopes: string[]): boolean {
 
 const eventTime = z
   .object({
-    dateTime: z.string().datetime({ offset: true }),
+    dateTime: z.iso.datetime({ offset: true }),
     timeZone: z.literal("America/New_York"),
   })
   .strict();
@@ -105,7 +79,7 @@ export const calendarEventSchema = z
     start: eventTime,
     end: eventTime,
     attendees: z
-      .array(z.object({ email: z.string().email() }).strict())
+      .array(z.object({ email: z.email() }).strict())
       .max(1)
       .optional(),
     reminders: z
@@ -126,12 +100,8 @@ export const calendarEventSchema = z
       .optional(),
   })
   .strict()
-  .refine(
-    (event) =>
-      Date.parse(event.end.dateTime) > Date.parse(event.start.dateTime),
-    {
-      message: "Event must end after it starts",
-    },
-  );
+  .refine((event) => Date.parse(event.end.dateTime) > Date.parse(event.start.dateTime), {
+    message: "Event must end after it starts",
+  });
 
-export const calendarEventIdSchema = z.string().regex(/^[a-zA-Z0-9_-]{1,500}$/);
+export const calendarEventIdSchema = z.string().regex(/^[\w-]{1,500}$/u);

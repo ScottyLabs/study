@@ -19,8 +19,6 @@ describe("JoinGroupButton", () => {
     render(<JoinGroupButton isJoined={true} onClick={vi.fn()} />);
 
     expect(screen.getByRole("button", { name: "Leave group" })).toBeVisible();
-    expect(
-      screen.queryByRole("button", { name: "Join group" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Join group" })).not.toBeInTheDocument();
   });
 });

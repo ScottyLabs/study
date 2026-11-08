@@ -21,165 +21,185 @@ const defaultBlockedUsers: BlockedUsers = {
   blockedByThem: [],
 };
 
-export function BlockList() {
-  const { user } = useUser();
+function blockedUsersFrom(state: BlockedUsers): BlockedUsers {
+  return { blockedByMe: state.blockedByMe, blockedByThem: state.blockedByThem };
+}
+
+function useBlockedUsers(userId: string) {
   const [blocked, setBlocked] = useState<BlockedUsers>(defaultBlockedUsers);
-  const [inputValue, setInputValue] = useState<string>("");
-  const confirm = useConfirm();
 
-  const getBlocked = useCallback(async () => {
-    if (!user) return;
-    const userId = user?.emailAddresses[0]?.emailAddress;
-    try {
-      if (!userId) {
-        return;
-      }
-      const blockingState = await fetchBlockingState();
-      setBlocked({
-        blockedByMe: blockingState.blockedByMe,
-        blockedByThem: blockingState.blockedByThem,
-      });
-    } catch (err) {
-      console.error(err);
-      setBlocked(defaultBlockedUsers);
-    }
-  }, [user]);
+  const refresh = useCallback(
+    () =>
+      fetchBlockingState()
+        .then((state) => {
+          setBlocked(blockedUsersFrom(state));
+        })
+        .catch((err: unknown) => {
+          console.error(err);
+          setBlocked(defaultBlockedUsers);
+        }),
+    [],
+  );
 
   useEffect(() => {
-    if (!user) {
-      return;
-    }
-    void getBlocked();
-  }, [getBlocked, user]);
+    if (userId === "") return;
+    void refresh();
+  }, [refresh, userId]);
 
   useEffect(() => {
-    setupGoogleApi().catch((err) => {
+    setupGoogleApi().catch((err: unknown) => {
       console.warn("Failed to initialize Google API:", err);
     });
   }, []);
 
-  const handleBlock = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const userToBlock = event.target.value.toLowerCase().trim();
-    setInputValue(userToBlock);
+  const unblock = async (email: string) => {
+    await unblockEmail(email);
+    setBlocked((current) => ({
+      blockedByMe: current.blockedByMe.filter((u) => u !== email),
+      blockedByThem: current.blockedByThem,
+    }));
   };
 
-  const handleBlockSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const userToBlock = inputValue.toLowerCase().trim();
+  const recover = (err: unknown) => {
+    console.error(err);
+    void refresh();
+  };
 
-    if (userToBlock === "" || !user) {
-      return;
-    }
+  return { blocked, setBlocked, unblock, recover };
+}
 
-    const userId = user?.emailAddresses[0]?.emailAddress;
-    if (!userId) return;
-
-    const alreadyBlockedByMe = blocked.blockedByMe.some(
-      (b) => b === userToBlock,
-    );
-    if (alreadyBlockedByMe) {
-      setInputValue("");
-      return;
-    }
-
-    try {
-      const { sharedGroupCount: numShared } =
-        await fetchBlockImpact(userToBlock);
-      if (numShared > 0) {
-        const calendarAuthorization: { promise?: Promise<void> } = {};
-        const ok = await confirm(
-          `You are currently in ${numShared} group${numShared === 1 ? "" : "s"} with ${userToBlock}. You will be removed from ${numShared === 1 ? "this group" : "these groups"} if you continue.`,
-          () => {
-            if (!hasCalendarAccess()) {
-              calendarAuthorization.promise = requestCalendarAccessInteractive().catch((err) => {
-                console.warn("Calendar auth failed:", err);
-              });
-            }
-          },
-        );
-        if (!ok) {
-          return;
-        }
-        if (calendarAuthorization.promise) await calendarAuthorization.promise;
+async function confirmSharedGroups(confirm: ReturnType<typeof useConfirm>, email: string) {
+  const { sharedGroupCount: numShared } = await fetchBlockImpact(email);
+  if (numShared <= 0) return true;
+  const calendarAuthorization: { promise?: Promise<void> } = {};
+  const ok = await confirm(
+    `You are currently in ${numShared} group${numShared === 1 ? "" : "s"} with ${email}. You will be removed from ${numShared === 1 ? "this group" : "these groups"} if you continue.`,
+    () => {
+      if (!hasCalendarAccess()) {
+        calendarAuthorization.promise = requestCalendarAccessInteractive().catch((err: unknown) => {
+          console.warn("Calendar auth failed:", err);
+        });
       }
+    },
+  );
+  if (ok && calendarAuthorization.promise) await calendarAuthorization.promise;
+  return ok;
+}
 
-      const result = await blockEmail(userToBlock);
-      await Promise.all(result.calendarEventIds.map(deleteFromCal));
+async function blockAfterConfirming(confirm: ReturnType<typeof useConfirm>, email: string) {
+  if (!(await confirmSharedGroups(confirm, email))) return null;
+  const result = await blockEmail(email);
+  await Promise.all(result.calendarEventIds.map((eventId) => deleteFromCal(eventId)));
+  return blockedUsersFrom(await fetchBlockingState());
+}
 
-      const updatedState = await fetchBlockingState();
-      setBlocked({
-        blockedByMe: updatedState.blockedByMe,
-        blockedByThem: updatedState.blockedByThem,
-      });
+type BlockFormProps = {
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+};
+
+function BlockForm({ value, onChange, onSubmit }: BlockFormProps) {
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSubmit();
+      }}
+    >
+      <input
+        id="blockInput"
+        className="course-search-input"
+        type="text"
+        pattern="[A-Za-z0-9]+@andrew\.cmu\.edu"
+        title='"<id>@andrew.cmu.edu"'
+        value={value}
+        onChange={(event) => {
+          onChange(event.target.value.toLowerCase().trim());
+        }}
+        placeholder="student@andrew.cmu.edu"
+        required
+      />
+      <button type="submit" className="button-outline mt-2 w-full">
+        Block User
+      </button>
+    </form>
+  );
+}
+
+function BlockedUserList({
+  users,
+  onUnblock,
+}: {
+  users: string[];
+  onUnblock: (user: string) => void;
+}) {
+  if (users.length === 0) {
+    return (
+      <div className="blocked-empty">
+        <ShieldCheck size={30} />
+        <strong>No blocked users</strong>
+      </div>
+    );
+  }
+  return (
+    <ul className="class-list-items">
+      {users.map((blockedUser) => (
+        <li key={blockedUser} className="class-list-item">
+          <div className="class-list-text">{blockedUser}</div>
+          <button
+            onClick={() => {
+              onUnblock(blockedUser);
+            }}
+            className="unblock-text-button"
+            aria-label={`Unblock ${blockedUser}`}
+          >
+            <UserMinus size={16} /> Unblock
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export function BlockList() {
+  const { user } = useUser();
+  const userId = user?.emailAddresses[0]?.emailAddress ?? "";
+  const { blocked, setBlocked, unblock, recover } = useBlockedUsers(userId);
+  const [inputValue, setInputValue] = useState<string>("");
+  const confirm = useConfirm();
+
+  const handleBlockSubmit = () => {
+    const userToBlock = inputValue.toLowerCase().trim();
+    if (userToBlock === "" || userId === "") return;
+    if (blocked.blockedByMe.includes(userToBlock)) {
       setInputValue("");
-    } catch (err) {
-      console.error(err);
-      void getBlocked();
+      return;
     }
+    blockAfterConfirming(confirm, userToBlock)
+      .then((updated) => {
+        if (updated === null) return;
+        setBlocked(updated);
+        setInputValue("");
+      })
+      .catch(recover);
   };
 
-  const handleUnblock = async (userToUnblock: string) => {
-    if (!user) return;
-    const userId = user?.emailAddresses[0]?.emailAddress;
-    if (!userId) return;
-
-    try {
-      await unblockEmail(userToUnblock);
-
-      const newBlocked: BlockedUsers = {
-        blockedByMe: blocked.blockedByMe.filter((u) => u !== userToUnblock),
-        blockedByThem: blocked.blockedByThem,
-      };
-
-      setBlocked(newBlocked);
-      setInputValue("");
-    } catch (err) {
-      console.error(err);
-      void getBlocked();
-    }
+  const handleUnblock = (userToUnblock: string) => {
+    if (userId === "") return;
+    unblock(userToUnblock)
+      .then(() => {
+        setInputValue("");
+      })
+      .catch(recover);
   };
 
   return (
     <div className="block-list">
       <div>
-        <form onSubmit={handleBlockSubmit}>
-          <input
-            id="blockInput"
-            className="course-search-input"
-            type="text"
-            pattern="[A-Za-z0-9]+@andrew\.cmu\.edu"
-            title='"<id>@andrew.cmu.edu"'
-            value={inputValue}
-            onChange={handleBlock}
-            placeholder="student@andrew.cmu.edu"
-            required
-          />
-          <button type="submit" className="button-outline mt-2 w-full">
-            Block User
-          </button>
-        </form>
+        <BlockForm value={inputValue} onChange={setInputValue} onSubmit={handleBlockSubmit} />
       </div>
-      {blocked.blockedByMe.length === 0 ? (
-        <div className="blocked-empty">
-          <ShieldCheck size={30} />
-          <strong>No blocked users</strong>
-        </div>
-      ) : (
-        <ul className="class-list-items">
-          {blocked.blockedByMe.map((blockedUser) => (
-            <li key={blockedUser} className="class-list-item">
-              <div className="class-list-text">{blockedUser}</div>
-              <button
-                onClick={() => handleUnblock(blockedUser)}
-                className="unblock-text-button"
-                aria-label={`Unblock ${blockedUser}`}
-              >
-                <UserMinus size={16} /> Unblock
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <BlockedUserList users={blocked.blockedByMe} onUnblock={handleUnblock} />
     </div>
   );
 }

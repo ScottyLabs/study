@@ -1,21 +1,19 @@
-import { readFileSync } from "node:fs";
+import tailwindcss from "@tailwindcss/postcss";
 import postcss from "postcss";
-import tailwindcss from "tailwindcss";
 import { expect, test } from "vitest";
-import tailwindConfig from "../../tailwind.config";
 
 test("logout content has equal vertical insets in light and dark mode", async () => {
-  const source = readFileSync("src/styles/components.css", "utf8");
-  const { css } = await postcss([tailwindcss(tailwindConfig)]).process(
-    `@tailwind base;\n${source}`,
-    { from: undefined },
+  // Optimize so Lightning CSS flattens nesting, which jsdom cannot parse
+  const { css } = await postcss([tailwindcss({ optimize: { minify: false } })]).process(
+    '@import "./globals.css";\n@import "./components.css";',
+    { from: "src/styles/entry.css" },
   );
   const style = document.createElement("style");
   style.textContent = css;
-  document.head.appendChild(style);
+  document.head.append(style);
   const host = document.createElement("div");
   host.innerHTML = '<button class="sidebar-logout">Log out</button>';
-  document.body.appendChild(host);
+  document.body.append(host);
 
   try {
     for (const theme of ["light", "dark"]) {

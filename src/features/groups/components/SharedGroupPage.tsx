@@ -10,65 +10,79 @@ import { fetchGroup } from "../services/groupApi";
 import { fetchBlockingState } from "~/features/profile/services/profileApi";
 import { GroupFinder } from "./GroupFinder";
 
-export function SharedGroupPage({ groupId }: { groupId: string }) {
-  const { user } = useUser();
-  const router = useRouter();
-  const [group, setGroup] = useState<StudyGroup | null>(null);
-  const [status, setStatus] = useState<
-    "loading" | "ready" | "missing" | "error"
-  >("loading");
+type Loaded = { status: "ready" | "missing" | "error"; group?: StudyGroup };
+
+async function loadSharedGroup(groupId: string): Promise<Loaded> {
+  try {
+    const [details, blocking] = await Promise.all([fetchGroup(groupId), fetchBlockingState()]);
+    const blocked = new Set(
+      [...blocking.blockedByMe, ...blocking.blockedByThem].map((email) => email.toLowerCase()),
+    );
+    if (details.participantDetails.some((person) => blocked.has(person.email.toLowerCase()))) {
+      return { status: "missing" };
+    }
+    return { status: "ready", group: details };
+  } catch (error) {
+    return {
+      status: error instanceof ApiRequestError && error.status === 404 ? "missing" : "error",
+    };
+  }
+}
+
+// Key results by group and attempt so a stale result reads as loading
+function useSharedGroup(groupId: string, signedIn: boolean) {
   const [attempt, setAttempt] = useState(0);
-  const close = useCallback(() => router.push("/feed"), [router]);
+  const [result, setResult] = useState<(Loaded & { key: string }) | null>(null);
+  const key = `${groupId}:${attempt}`;
+
   useEffect(() => {
-    if (!user) return;
     let cancelled = false;
-    setStatus("loading");
-    void Promise.all([fetchGroup(groupId), fetchBlockingState()])
-      .then(([details, blocking]) => {
-        if (cancelled) return;
-        const blocked = new Set(
-          [...blocking.blockedByMe, ...blocking.blockedByThem].map((email) =>
-            email.toLowerCase(),
-          ),
-        );
-        if (
-          details.participantDetails.some((person) =>
-            blocked.has(person.email.toLowerCase()),
-          )
-        ) {
-          setStatus("missing");
-          return;
-        }
-        setGroup(details);
-        setStatus("ready");
-      })
-      .catch((error: unknown) => {
-        if (!cancelled)
-          setStatus(
-            error instanceof ApiRequestError && error.status === 404
-              ? "missing"
-              : "error",
-          );
+    if (signedIn) {
+      void loadSharedGroup(groupId).then((loaded) => {
+        if (!cancelled) setResult({ ...loaded, key });
       });
+    }
     return () => {
       cancelled = true;
     };
-  }, [groupId, user, attempt]);
-  if (status === "ready" && group) {
+  }, [groupId, key, signedIn]);
+
+  const current = result?.key === key ? result : null;
+  return {
+    status: current?.status ?? "loading",
+    group: current?.group,
+    markMissing: () => {
+      setResult({ key, status: "missing" });
+    },
+    retry: () => {
+      setAttempt((value) => value + 1);
+    },
+  };
+}
+
+export function SharedGroupPage({ groupId }: { groupId: string }) {
+  const { user } = useUser();
+  const router = useRouter();
+  const shared = useSharedGroup(groupId, Boolean(user));
+  const close = useCallback(() => {
+    router.push("/feed");
+  }, [router]);
+
+  if (shared.status === "ready" && shared.group) {
     return (
       <GroupFinder
-        key={group.id}
-        initialGroup={group}
+        key={shared.group.id}
+        initialGroup={shared.group}
         onCloseInitialGroup={close}
-        onInitialGroupUnavailable={() => setStatus("missing")}
+        onInitialGroupUnavailable={shared.markMissing}
       />
     );
   }
 
   return (
     <main className="content-page">
-      {status === "loading" && <p role="status">Loading group...</p>}
-      {status === "missing" && (
+      {shared.status === "loading" && <output className="block">Loading group...</output>}
+      {shared.status === "missing" && (
         <div className="app-empty">
           <h1>Group unavailable</h1>
           <Link href="/feed" className="button-primary">
@@ -76,13 +90,10 @@ export function SharedGroupPage({ groupId }: { groupId: string }) {
           </Link>
         </div>
       )}
-      {status === "error" && (
+      {shared.status === "error" && (
         <div className="app-empty">
           <p>Could not load this group.</p>
-          <button
-            className="button-primary"
-            onClick={() => setAttempt((value) => value + 1)}
-          >
+          <button className="button-primary" onClick={shared.retry}>
             Retry
           </button>
         </div>

@@ -22,9 +22,7 @@ const Card = ({ onClick, group, time, date, isInGroup, selected }: Props) => {
   );
 
   return (
-    <article
-      className={`study-card ${selected ? "study-card-accent" : "study-card-sidebar"}`}
-    >
+    <article className={`study-card ${selected ? "study-card-accent" : "study-card-sidebar"}`}>
       <button
         type="button"
         className="study-card-details-trigger"
@@ -74,9 +72,7 @@ const Card = ({ onClick, group, time, date, isInGroup, selected }: Props) => {
               />
             ))}
             {remainingParticipants > 0 && (
-              <span className="participant-overflow">
-                +{remainingParticipants}
-              </span>
+              <span className="participant-overflow">+{remainingParticipants}</span>
             )}
           </div>
           <span>
@@ -84,11 +80,7 @@ const Card = ({ onClick, group, time, date, isInGroup, selected }: Props) => {
           </span>
         </div>
         <div className="study-card-footer-actions">
-          <GroupShareAction
-            group={group}
-            compact
-            className="study-card-share"
-          />
+          <GroupShareAction group={group} compact className="study-card-share" />
           <span className="study-card-open" aria-hidden="true">
             Details <ArrowUpRight size={16} />
           </span>

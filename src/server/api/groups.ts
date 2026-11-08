@@ -58,12 +58,12 @@ function serializeGroup<
 
 export async function listGroups(courseCode?: string) {
   const groups = await db.studyGroup.findMany({
-    where: courseCode ? { courseCode } : undefined,
+    where: courseCode === undefined || courseCode === "" ? {} : { courseCode },
     orderBy: { startTime: "asc" },
     include: groupInclude,
   });
 
-  return groups.map(serializeGroup);
+  return groups.map((group) => serializeGroup(group));
 }
 
 export async function getGroup(groupId: string) {
@@ -99,11 +99,7 @@ export async function createGroup(input: GroupInput, userId: string) {
   return serializeGroup(group);
 }
 
-export async function updateGroup(
-  groupId: string,
-  userId: string,
-  input: GroupInput,
-) {
+export async function updateGroup(groupId: string, userId: string, input: GroupInput) {
   const { calendarEventId: _calendarEventId, ...groupInput } = input;
   const membership = await db.groupMembership.findUnique({
     where: { groupId_userId: { groupId, userId } },
@@ -120,11 +116,7 @@ export async function updateGroup(
   return serializeGroup(group);
 }
 
-export async function joinGroup(
-  groupId: string,
-  userId: string,
-  calendarEventId?: string,
-) {
+export function joinGroup(groupId: string, userId: string, calendarEventId?: string) {
   return db.$transaction(
     async (transaction) => {
       const group = await transaction.studyGroup.findUnique({
@@ -169,10 +161,7 @@ export async function joinGroup(
   );
 }
 
-async function findGroupMemberIds(
-  transaction: Prisma.TransactionClient,
-  groupId: string,
-) {
+async function findGroupMemberIds(transaction: Prisma.TransactionClient, groupId: string) {
   const members = await transaction.groupMembership.findMany({
     where: { groupId },
     select: { userId: true },
@@ -181,7 +170,7 @@ async function findGroupMemberIds(
   return members.map(({ userId }) => userId);
 }
 
-export async function leaveGroup(groupId: string, userId: string) {
+export function leaveGroup(groupId: string, userId: string) {
   return db.$transaction(async (transaction) => {
     const membership = await transaction.groupMembership.findUnique({
       where: { groupId_userId: { groupId, userId } },

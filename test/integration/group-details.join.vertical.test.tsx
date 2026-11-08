@@ -1,3 +1,4 @@
+import type { SetStateAction } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterAll, afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -16,7 +17,7 @@ const authMocks = vi.hoisted(() => ({ getSession: vi.fn() }));
 const toastMocks = vi.hoisted(() => ({ error: vi.fn(), success: vi.fn() }));
 
 vi.mock("~/lib/auth", () => ({
-  auth: { api: { getSession: authMocks.getSession } },
+  getSession: authMocks.getSession,
 }));
 vi.mock("~/lib/auth-client", () => ({
   useUser: () => ({
@@ -28,16 +29,16 @@ vi.mock("~/lib/auth-client", () => ({
   }),
 }));
 vi.mock("~/server/eligibility/service", () => ({
-  getUserEligibility: vi.fn(async () => "ELIGIBLE"),
+  getUserEligibility: vi.fn(() => Promise.resolve("ELIGIBLE")),
 }));
 vi.mock("react-redux", () => ({ useDispatch: () => vi.fn() }));
 vi.mock("posthog-js/react", () => ({ usePostHog: () => ({ capture: vi.fn() }) }));
 vi.mock("~/helpers/calendar_helper", () => ({
-  addToCal: vi.fn(async () => "calendar-event-from-ui"),
-  deleteFromCal: vi.fn(async () => true),
+  addToCal: vi.fn(() => Promise.resolve("calendar-event-from-ui")),
+  deleteFromCal: vi.fn(() => Promise.resolve(true)),
   isCalendarApiReady: vi.fn(() => false),
-  requestCalendarAccessInteractive: vi.fn(async () => undefined),
-  setupGoogleApi: vi.fn(async () => undefined),
+  requestCalendarAccessInteractive: vi.fn(() => Promise.resolve()),
+  setupGoogleApi: vi.fn(() => Promise.resolve()),
 }));
 vi.mock("~/features/groups/components/EditGroupModal", () => ({
   default: () => null,
@@ -59,6 +60,30 @@ function fetchViaInProcessApi(input: RequestInfo | URL, init?: RequestInit) {
   return api.fetch(request);
 }
 
+type TestUser = Awaited<ReturnType<typeof createTestUser>>;
+type TestGroup = Awaited<ReturnType<typeof createTestGroup>>;
+
+function studyGroup(group: TestGroup, owner: TestUser): StudyGroup {
+  return {
+    id: group.id,
+    course: group.courseCode,
+    title: group.title,
+    purpose: group.purpose,
+    details: group.details,
+    location: group.location,
+    startTime: group.startTime,
+    totalSeats: group.totalSeats,
+    participantDetails: [
+      {
+        name: owner.name,
+        email: owner.email,
+        url: owner.image,
+        eventId: "owner-event",
+      },
+    ],
+  };
+}
+
 describe("GroupDetails Join Group vertical pipeline", () => {
   beforeEach(resetTestDatabase);
   afterEach(() => {
@@ -77,38 +102,18 @@ describe("GroupDetails Join Group vertical pipeline", () => {
     });
     vi.stubGlobal("fetch", vi.fn(fetchViaInProcessApi));
 
-    const details: StudyGroup = {
-      id: group.id,
-      course: group.courseCode,
-      title: group.title,
-      purpose: group.purpose,
-      details: group.details,
-      location: group.location,
-      startTime: group.startTime,
-      totalSeats: group.totalSeats,
-      participantDetails: [
-        {
-          name: owner.name,
-          email: owner.email,
-          url: owner.image,
-          eventId: "owner-event",
-        },
-      ],
-    };
-    const updateJoinedGroups = vi.fn();
+    const updateJoinedGroups = vi.fn<(update: SetStateAction<string[] | null>) => void>();
     const user = userEvent.setup();
 
     render(
       <GroupDetails
-        details={details}
-        onClick={vi.fn()}
+        details={studyGroup(group, owner)}
+        onClick={vi.fn<() => void>()}
         updateJoinedGroups={updateJoinedGroups}
       />,
     );
 
-    await user.click(
-      await screen.findByRole("button", { name: "Join group" }),
-    );
+    await user.click(await screen.findByRole("button", { name: "Join group" }));
 
     await waitFor(async () => {
       await expect(
@@ -117,9 +122,7 @@ describe("GroupDetails Join Group vertical pipeline", () => {
         }),
       ).resolves.toMatchObject({ calendarEventId: "calendar-event-from-ui" });
     });
-    expect(
-      await screen.findByRole("button", { name: "Leave group" }),
-    ).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Leave group" })).toBeVisible();
     expect(toastMocks.success).toHaveBeenCalledWith("Joined group");
     expect(updateJoinedGroups).toHaveBeenCalledOnce();
   });

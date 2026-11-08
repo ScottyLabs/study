@@ -18,8 +18,7 @@ export default function EligibilityUnavailablePage() {
 
         <h1 className="access-title">Verification temporarily unavailable</h1>
         <p className="access-message">
-          We could not verify your CMU student status right now. Please try
-          again in a few minutes.
+          We could not verify your CMU student status right now. Please try again in a few minutes.
         </p>
         <div className="mt-8 flex justify-end gap-3">
           <Link href="/login" className="button-primary">

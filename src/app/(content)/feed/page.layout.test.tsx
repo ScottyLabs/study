@@ -54,8 +54,9 @@ const stylesheetPath = path.resolve(
 
 function lastRuleBody(css: string, selector: string) {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
   const matches = [...css.matchAll(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, "g"))];
-  return matches.length ? matches[matches.length - 1][1] : null;
+  return matches.at(-1)?.[1] ?? null;
 }
 
 describe("feed page filter bar layout", () => {
@@ -66,8 +67,7 @@ describe("feed page filter bar layout", () => {
     const newGroupButton = screen.getByRole("button", { name: /new group/i });
 
     expect(
-      searchInput.compareDocumentPosition(newGroupButton) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
+      searchInput.compareDocumentPosition(newGroupButton) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
 

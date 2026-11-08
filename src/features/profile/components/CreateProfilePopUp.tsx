@@ -35,9 +35,7 @@ function CreateProfilePopUp({ username, email }: CreateProfilePopUpProps) {
           <div className="text-default">
             <h2 className="text-xl font-bold">{firstName}</h2>
             <p className="text-sm text-black/60 dark:text-white/60">{email}</p>
-            {profile.year && (
-              <p className="font-bold">{formatYear(profile.year)}</p>
-            )}
+            {profile.year && <p className="font-bold">{formatYear(profile.year)}</p>}
             {profile.majors && (
               <p>
                 <strong>Majors: </strong>
@@ -51,11 +49,7 @@ function CreateProfilePopUp({ username, email }: CreateProfilePopUpProps) {
               </p>
             )}
           </div>
-          <button
-            onClick={handleClose}
-            className="profile-popup-close"
-            aria-label="Close profile"
-          >
+          <button onClick={handleClose} className="profile-popup-close" aria-label="Close profile">
             <X size={18} />
           </button>
         </div>

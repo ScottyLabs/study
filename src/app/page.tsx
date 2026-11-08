@@ -4,15 +4,7 @@ import { Suspense } from "react";
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  CalendarDays,
-  CheckSquare,
-  Clock,
-  MapPin,
-  Search,
-  ShieldCheck,
-  Users,
-} from "lucide-react";
+import { CalendarDays, CheckSquare, Clock, MapPin, Search, ShieldCheck, Users } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, useUser } from "~/lib/auth-client";
 
 import { destinationQuery, groupDestination } from "~/lib/group-destination";
@@ -99,10 +91,7 @@ function HomePageContent() {
                 </button>
               </SignInButton>
               <SignInButton forceRedirectUrl={loginUrl}>
-                <button
-                  type="button"
-                  className="button-outline landing-secondary"
-                >
+                <button type="button" className="button-outline landing-secondary">
                   Get started
                 </button>
               </SignInButton>
@@ -141,11 +130,7 @@ function HomePageContent() {
                       <strong>{group.title}</strong>
                       <span>
                         <span
-                          className={
-                            group.status === "Filling"
-                              ? "status-filling"
-                              : "status-open"
-                          }
+                          className={group.status === "Filling" ? "status-filling" : "status-open"}
                         >
                           {group.status}
                         </span>{" "}

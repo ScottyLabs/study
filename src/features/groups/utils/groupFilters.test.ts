@@ -44,10 +44,7 @@ describe("shouldHideBySharedFilters date ranges", () => {
   });
 
   test("includes both ends and every calendar day in a selected range", () => {
-    const selectedDateRange = [
-      new Date(2099, 9, 2),
-      new Date(2099, 9, 5),
-    ] as const;
+    const selectedDateRange = [new Date(2099, 9, 2), new Date(2099, 9, 5)] as const;
 
     expect(
       shouldHideBySharedFilters({
@@ -76,10 +73,7 @@ describe("shouldHideBySharedFilters date ranges", () => {
   });
 
   test("matches ranges that cross a year boundary", () => {
-    const selectedDateRange = [
-      new Date(2099, 11, 31),
-      new Date(2100, 0, 2),
-    ] as const;
+    const selectedDateRange = [new Date(2099, 11, 31), new Date(2100, 0, 2)] as const;
 
     expect(
       shouldHideBySharedFilters({

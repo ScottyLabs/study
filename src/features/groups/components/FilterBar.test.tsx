@@ -56,12 +56,7 @@ describe("TopFilterBar", () => {
     const user = userEvent.setup();
     const setSelectedCourses = vi.fn();
 
-    render(
-      <TopFilterBar
-        {...defaultProps}
-        setSelectedCourses={setSelectedCourses}
-      />,
-    );
+    render(<TopFilterBar {...defaultProps} setSelectedCourses={setSelectedCourses} />);
 
     await user.click(screen.getByText("All courses"));
     await user.click(screen.getByText("15-122"));
@@ -78,12 +73,7 @@ describe("TopFilterBar", () => {
   test("renders a single selected date", () => {
     const selectedDate = new Date(2026, 9, 2);
 
-    render(
-      <TopFilterBar
-        {...defaultProps}
-        selectedDateRange={[selectedDate, null]}
-      />,
-    );
+    render(<TopFilterBar {...defaultProps} selectedDateRange={[selectedDate, null]} />);
 
     expect(screen.getByDisplayValue("10/02/2026 -")).toBeInTheDocument();
   });
@@ -96,8 +86,6 @@ describe("TopFilterBar", () => {
       />,
     );
 
-    expect(
-      screen.getByDisplayValue("10/02/2026 - 10/05/2026"),
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue("10/02/2026 - 10/05/2026")).toBeInTheDocument();
   });
 });

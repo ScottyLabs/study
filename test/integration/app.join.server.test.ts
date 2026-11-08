@@ -12,7 +12,7 @@ import { createTestGroup, createTestUser } from "./factories";
 const authMocks = vi.hoisted(() => ({ getSession: vi.fn() }));
 
 vi.mock("~/lib/auth", () => ({
-  auth: { api: { getSession: authMocks.getSession } },
+  getSession: authMocks.getSession,
 }));
 vi.mock("~/server/eligibility/service", () => ({
   getUserEligibility: vi.fn(async () => "ELIGIBLE"),
@@ -59,29 +59,32 @@ describe("POST /api/v1/groups/:groupId/join", () => {
     ).resolves.toMatchObject({ calendarEventId: "joiner-calendar-event" });
   });
 
-  integrationTest("maps missing, duplicate, full, and unauthenticated joins to HTTP errors", async () => {
-    const owner = await createTestUser({ id: "owner", email: "owner@example.edu" });
-    const joiner = await createTestUser({ id: "joiner", email: "joiner@example.edu" });
-    const group = await createTestGroup({ ownerId: owner.id, totalSeats: 2 });
-    authMocks.getSession.mockResolvedValue({
-      user: { id: joiner.id, andrewID: joiner.andrewID },
-      session: { id: "joiner-session" },
-    });
+  integrationTest(
+    "maps missing, duplicate, full, and unauthenticated joins to HTTP errors",
+    async () => {
+      const owner = await createTestUser({ id: "owner", email: "owner@example.edu" });
+      const joiner = await createTestUser({ id: "joiner", email: "joiner@example.edu" });
+      const group = await createTestGroup({ ownerId: owner.id, totalSeats: 2 });
+      authMocks.getSession.mockResolvedValue({
+        user: { id: joiner.id, andrewID: joiner.andrewID },
+        session: { id: "joiner-session" },
+      });
 
-    expect((await requestJoin("does-not-exist")).status).toBe(404);
+      expect((await requestJoin("does-not-exist")).status).toBe(404);
 
-    expect((await requestJoin(group.id)).status).toBe(200);
-    expect((await requestJoin(group.id)).status).toBe(409);
+      expect((await requestJoin(group.id)).status).toBe(200);
+      expect((await requestJoin(group.id)).status).toBe(409);
 
-    const otherJoiner = await createTestUser({ id: "other", email: "other@example.edu" });
-    const fullGroup = await createTestGroup({ ownerId: owner.id, totalSeats: 1 });
-    authMocks.getSession.mockResolvedValue({
-      user: { id: otherJoiner.id, andrewID: otherJoiner.andrewID },
-      session: { id: "other-joiner-session" },
-    });
-    expect((await requestJoin(fullGroup.id)).status).toBe(409);
+      const otherJoiner = await createTestUser({ id: "other", email: "other@example.edu" });
+      const fullGroup = await createTestGroup({ ownerId: owner.id, totalSeats: 1 });
+      authMocks.getSession.mockResolvedValue({
+        user: { id: otherJoiner.id, andrewID: otherJoiner.andrewID },
+        session: { id: "other-joiner-session" },
+      });
+      expect((await requestJoin(fullGroup.id)).status).toBe(409);
 
-    authMocks.getSession.mockResolvedValue(null);
-    expect((await requestJoin(group.id)).status).toBe(401);
-  });
+      authMocks.getSession.mockResolvedValue(null);
+      expect((await requestJoin(group.id)).status).toBe(401);
+    },
+  );
 });

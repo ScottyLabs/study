@@ -25,10 +25,9 @@ test("keeps Profile only in the mobile bottom navigation", async () => {
 
   expect(screen.queryByRole("link", { name: "Open profile" })).not.toBeInTheDocument();
   expect(
-    within(screen.getByRole("navigation", { name: "Primary navigation" })).getByRole(
-      "link",
-      { name: "Profile" },
-    ),
+    within(screen.getByRole("navigation", { name: "Primary navigation" })).getByRole("link", {
+      name: "Profile",
+    }),
   ).toHaveAttribute("href", "/profile");
 
   await user.click(screen.getByRole("button", { name: "Open navigation menu" }));

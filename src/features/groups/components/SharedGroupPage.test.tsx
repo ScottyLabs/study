@@ -5,6 +5,7 @@ import { SharedGroupPage } from "./SharedGroupPage";
 import { ApiRequestError } from "~/lib/api/client";
 import { MOBILE_LAYOUT_QUERY } from "~/lib/responsive";
 import type { StudyGroup } from "~/types";
+import { mediaQueryList } from "../../../../test/fakes/media-query";
 const mocks = vi.hoisted(() => ({
   fetch: vi.fn(),
   fetchAll: vi.fn(),
@@ -29,7 +30,7 @@ vi.mock("posthog-js/react", () => ({
   usePostHog: () => ({ capture: mocks.capture }),
 }));
 vi.mock("~/helpers/calendar_helper", () => ({
-  setupGoogleApi: async () => undefined,
+  setupGoogleApi: () => Promise.resolve(),
   requestCalendarAccessInteractive: mocks.calendar,
   addToCal: mocks.addCalendar,
   deleteFromCal: vi.fn(),
@@ -70,42 +71,30 @@ beforeEach(() => {
     blockedByThem: [],
     joinedGroups: [],
   });
-  mocks.calendar.mockResolvedValue(undefined);
+  mocks.calendar.mockReturnValue(Promise.resolve());
   mocks.addCalendar.mockResolvedValue("calendar-event");
-  mocks.join.mockResolvedValue(undefined);
+  mocks.join.mockReturnValue(Promise.resolve());
 });
 test("opens a specific group without joining, then uses existing join/calendar flow", async () => {
   const userEventInstance = userEvent.setup();
   render(<SharedGroupPage groupId="abc" />);
-  expect(
-    await screen.findByRole("button", { name: "Join group" }),
-  ).toBeEnabled();
+  expect(await screen.findByRole("button", { name: "Join group" })).toBeEnabled();
   expect(screen.getByRole("heading", { name: "Group Finder" })).toBeVisible();
   expect(screen.getByRole("button", { name: "New group" })).toBeVisible();
   expect(
-    screen
-      .getByRole("button", { name: "Join group" })
-      .closest(".workspace-detail"),
+    screen.getByRole("button", { name: "Join group" }).closest(".workspace-detail"),
   ).not.toBeNull();
   expect(mocks.join).not.toHaveBeenCalled();
-  await userEventInstance.click(
-    screen.getByRole("button", { name: "Join group" }),
-  );
-  expect(
-    await screen.findByRole("button", { name: "Leave group" }),
-  ).toBeVisible();
-  expect(mocks.join).toHaveBeenCalledWith(
-    expect.objectContaining({ groupId: "abc" }),
-  );
+  await userEventInstance.click(screen.getByRole("button", { name: "Join group" }));
+  expect(await screen.findByRole("button", { name: "Leave group" })).toBeVisible();
+  expect(mocks.join).toHaveBeenCalledWith(expect.objectContaining({ groupId: "abc" }));
   expect(mocks.calendar).toHaveBeenCalledOnce();
   expect(mocks.addCalendar).toHaveBeenCalledOnce();
 });
 test("deleted groups show an unavailable state", async () => {
   mocks.fetch.mockRejectedValue(new ApiRequestError("Missing", 404));
   render(<SharedGroupPage groupId="abc" />);
-  expect(
-    await screen.findByRole("heading", { name: "Group unavailable" }),
-  ).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Group unavailable" })).toBeVisible();
 });
 test.each(["blockedByMe", "blockedByThem"])(
   "blocked groups are unavailable: %s",
@@ -117,9 +106,7 @@ test.each(["blockedByMe", "blockedByThem"])(
       [direction]: ["OWNER@cmu.edu"],
     });
     render(<SharedGroupPage groupId="abc" />);
-    expect(
-      await screen.findByRole("heading", { name: "Group unavailable" }),
-    ).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Group unavailable" })).toBeVisible();
     expect(screen.queryByText("Systems session")).not.toBeInTheDocument();
   },
 );
@@ -128,9 +115,7 @@ test("fetch errors offer a working retry", async () => {
   mocks.fetch.mockRejectedValueOnce(new Error("offline"));
   render(<SharedGroupPage groupId="abc" />);
   await u.click(await screen.findByRole("button", { name: "Retry" }));
-  expect(
-    await screen.findByRole("dialog", { name: "Systems session details" }),
-  ).toBeVisible();
+  expect(await screen.findByRole("dialog", { name: "Systems session details" })).toBeVisible();
 });
 test.each([
   ["full", { totalSeats: 1 }, "Group full"],
@@ -148,19 +133,14 @@ test("existing members can leave even if the session is full or past", async () 
     ...group,
     totalSeats: 1,
     startTime: new Date("2000-01-01"),
-    participantDetails: [
-      { name: "Student", email: "student@cmu.edu", url: null },
-    ],
+    participantDetails: [{ name: "Student", email: "student@cmu.edu", url: null }],
   });
   render(<SharedGroupPage groupId="abc" />);
-  expect(
-    await screen.findByRole("button", { name: "Leave group" }),
-  ).toBeEnabled();
+  expect(await screen.findByRole("button", { name: "Leave group" })).toBeEnabled();
 });
 
 test("a newly signed-in recipient gets Join in the mobile overlay on first load", async () => {
-  const media = window.matchMedia(MOBILE_LAYOUT_QUERY);
-  vi.spyOn(window, "matchMedia").mockReturnValue({ ...media, matches: true });
+  vi.spyOn(window, "matchMedia").mockReturnValue(mediaQueryList(MOBILE_LAYOUT_QUERY, true));
   const previousOverflow = document.body.style.overflow;
   mocks.sessionReady = false;
   const { rerender, unmount } = render(<SharedGroupPage groupId="abc" />);
@@ -195,38 +175,27 @@ test("the shared link shows the normal group cards beside the selected details",
   const u = userEvent.setup();
   const otherGroup = { ...group, id: "other", title: "Another session" };
   mocks.fetchAll.mockResolvedValue([group, otherGroup]);
-  mocks.fetch.mockImplementation(async (id: string) =>
-    id === "other" ? otherGroup : group,
+  mocks.fetch.mockImplementation((id: string) =>
+    Promise.resolve(id === "other" ? otherGroup : group),
   );
   render(<SharedGroupPage groupId="abc" />);
-  expect(
-    await screen.findByRole("dialog", { name: "Systems session details" }),
-  ).toBeVisible();
+  expect(await screen.findByRole("dialog", { name: "Systems session details" })).toBeVisible();
   const otherCard = await screen.findByRole("button", {
     name: "15-213: Another session",
   });
   expect(
-    screen
-      .getByRole("button", { name: "15-213: Systems session" })
-      .closest("article"),
+    screen.getByRole("button", { name: "15-213: Systems session" }).closest("article"),
   ).toHaveClass("study-card-accent");
   await u.click(otherCard);
-  expect(
-    await screen.findByRole("dialog", { name: "Another session details" }),
-  ).toBeVisible();
+  expect(await screen.findByRole("dialog", { name: "Another session details" })).toBeVisible();
 });
 
 test("details scroll locking follows changes between tablet and desktop layouts", async () => {
-  const initial = window.matchMedia(MOBILE_LAYOUT_QUERY);
   let handleChange: (() => void) | undefined;
-  const media = {
-    ...initial,
-    matches: true,
-    addEventListener: vi.fn((_event: string, listener: () => void) => {
-      handleChange = listener;
-    }),
-    removeEventListener: vi.fn(),
-  };
+  const media = mediaQueryList(MOBILE_LAYOUT_QUERY, true);
+  media.addEventListener.mockImplementation((_event, listener) => {
+    handleChange = listener;
+  });
   vi.spyOn(window, "matchMedia").mockReturnValue(media);
   const previousOverflow = document.body.style.overflow;
   const { unmount } = render(<SharedGroupPage groupId="abc" />);
@@ -241,8 +210,5 @@ test("details scroll locking follows changes between tablet and desktop layouts"
   expect(document.body.style.overflow).toBe("hidden");
   unmount();
   expect(document.body.style.overflow).toBe(previousOverflow);
-  expect(media.removeEventListener).toHaveBeenCalledWith(
-    "change",
-    handleChange,
-  );
+  expect(media.removeEventListener).toHaveBeenCalledWith("change", handleChange);
 });

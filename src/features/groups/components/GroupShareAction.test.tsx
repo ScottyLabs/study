@@ -44,17 +44,11 @@ test("cancellation is silent and re-enables the button", async () => {
   const user = userEvent.setup();
   Object.defineProperty(navigator, "share", {
     configurable: true,
-    value: vi
-      .fn()
-      .mockRejectedValue(new DOMException("Canceled", "AbortError")),
+    value: vi.fn().mockRejectedValue(new DOMException("Canceled", "AbortError")),
   });
   render(<GroupShareAction group={group} />);
   await user.click(screen.getByRole("button", { name: "Invite friends" }));
-  await waitFor(() =>
-    expect(
-      screen.getByRole("button", { name: "Invite friends" }),
-    ).toBeEnabled(),
-  );
+  await waitFor(() => expect(screen.getByRole("button", { name: "Invite friends" })).toBeEnabled());
   expect(notifications.error).not.toHaveBeenCalled();
 });
 test("share errors show feedback and allow retry", async () => {
@@ -69,9 +63,7 @@ test("share errors show feedback and allow retry", async () => {
   });
   render(<GroupShareAction group={group} />);
   await user.click(screen.getByRole("button", { name: "Invite friends" }));
-  expect(notifications.error).toHaveBeenCalledWith(
-    "Could not open sharing. Please try again.",
-  );
+  expect(notifications.error).toHaveBeenCalledWith("Could not open sharing. Please try again.");
   await user.click(screen.getByRole("button", { name: "Invite friends" }));
   expect(share).toHaveBeenCalledTimes(2);
 });
@@ -90,9 +82,7 @@ test("unsupported mobile browsers copy the full invitation without a site editor
 });
 test("clipboard failure is reported without opening a message editor", async () => {
   const user = userEvent.setup();
-  vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(
-    new Error("Denied"),
-  );
+  vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(new Error("Denied"));
   render(<GroupShareAction group={group} />);
   await user.click(screen.getByRole("button", { name: "Invite friends" }));
   expect(notifications.error).toHaveBeenCalledWith(
@@ -100,12 +90,8 @@ test("clipboard failure is reported without opening a message editor", async () 
   );
 });
 test("generates encoded links and casual invitations", () => {
-  expect(groupLink("https://cmustudy.com", "a/b")).toBe(
-    "https://cmustudy.com/groups/a%2Fb",
-  );
-  expect(
-    invitationMessage({ course: "15-122", purpose: "Homework" }, "LINK"),
-  ).toBe(
+  expect(groupLink("https://cmustudy.com", "a/b")).toBe("https://cmustudy.com/groups/a%2Fb");
+  expect(invitationMessage({ course: "15-122", purpose: "Homework" }, "LINK")).toBe(
     "I'm looking for people to study 15-122 with! Join my study group! LINK",
   );
 });

@@ -18,7 +18,7 @@ export function hasCalendarAccess(): boolean {
   return connected;
 }
 
-export async function setupGoogleApi(): Promise<void> {
+export function setupGoogleApi(): Promise<void> {
   if (setupPromise) return setupPromise;
   setupPromise = (async () => {
     try {
@@ -26,10 +26,9 @@ export async function setupGoogleApi(): Promise<void> {
     } catch {
       // Storage may be unavailable in private browsing.
     }
-    const status = await apiRequest<ConnectionStatus>(
-      `${CALENDAR_API}/status`,
-      { cache: "no-store" },
-    );
+    const status = await apiRequest<ConnectionStatus>(`${CALENDAR_API}/status`, {
+      cache: "no-store",
+    });
     configured = status.configured;
     connected = status.connected;
     initialized = true;
@@ -43,6 +42,54 @@ export function requestCalendarAccess(): Promise<void> {
   return requestCalendarAccessInteractive();
 }
 
+function delay(milliseconds: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
+// Cross-origin opener policies can report a live Google popup as closed.
+// Trust closure only while its same-origin location is still readable.
+function popupCancelled(popup: Window) {
+  if (!popup.closed) return false;
+  try {
+    const location = popup.location.href;
+    return location === "about:blank" || new URL(location).origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
+async function awaitAuthorization(attemptId: string, popup: Window, deadline: number) {
+  if (Date.now() >= deadline) throw new Error("Calendar connection timed out. Please retry.");
+  const attempt = await apiRequest<{ status: string }>(
+    `${CALENDAR_API}/attempts/${encodeURIComponent(attemptId)}`,
+    { cache: "no-store" },
+  );
+  if (attempt.status === "success") {
+    await setupGoogleApi();
+    if (!connected) throw new Error("Calendar connection could not be confirmed");
+    return;
+  }
+  if (!["pending", "processing"].includes(attempt.status)) {
+    throw new Error("Calendar connection did not complete. Please retry.");
+  }
+  if (popupCancelled(popup)) throw new Error("Calendar connection cancelled");
+  await delay(1000);
+  await awaitAuthorization(attemptId, popup, deadline);
+}
+
+async function authorizeInPopup(popup: Window) {
+  const deadline = Date.now() + 5 * 60_000;
+  const { attemptId, authorizationUrl } = await apiRequest<{
+    attemptId: string;
+    authorizationUrl: string;
+  }>(`${CALENDAR_API}/authorize`, { method: "POST" });
+  if (popup.closed) throw new Error("Calendar connection cancelled");
+  popup.location.href = authorizationUrl;
+  await awaitAuthorization(attemptId, popup, deadline);
+}
+
 /** Open synchronously in the click handler so the browser permits the popup. */
 export function requestCalendarAccessInteractive({
   forceRefresh = false,
@@ -50,64 +97,13 @@ export function requestCalendarAccessInteractive({
   if (authorizationPromise) return authorizationPromise;
   if (initialized && !configured) return Promise.resolve();
   if (connected && !forceRefresh) return Promise.resolve();
-  const popup = window.open(
-    "about:blank",
-    "_blank",
-    "popup,width=520,height=680",
-  );
-  if (!popup)
-    return Promise.reject(
-      new Error("Calendar popup blocked. Allow popups and retry."),
-    );
+  const popup = window.open("about:blank", "_blank", "popup,width=520,height=680");
+  if (!popup) return Promise.reject(new Error("Calendar popup blocked. Allow popups and retry."));
   // Google must not be able to navigate the original preview through window.opener.
   popup.opener = null;
   connected = false;
 
-  authorizationPromise = (async () => {
-    const deadline = Date.now() + 5 * 60_000;
-    const { attemptId, authorizationUrl } = await apiRequest<{
-      attemptId: string;
-      authorizationUrl: string;
-    }>(`${CALENDAR_API}/authorize`, { method: "POST" });
-    if (popup.closed) throw new Error("Calendar connection cancelled");
-    popup.location.href = authorizationUrl;
-    while (Date.now() < deadline) {
-      const attempt = await apiRequest<{ status: string }>(
-        `${CALENDAR_API}/attempts/${encodeURIComponent(attemptId)}`,
-        { cache: "no-store" },
-      );
-      if (attempt.status === "success") {
-        await setupGoogleApi();
-        if (!connected)
-          throw new Error("Calendar connection could not be confirmed");
-        return;
-      }
-      if (!["pending", "processing"].includes(attempt.status)) {
-        throw new Error("Calendar connection did not complete. Please retry.");
-      }
-      // Cross-origin opener policies can report a live Google popup as closed.
-      // Trust closure only while its same-origin location is still readable.
-      if (popup.closed) {
-        try {
-          const location = popup.location.href;
-          if (
-            location === "about:blank" ||
-            new URL(location).origin === window.location.origin
-          ) {
-            throw new Error("Calendar connection cancelled");
-          }
-        } catch (error) {
-          if (
-            error instanceof Error &&
-            error.message === "Calendar connection cancelled"
-          )
-            throw error;
-        }
-      }
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-    throw new Error("Calendar connection timed out. Please retry.");
-  })().finally(() => {
+  authorizationPromise = authorizeInPopup(popup).finally(() => {
     authorizationPromise = null;
     try {
       popup.close();
@@ -119,13 +115,11 @@ export function requestCalendarAccessInteractive({
 }
 
 async function calendarRequest<T>(path: string, init: RequestInit): Promise<T> {
-  if (initialized && !configured)
-    throw new Error("Calendar integration is not configured");
+  if (initialized && !configured) throw new Error("Calendar integration is not configured");
   try {
     return await apiRequest<T>(`${CALENDAR_API}/events${path}`, init);
   } catch (error) {
-    if (error instanceof ApiRequestError && [401, 409].includes(error.status))
-      connected = false;
+    if (error instanceof ApiRequestError && [401, 409].includes(error.status)) connected = false;
     throw error;
   }
 }

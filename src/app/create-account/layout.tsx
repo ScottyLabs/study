@@ -8,11 +8,7 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/CMUStudy.ico" }],
 };
 
-export default async function ContentLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function ContentLayout({ children }: { children: React.ReactNode }) {
   await requireContentAccess(undefined, false);
 
   return (

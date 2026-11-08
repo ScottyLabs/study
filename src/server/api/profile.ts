@@ -19,13 +19,9 @@ async function getSharedMemberships(
       select: { groupId: true },
     }),
   ]);
-  const targetGroupIds = new Set(
-    targetMemberships.map(({ groupId }) => groupId),
-  );
+  const targetGroupIds = new Set(targetMemberships.map(({ groupId }) => groupId));
 
-  return currentMemberships.filter(({ groupId }) =>
-    targetGroupIds.has(groupId),
-  );
+  return currentMemberships.filter(({ groupId }) => targetGroupIds.has(groupId));
 }
 
 export async function getProfile(userId: string) {
@@ -68,7 +64,7 @@ export async function updateProfile(
 export async function updateTheme(userId: string, theme: "light" | "dark") {
   await db.user.update({
     where: { id: userId },
-    data: { theme: theme.toUpperCase() as "LIGHT" | "DARK" },
+    data: { theme: theme === "light" ? "LIGHT" : "DARK" },
   });
 }
 
@@ -125,7 +121,25 @@ export async function getBlockingState(userId: string) {
   };
 }
 
-export async function blockUser(userId: string, targetEmail: string) {
+async function leaveSharedGroups(
+  transaction: Prisma.TransactionClient,
+  userId: string,
+  targetId: string,
+) {
+  const sharedMemberships = await getSharedMemberships(transaction, userId, targetId);
+  const groupIds = sharedMemberships.map(({ groupId }) => groupId);
+  if (groupIds.length > 0) {
+    await transaction.groupMembership.deleteMany({ where: { userId, groupId: { in: groupIds } } });
+    await transaction.studyGroup.deleteMany({
+      where: { id: { in: groupIds }, memberships: { none: {} } },
+    });
+  }
+  return sharedMemberships
+    .map(({ calendarEventId }) => calendarEventId)
+    .filter((calendarEventId): calendarEventId is string => Boolean(calendarEventId));
+}
+
+export function blockUser(userId: string, targetEmail: string) {
   return db.$transaction(
     async (transaction) => {
       const [blocker, target] = await Promise.all([
@@ -140,10 +154,7 @@ export async function blockUser(userId: string, targetEmail: string) {
       ]);
 
       if (!blocker) return { kind: "missing_blocker" as const };
-      if (
-        target?.id === userId ||
-        blocker.email.toLowerCase() === targetEmail.toLowerCase()
-      ) {
+      if (target?.id === userId || blocker.email.toLowerCase() === targetEmail.toLowerCase()) {
         return { kind: "self" as const };
       }
 
@@ -162,44 +173,9 @@ export async function blockUser(userId: string, targetEmail: string) {
         update: { blockedId: target?.id },
       });
 
-      if (!target) {
-        return {
-          kind: "blocked" as const,
-          calendarEventIds: [],
-        };
-      }
-
-      const sharedMemberships = await getSharedMemberships(
-        transaction,
-        userId,
-        target.id,
-      );
-
-      if (sharedMemberships.length > 0) {
-        await transaction.groupMembership.deleteMany({
-          where: {
-            userId,
-            groupId: { in: sharedMemberships.map(({ groupId }) => groupId) },
-          },
-        });
-
-        for (const { groupId } of sharedMemberships) {
-          const remainingMembers = await transaction.groupMembership.count({
-            where: { groupId },
-          });
-          if (remainingMembers === 0) {
-            await transaction.studyGroup.delete({ where: { id: groupId } });
-          }
-        }
-      }
-
       return {
         kind: "blocked" as const,
-        calendarEventIds: sharedMemberships
-          .map(({ calendarEventId }) => calendarEventId)
-          .filter((calendarEventId): calendarEventId is string =>
-            Boolean(calendarEventId),
-          ),
+        calendarEventIds: target ? await leaveSharedGroups(transaction, userId, target.id) : [],
       };
     },
     { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },

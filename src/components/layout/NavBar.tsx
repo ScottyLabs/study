@@ -3,16 +3,7 @@
 import { Fragment } from "react";
 import { usePathname } from "next/navigation";
 import { useDispatch } from "react-redux";
-import {
-  FileText,
-  LogOut,
-  MessageSquare,
-  Moon,
-  Plus,
-  Search,
-  Sun,
-  Users,
-} from "lucide-react";
+import { FileText, LogOut, MessageSquare, Moon, Plus, Search, Sun, Users } from "lucide-react";
 import { SignOutButton, useUser } from "~/lib/auth-client";
 import { UserAvatar } from "~/components/ui/UserAvatar";
 import MobileNavBar from "~/components/layout/MobileNavBar";
@@ -39,11 +30,7 @@ export default function NavBar() {
       <aside className="sidebar-shell" aria-label="Primary navigation">
         <div className="sidebar-content">
           <div>
-            <Link
-              href="/feed"
-              className="sidebar-brand"
-              aria-label="CMU Study home"
-            >
+            <Link href="/feed" className="sidebar-brand" aria-label="CMU Study home">
               <span>CMU</span> Study
             </Link>
             <button
@@ -80,12 +67,7 @@ export default function NavBar() {
               >
                 <MessageSquare className="nav-link-icon" /> Feedback
               </a>
-              <Link
-                href="/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-link"
-              >
+              <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="nav-link">
                 <FileText className="nav-link-icon" /> Privacy
               </Link>
               <button type="button" onClick={toggleTheme} className="nav-link">

@@ -9,8 +9,7 @@ export function useUserTheme(userId?: string) {
   const [hasHydratedTheme, setHasHydratedTheme] = useState(false);
 
   useEffect(() => {
-    const savedTheme: ThemePreference =
-      localStorage.getItem("theme") === "dark" ? "dark" : "light";
+    const savedTheme: ThemePreference = localStorage.getItem("theme") === "dark" ? "dark" : "light";
 
     setTheme(savedTheme);
     document.documentElement.classList.toggle("dark", savedTheme === "dark");

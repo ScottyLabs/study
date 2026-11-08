@@ -4,18 +4,12 @@ import { userHasCreatedProfile } from "~/features/profile/services/serverAccount
 import { getUserEligibility } from "~/server/eligibility/service";
 import { destinationQuery, groupDestination } from "./group-destination";
 
-export async function requireContentAccess(
-  next?: string,
-  requireProfile = true,
-) {
+export async function requireContentAccess(next?: string, requireProfile = true) {
   const destination = groupDestination(next);
   const query = destinationQuery(destination);
   const session = await requireServerSession();
-  if (!session?.user.email) redirect(`/${query}`);
-  const eligibility = await getUserEligibility(
-    session.user.id,
-    session.user.andrewID,
-  );
+  if (session === null || session.user.email === "") redirect(`/${query}`);
+  const eligibility = await getUserEligibility(session.user.id, session.user.andrewID);
   if (eligibility === "INELIGIBLE") redirect("/access-restricted");
   if (eligibility === "UNAVAILABLE") redirect("/eligibility-unavailable");
   if (requireProfile && !(await userHasCreatedProfile(session.user.id))) {

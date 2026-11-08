@@ -9,20 +9,14 @@ type ProfileMenuProps = {
   containerClassName?: string;
 };
 
-export function ProfileMenu({
-  containerClassName = "profile-menu-container",
-}: ProfileMenuProps) {
+export function ProfileMenu({ containerClassName = "profile-menu-container" }: ProfileMenuProps) {
   const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isOpen &&
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
+      if (isOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -44,11 +38,7 @@ export function ProfileMenu({
       </button>
       {isOpen && (
         <div className="profile-menu">
-          <Link
-            href="/profile"
-            className="profile-menu-item"
-            onClick={() => setIsOpen(false)}
-          >
+          <Link href="/profile" className="profile-menu-item" onClick={() => setIsOpen(false)}>
             Profile
           </Link>
           <SignOutButton>

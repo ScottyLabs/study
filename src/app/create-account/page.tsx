@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClassList } from "~/features/profile/components/ClassList";
 import { ProfileDetailsForm } from "~/features/profile/components/ProfileDetailsForm";
@@ -11,35 +11,45 @@ import { useUser } from "~/lib/auth-client";
 import { groupDestination } from "~/lib/group-destination";
 
 function CourseRequiredPopup({ onClose }: { onClose: () => void }) {
+  const okButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    okButton.current?.focus();
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [onClose]);
 
   return (
-    <div className="confirm-overlay" onClick={onClose}>
+    <div
+      className="confirm-overlay"
+      role="presentation"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="course-required-message"
         className="confirm-panel flex items-center gap-4"
-        onClick={(event) => event.stopPropagation()}
       >
-        <p
-          id="course-required-message"
-          className="confirm-message m-0 flex-1 text-left"
-        >
+        <p id="course-required-message" className="confirm-message m-0 flex-1 text-left">
           Add at least one course to continue.
         </p>
         <div className="confirm-actions m-0 shrink-0">
           <button
+            ref={okButton}
             type="button"
             className="confirm-button-continue"
             onClick={onClose}
-            autoFocus
           >
             OK
           </button>
@@ -67,9 +77,31 @@ function ContinueButton({ onNeedsCourse }: { onNeedsCourse: () => void }) {
   };
 
   return (
-    <button type="button" className="button-primary" onClick={handleContinue}>
+    <button
+      type="button"
+      className="button-primary"
+      onClick={() => {
+        void handleContinue();
+      }}
+    >
       Continue
     </button>
+  );
+}
+
+function CoursesColumn() {
+  return (
+    <div className="profile-column desktop:flex">
+      <div className="settings-panel w-full">
+        <div className="settings-panel-heading">
+          <div>
+            <h2>My courses</h2>
+            <p>Add the courses you are taking to connect with classmates.</p>
+          </div>
+        </div>
+        <ClassList />
+      </div>
+    </div>
   );
 }
 
@@ -86,12 +118,15 @@ function CreateAccountPageContent() {
           <div className="workspace-kicker">Welcome</div>
           <h1 className="workspace-title">Set up CMU Study</h1>
           <p className="workspace-subtitle">
-            Add your profile details and at least one course to start finding
-            useful study groups.
+            Add your profile details and at least one course to start finding useful study groups.
           </p>
         </div>
         <div className="workspace-actions">
-          <ContinueButton onNeedsCourse={() => setShowCoursePopup(true)} />
+          <ContinueButton
+            onNeedsCourse={() => {
+              setShowCoursePopup(true);
+            }}
+          />
         </div>
       </section>
       <div className="profile-workspace">
@@ -101,22 +136,14 @@ function CreateAccountPageContent() {
             <ProfileDetailsForm userId={userId} mastersValue="Masters" />
           </div>
         </div>
-        <div className="profile-column desktop:flex">
-          <div className="settings-panel w-full">
-            <div className="settings-panel-heading">
-              <div>
-                <h2>My courses</h2>
-                <p>
-                  Add the courses you are taking to connect with classmates.
-                </p>
-              </div>
-            </div>
-            <ClassList />
-          </div>
-        </div>
+        <CoursesColumn />
       </div>
       {showCoursePopup && (
-        <CourseRequiredPopup onClose={() => setShowCoursePopup(false)} />
+        <CourseRequiredPopup
+          onClose={() => {
+            setShowCoursePopup(false);
+          }}
+        />
       )}
     </div>
   );
@@ -124,7 +151,7 @@ function CreateAccountPageContent() {
 
 export default function CreateAccountPage() {
   return (
-    <Suspense fallback={<p role="status">Loading...</p>}>
+    <Suspense fallback={<output className="block">Loading...</output>}>
       <CreateAccountPageContent />
     </Suspense>
   );

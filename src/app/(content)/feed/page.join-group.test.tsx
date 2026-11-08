@@ -82,13 +82,9 @@ describe("feed Join Group entry point", () => {
     const user = userEvent.setup();
     render(<FeedPage />);
 
-    await user.click(
-      screen.getByRole("button", { name: /calculus review/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /calculus review/i }));
 
     expect(screen.getByRole("button", { name: "Join group" })).toBeVisible();
-    expect(
-      screen.queryByRole("button", { name: "Leave group" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Leave group" })).not.toBeInTheDocument();
   });
 });
