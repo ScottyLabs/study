@@ -2,18 +2,6 @@
 
 set -euo pipefail
 
-locked_prisma_engine_commit="$(node -e '
-  const lock = require("./package-lock.json");
-  const version = lock.packages["node_modules/@prisma/engines-version"].version;
-  console.log(version.split(".").at(-1));
-')"
-
-if [ -n "${STUDYSTARTER_PRISMA_ENGINE_COMMIT:-}" ] && [ "${locked_prisma_engine_commit}" != "${STUDYSTARTER_PRISMA_ENGINE_COMMIT}" ]; then
-  echo "The Nix Prisma engine does not match package-lock.json." >&2
-  echo "Expected ${locked_prisma_engine_commit}; got ${STUDYSTARTER_PRISMA_ENGINE_COMMIT}." >&2
-  exit 1
-fi
-
 test_port="${TEST_POSTGRES_PORT:-54329}"
 test_temp_root="${RUNNER_TEMP:-/tmp}"
 test_data_dir="$(mktemp -d "${test_temp_root%/}/studystarter-postgres.XXXXXX")"
@@ -60,6 +48,6 @@ createdb \
   --username=studystarter \
   studystarter_test
 
-npx prisma generate
-DATABASE_URL="${test_database_url}" npx prisma migrate deploy
-DATABASE_URL_TEST="${test_database_url}" npm run test:integration -- "$@"
+deno run -A npm:prisma generate
+DATABASE_URL="${test_database_url}" deno run -A npm:prisma migrate deploy
+DATABASE_URL_TEST="${test_database_url}" deno task test:integration "$@"

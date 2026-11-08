@@ -5,12 +5,13 @@ import { SharedGroupPage } from "~/features/groups/components/SharedGroupPage";
 export default async function GroupPage({
   params,
 }: {
-  params: { groupId: string };
+  params: Promise<{ groupId: string }>;
 }) {
-  await requireContentAccess(`/groups/${params.groupId}`);
+  const { groupId } = await params;
+  await requireContentAccess(`/groups/${groupId}`);
   return (
     <AuthenticatedShell>
-      <SharedGroupPage groupId={params.groupId} />
+      <SharedGroupPage groupId={groupId} />
     </AuthenticatedShell>
   );
 }

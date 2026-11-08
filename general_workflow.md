@@ -97,7 +97,7 @@ git add <files>
 git commit -m "A concise, one-sentence description of this commit"
 ```
 
-Use the project's conventional-commit conventions where applicable.
+Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/). Kennel's [git hooks](https://docs.kennel.scottylabs.org/guides/local-development/#git-hooks) check the message and run `deno task test:all` on each commit.
 
 ### 8. Verify the complete feature
 
@@ -115,50 +115,42 @@ Fix the code (or, occasionally, the test when the test is genuinely incorrect) u
 
 ### Running the automated tests locally
 
-The test commands run inside the devenv environment. In one terminal, start the
-local PostgreSQL service and leave it running:
+The test commands run inside the dev shell, which installs the dependencies. Enter it, start the local PostgreSQL service, and prepare the database:
 
 ```bash
-devenv up
-```
-
-In a second terminal, open the development shell and prepare the database:
-
-```bash
-devenv shell
-npm ci
+nix develop
+pitchfork start --local
 migrate
 ```
 
 Run the unit tests first:
 
 ```bash
-npm test
+deno task test
 ```
 
 Then run the PostgreSQL integration tests against a temporary, disposable database:
 
 ```bash
-npm run test:integration
+deno task test:integration
 ```
 
 Or run both suites, with integration skipped if unit tests fail and a final
 combined summary:
 
 ```bash
-npm run test:all
+deno task test:all
 ```
 
 The runner creates, migrates, and destroys the test database. To use an
 existing dedicated test database, pass its connection string only for the
-command: `DATABASE_URL_TEST="postgresql://.../dedicated_test_database" npm run test:integration`.
+command: `DATABASE_URL_TEST="postgresql://.../dedicated_test_database" deno task test:integration`.
 It must differ from `DATABASE_URL`; never use a development,
 shared, or production database.
 
-To stop any suite after its first failure, append `-- --bail=1`, such as
-`npm run test:unit -- --bail=1`, `npm run test:integration -- --bail=1`, or
-`npm run test:all -- --bail=1`. The first `--` passes the Vitest flag through
-npm.
+To stop any suite after its first failure, append `--bail=1`, such as
+`deno task test:unit --bail=1`, `deno task test:integration --bail=1`, or
+`deno task test:all --bail=1`.
 
 ### 9. Test different screen sizes
 
@@ -224,14 +216,9 @@ Repeat [full-feature testing](#8-verify-the-complete-feature) and [responsive te
 git push -u origin <your-branch-name>
 ```
 
-Open a pull request after pushing. The `Test` workflow runs only for pull-request
-events, not ordinary pushes: unit tests run first, followed by integration tests
-only if unit tests pass. Pushing further commits to the open PR updates it and
-runs the workflow again.
+Open a pull request after pushing. Pushing further commits to the open PR updates it.
 
-Kennel independently builds and deploys an open PR preview. Monitor its
-`kennel/build` and `kennel/deploy` statuses on the latest commit; once it is
-healthy, Kennel comments with the preview URL.
+Kennel deploys an open PR preview. Monitor its `kennel/deploy` status on the latest commit; once it is healthy, Kennel comments with the preview URL.
 
 ### 12. Test on the development app
 
@@ -259,7 +246,7 @@ Once the feature works on the development app:
 
 Leads may ask questions, request code changes, or request additional tests. Reply to questions directly in the PR. You should not close and reopen the PR.
 
-For code changes, update your branch, test the changes thoroughly, and push again. This updates the open PR, reruns its tests, and refreshes the Kennel preview. If the base branch changed, update your branch first; see [step 10](#10-update-from-the-base-branch). Your new code will show in the PR. Re-request review from each lead so we know you have updates ready.
+For code changes, update your branch, test the changes thoroughly, and push again. This updates the open PR and refreshes the Kennel preview. If the base branch changed, update your branch first; see [step 10](#10-update-from-the-base-branch). Your new code will show in the PR. Re-request review from each lead so we know you have updates ready.
 
 ### 15. Merge the pull request
 
@@ -267,7 +254,7 @@ After a lead approves the PR, you may merge it into the base branch yourself. On
 
 If the PR is out of date, update it from the base branch, test again, and push before merging.
 
-- Tests are intentionally not rerun by a merge. Required PR checks must be green before merging.
+- Required PR checks must be green before merging.
 - A merge into `main` causes Kennel to deploy production (usually about five minutes when no jobs are queued).
 - Merging into another long-lived deployment branch, such as `dev` or `staging`, deploys that branch.
 

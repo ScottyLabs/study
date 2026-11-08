@@ -53,7 +53,9 @@ export function decryptCredential(
   if (!iv || iv.length !== 12 || !tag || tag.length !== 16 || !encrypted) {
     throw new Error("Invalid encrypted Calendar credential");
   }
-  const decipher = createDecipheriv("aes-256-gcm", Buffer.from(key, "hex"), iv);
+  const decipher = createDecipheriv("aes-256-gcm", Buffer.from(key, "hex"), iv, {
+    authTagLength: 16,
+  });
   decipher.setAAD(Buffer.from(context));
   decipher.setAuthTag(tag);
   return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString(

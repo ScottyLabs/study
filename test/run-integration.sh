@@ -3,7 +3,7 @@
 set -euo pipefail
 
 if [ -n "${DATABASE_URL_TEST:-}" ]; then
-  DATABASE_TEST_REQUIRED=true npx vitest run test/integration "$@"
+  DATABASE_TEST_REQUIRED=true deno run -A npm:vitest run test/integration "$@"
 else
   bash test/run-postgres-integration.sh "$@"
 fi

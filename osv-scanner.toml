@@ -1,0 +1,16 @@
+# better-auth 1.7 replaces Generic OAuth with social providers and moves the callback route
+[[IgnoredVulns]]
+id = "GHSA-965c-763c-88jm"
+reason = "needs the Magic Link plugin and database-backed OAuth state, and study uses neither"
+
+[[IgnoredVulns]]
+id = "GHSA-r4xp-prcw-77qf"
+reason = "needs the OAuth Proxy plugin, which study does not use"
+
+[[IgnoredVulns]]
+id = "GHSA-q84f-53jg-9ppm"
+reason = "needs the device authorization plugin, which study does not use"
+
+[[IgnoredVulns]]
+id = "GHSA-44jh-23m7-hpcf"
+reason = "rate limits in the Drizzle and Kysely adapters, and study stores data through the Prisma adapter"

@@ -41,7 +41,7 @@ describe("invitation authentication destination", () => {
   });
   test("returns eligible users to the group", async () => {
     await expect(
-      LoginPage({ searchParams: { next: "/groups/abc-123" } }),
+      LoginPage({ searchParams: Promise.resolve({ next: "/groups/abc-123" }) }),
     ).rejects.toThrow("REDIRECT:/groups/abc-123");
   });
   test("preserves group destination for signed out users", async () => {
@@ -69,7 +69,7 @@ describe("invitation authentication destination", () => {
   });
   test("invalid destinations fall back to feed", async () => {
     await expect(
-      LoginPage({ searchParams: { next: "https://evil.test" } }),
+      LoginPage({ searchParams: Promise.resolve({ next: "https://evil.test" }) }),
     ).rejects.toThrow("REDIRECT:/feed");
   });
 });

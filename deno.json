@@ -1,0 +1,16 @@
+{
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "build": "prisma generate && next build",
+    "dev": "prisma generate && next dev",
+    "start": "next start",
+    "db:generate": "prisma migrate dev",
+    "db:migrate": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "test": "deno task test:unit",
+    "test:unit": "prisma generate && vitest run src test/unit",
+    "test:integration": "bash test/run-integration.sh",
+    "test:all": "bash test/run-all-tests.sh"
+  }
+}

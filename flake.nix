@@ -9,19 +9,15 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    scottylabs.url = "git+https://git.cmu.dev/ScottyLabs/kennel";
+    nixpkgs.follows = "scottylabs/nixpkgs";
+    flake-parts.follows = "scottylabs/flake-parts";
   };
 
   outputs =
-    { nixpkgs, ... }:
+    inputs:
     let
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-      ];
-      forAllSystems = nixpkgs.lib.genAttrs systems;
-
-      # must track @prisma/engines-version in package-lock.json
+      # must track @prisma/engines-version in deno.lock
       engineCommit = "34ace0eb2704183d2c05b60b52fba5c43c13f303";
 
       engineTargets = {
@@ -40,12 +36,23 @@
         };
       };
     in
-    {
-      packages = forAllSystems (
-        system:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ inputs.scottylabs.flakeModules.default ];
+      # the prisma engines are only fetched for linux
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+
+      perSystem =
+        {
+          pkgs,
+          lib,
+          system,
+          helpers,
+          ...
+        }:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
-          inherit (pkgs) lib;
           nodejs = pkgs.nodejs_22;
 
           engineTarget = engineTargets.${system};
@@ -104,15 +111,17 @@
             exec ${lib.getExe nodejs} "$1"/share/study/server.js
           '';
 
-          study = pkgs.buildNpmPackage {
+          built = helpers.buildDenoTask {
             pname = "study";
             version = "0.1.0";
+            output = ".";
 
             src = lib.fileset.toSource {
               root = ./.;
               fileset = lib.fileset.unions [
+                ./deno.json
+                ./deno.lock
                 ./package.json
-                ./package-lock.json
                 ./next.config.js
                 ./postcss.config.cjs
                 ./tailwind.config.ts
@@ -122,11 +131,11 @@
                 ./src
               ];
             };
+          };
 
-            npmDepsHash = "sha256-ZhvyCMBcxseyR5f0dTfqn/ZI9u3zpWYf0GDaW3Nl22E=";
-
-            inherit nodejs;
-            nativeBuildInputs = [ pkgs.makeWrapper ];
+          study = built.overrideAttrs (old: {
+            nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.makeWrapper ];
+            buildInputs = old.buildInputs ++ [ pkgs.openssl ];
 
             env = {
               PRISMA_QUERY_ENGINE_LIBRARY = queryEngineLibrary;
@@ -161,8 +170,14 @@
               cp -r .next/static $out/share/study/.next/static
               cp -r public $out/share/study/public
 
+              # the standalone trace copies addons patched against the build tree
+              chmod -R u+w $out/share/study
+              find $out/share/study/node_modules -name '*musl*' -prune -exec rm -rf {} +
+              autoPatchelf $out/share/study/node_modules
+
               cp -r prisma $out/share/migrate/schema
-              cp -r node_modules/prisma node_modules/@prisma $out/share/migrate/node_modules/
+              cp -rL node_modules/prisma $out/share/migrate/node_modules/prisma
+              cp -rL node_modules/.deno/node_modules/@prisma $out/share/migrate/node_modules/@prisma
 
               makeWrapper ${start} $out/bin/study --add-flags $out
 
@@ -174,15 +189,69 @@
               mainProgram = "study";
               platforms = lib.platforms.linux;
             };
-          };
+          });
         in
         {
-          prisma-engines = prismaEngines;
+          scottylabs = {
+            project.name = "study";
 
-          # hash collision prevention
-          web = study;
-          default = study;
-        }
-      );
+            postgres.enable = true;
+            ricochet = {
+              enable = true;
+              appUrl = "http://localhost:3000";
+            };
+
+            deno = {
+              enable = true;
+              react.enable = true;
+            };
+
+            processes.web = {
+              run = "exec secretspec run -P dev -- deno task dev";
+              depends = [ "postgres-setup" ];
+            };
+
+            shell = {
+              env = {
+                PRISMA_QUERY_ENGINE_LIBRARY = queryEngineLibrary;
+                PRISMA_SCHEMA_ENGINE_BINARY = "${prismaEngines}/bin/schema-engine";
+              };
+
+              # prisma sends an empty user unless the url names one
+              exports = lib.mkAfter ''
+                case "$DATABASE_URL" in
+                  postgresql:///*)
+                    export DATABASE_URL="postgresql://$(id -un)@localhost/''${DATABASE_URL#postgresql:///}"
+                    ;;
+                esac
+              '';
+
+              scripts = {
+                migration = "deno task db:generate";
+                migrate = "deno task db:migrate";
+                studio = "deno task db:studio";
+              };
+            };
+          };
+
+          packages.prisma-engines = prismaEngines;
+
+          pre-commit.settings.hooks = {
+            deno-test.enable = lib.mkForce false;
+            vitest = {
+              enable = true;
+              name = "vitest";
+              entry = "deno task test:all";
+              files = "\\.(ts|tsx|mts|cts|js|mjs|cjs|jsx|prisma)$";
+              pass_filenames = false;
+              language = "system";
+            };
+          };
+
+          services.web = {
+            package = study;
+            customDomain = "cmustudy.com";
+          };
+        };
     };
 }

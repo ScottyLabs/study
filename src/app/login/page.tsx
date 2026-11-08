@@ -6,9 +6,9 @@ export const dynamic = "force-dynamic";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { next?: string };
+  searchParams: Promise<{ next?: string }>;
 }) {
-  const next = groupDestination(searchParams.next);
+  const next = groupDestination((await searchParams).next);
   await requireContentAccess(next);
   redirect(next);
 }

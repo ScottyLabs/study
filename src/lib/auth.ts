@@ -73,6 +73,6 @@ export const auth = betterAuth({
 
 export async function requireServerSession() {
   return auth.api.getSession({
-    headers: headers(),
+    headers: await headers(),
   });
 }
