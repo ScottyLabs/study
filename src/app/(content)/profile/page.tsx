@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import { ConfirmProvider } from "~/components/ui/ConfirmContext";
 import { useUser } from "~/lib/auth-client";
-import { CalendarStatus } from "~/features/calendar/components/CalendarStatus";
 import { BlockList } from "~/features/profile/components/BlockList";
 import { ClassList } from "~/features/profile/components/ClassList";
 import { ProfileDetailsForm } from "~/features/profile/components/ProfileDetailsForm";
@@ -56,7 +55,6 @@ export default function ProfilePage() {
               </div>
             </div>
             <ProfileDetailsForm userId={userId} />
-            <CalendarStatus />
           </section>
           <section
             className={`settings-panel profile-section profile-section-courses ${activeTab === "courses" ? "profile-section-active" : ""}`}

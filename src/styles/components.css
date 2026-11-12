@@ -1237,14 +1237,6 @@
   @apply text-xs text-black/45 dark:text-white/45;
 }
 
-.calendar-status {
-  @apply mt-4 text-xs text-black/50 dark:text-white/50;
-}
-
-.calendar-status button {
-  @apply font-semibold text-lightSelected underline dark:text-darkSelected;
-}
-
 .filter-availability {
   @apply mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-black/60 dark:text-white/60;
 }

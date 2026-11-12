@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   fetchBusyIntervals,
-  hasCalendarAccess,
   isCalendarApiReady,
+  requestCalendarAccessInteractive,
   setupGoogleApi,
   type BusyInterval,
 } from "~/helpers/calendar_helper";
@@ -28,19 +28,26 @@ function availabilityRange(groups: StudyGroup[]) {
 
 function failureStatus(error: unknown) {
   if (error instanceof ApiRequestError && [401, 409].includes(error.status))
-    return "Calendar not connected";
+    return "Reconnect Google Calendar";
   return error instanceof Error
     ? error.message
     : "Availability is unavailable. Please retry.";
 }
 
-/** Loads busy times once each time the user turns the filter on. */
+/** Turns the filter on, connecting Google Calendar first if needed. */
 export function useAvailabilityFilter(groups: StudyGroup[]) {
   const [busyIntervals, setBusyIntervals] = useState<BusyInterval[] | null>(
     null,
   );
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+
+  // Load the connection state early, so a click can decide without waiting.
+  useEffect(() => {
+    setupGoogleApi().catch((err) => {
+      console.warn("Failed to load Google Calendar status:", err);
+    });
+  }, []);
 
   async function setEnabled(enabled: boolean) {
     setStatus(null);
@@ -50,11 +57,11 @@ export function useAvailabilityFilter(groups: StudyGroup[]) {
     }
     setLoading(true);
     try {
-      await setupGoogleApi();
+      // Nothing is awaited before this call: iPhone browsers only allow a popup
+      // opened directly in the click. It resolves at once when already connected.
+      await requestCalendarAccessInteractive();
       if (!isCalendarApiReady()) {
         setStatus("Google Calendar is unavailable");
-      } else if (!hasCalendarAccess()) {
-        setStatus("Calendar not connected");
       } else {
         const { from, to } = availabilityRange(groups);
         setBusyIntervals(await fetchBusyIntervals(from, to));
