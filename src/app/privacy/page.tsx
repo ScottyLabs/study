@@ -106,10 +106,8 @@ export default function PrivacyPage() {
               refresh tokens, their expiration information, granted permissions,
               and a Google account identifier when provided. These credentials
               let the server perform Calendar actions you request without asking
-              you to reconnect each time an access token expires. Busy times
-              are kept only in server memory for up to one minute, to avoid
-              repeating the same request to Google, and are never saved to our
-              database.
+              you to reconnect each time an access token expires. Busy times are
+              never saved to our database.
             </p>
 
             <p className="mt-4 opacity-90">

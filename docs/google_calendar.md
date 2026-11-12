@@ -52,14 +52,11 @@ calendar with the existing `calendar.freebusy` scope and returns busy intervals
 only. A group counts as one hour from its start time, matching the events the
 app creates, and groups the user joined are never hidden.
 
-The endpoint is limited in `src/server/calendar/rateLimit.ts`, in memory, which
-is correct because Kennel runs one app instance per environment:
-
-- Ranges must start no earlier than now and span at most 60 days.
-- Each user may trigger 10 Google calls per minute, and all users together
-  1,000 per minute. Extra requests return 429.
-- A user's last result is reused for 60 seconds when it covers the requested
-  range. Busy times are never written to the database.
+Google is only called when the user turns the filter on, so the endpoint has
+no rate limiter or cache. It checks that the range starts no earlier than now
+and spans at most 60 days (`MAX_BUSY_RANGE_MS` in `src/lib/calendar.ts`), and
+returns 429 when Google reports a rate limit. Busy times are never written to
+the database.
 
 A per-calendar error or malformed response is an error, never free time.
 

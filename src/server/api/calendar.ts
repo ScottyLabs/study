@@ -14,7 +14,7 @@ import {
   calendarEventIdSchema,
   calendarEventSchema,
 } from "~/server/calendar/security";
-import { MAX_BUSY_RANGE_MS } from "~/server/calendar/rateLimit";
+import { MAX_BUSY_RANGE_MS } from "~/lib/calendar";
 
 export const calendarApi = new Hono<ApiEnvironment>();
 

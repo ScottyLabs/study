@@ -601,12 +601,9 @@ async function connected(settings) {
   return f;
 }
 
-test("free/busy reads only the primary calendar and reuses the result within a minute", async () => {
+test("free/busy reads only the primary calendar", async () => {
   const f = await connected();
   const to = new Date(from.getTime() + 7 * day);
-  assert.deepEqual(await f.service.getBusyIntervals(userId, from, to), [
-    busyInterval,
-  ]);
   assert.deepEqual(await f.service.getBusyIntervals(userId, from, to), [
     busyInterval,
   ]);
@@ -617,25 +614,6 @@ test("free/busy reads only the primary calendar and reuses the result within a m
     items: [{ id: "primary" }],
   });
   assert.equal(f.requests[0].options.retry, false);
-});
-
-test("each user is stopped before an eleventh Google call in a minute", async () => {
-  const f = await connected();
-  for (let days = 1; days <= 10; days++)
-    await f.service.getBusyIntervals(
-      userId,
-      from,
-      new Date(from.getTime() + days * day),
-    );
-  await assert.rejects(
-    f.service.getBusyIntervals(
-      userId,
-      from,
-      new Date(from.getTime() + 11 * day),
-    ),
-    { status: 429, code: "rate_limited" },
-  );
-  assert.equal(f.requests.length, 10);
 });
 
 test("Google limits, calendar errors, and revoked access never read as free time", async () => {

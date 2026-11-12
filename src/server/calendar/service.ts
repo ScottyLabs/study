@@ -7,6 +7,7 @@ import type { CalendarConnection } from "@prisma/client";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
+import type { BusyInterval } from "~/lib/calendar";
 import {
   CALENDAR_SCOPES,
   CalendarError,
@@ -16,7 +17,6 @@ import {
   hasRequiredScopes,
   readRelayState,
 } from "./security";
-import { createBusyLimiter, type BusyInterval } from "./rateLimit";
 
 export const calendarOrigin = () => new URL(env.SERVER_URL).origin;
 const callbackURL = () => `${calendarOrigin()}/api/calendar/oauth/callback`;
@@ -409,7 +409,6 @@ export async function calendarEventRequest(
   }
 }
 
-const busyLimiter = createBusyLimiter();
 const busyIntervalsSchema = z.array(
   z.object({
     start: z.string().datetime({ offset: true }),
@@ -417,25 +416,12 @@ const busyIntervalsSchema = z.array(
   }),
 );
 
-function rateLimited(): never {
-  throw new CalendarError(
-    "Too many availability checks. Try again in a minute.",
-    "rate_limited",
-    429,
-  );
-}
-
-/** Returns busy times on the user's primary calendar, limited per user and app. */
+/** Returns busy times on the user's primary calendar. */
 export async function getBusyIntervals(
   userId: string,
   from: Date,
   to: Date,
 ): Promise<BusyInterval[]> {
-  const now = Date.now();
-  const cached = busyLimiter.cached(userId, from.getTime(), to.getTime(), now);
-  if (cached) return cached;
-  // Count before connecting, because a token refresh is also a Google call.
-  if (!busyLimiter.acquire(userId, now)) rateLimited();
   const { connection, calendar } = await calendarClient(userId);
   let primary: calendar_v3.Schema$FreeBusyCalendar | undefined;
   try {
@@ -451,14 +437,15 @@ export async function getBusyIntervals(
     );
     primary = data.calendars?.primary;
   } catch (error) {
-    const {
-      status,
-      scopeDenied,
-      rateLimited: googleLimited,
-    } = providerError(error);
+    const { status, scopeDenied, rateLimited } = providerError(error);
     if (status === 401 || (status === 403 && scopeDenied))
       return requireReconnection(connection);
-    if (googleLimited) rateLimited();
+    if (rateLimited)
+      throw new CalendarError(
+        "Google Calendar is busy. Try again in a minute.",
+        "rate_limited",
+        429,
+      );
     console.warn("Calendar availability request failed", { status });
     throw new CalendarError(
       "Calendar availability request failed. Please retry.",
@@ -475,6 +462,5 @@ export async function getBusyIntervals(
       502,
     );
   }
-  busyLimiter.store(userId, from.getTime(), to.getTime(), busy.data, now);
   return busy.data;
 }

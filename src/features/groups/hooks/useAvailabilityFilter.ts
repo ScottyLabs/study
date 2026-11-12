@@ -9,7 +9,7 @@ import {
   type BusyInterval,
 } from "~/helpers/calendar_helper";
 import { ApiRequestError } from "~/lib/api/client";
-import { MAX_BUSY_RANGE_MS } from "~/server/calendar/rateLimit";
+import { MAX_BUSY_RANGE_MS } from "~/lib/calendar";
 import type { StudyGroup } from "~/types";
 
 const HOUR_MS = 60 * 60_000;

@@ -1,5 +1,5 @@
 import { apiRequest, ApiRequestError } from "~/lib/api/client";
-import type { BusyInterval } from "~/server/calendar/rateLimit";
+import type { BusyInterval } from "~/lib/calendar";
 
 export type { BusyInterval };
 
@@ -143,7 +143,7 @@ export async function fetchBusyIntervals(
     to: to.toISOString(),
   });
   const { busy } = await calendarRequest<{ busy: BusyInterval[] }>(
-    `/busy?${range}`,
+    `/busy?${range.toString()}`,
     { cache: "no-store" },
   );
   return busy;
