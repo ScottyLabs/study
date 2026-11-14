@@ -2,6 +2,7 @@ import Select, { type MultiValue, type StylesConfig } from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { CalendarDays, Search } from "lucide-react";
+import type { DateFilterRange } from "~/types";
 
 type FilterOption = { value: string; label: string };
 
@@ -95,8 +96,8 @@ interface TopFilterBarProps {
   courseOptions: FilterOption[];
   selectedCourses: MultiValue<FilterOption>;
   setSelectedCourses: (selected: MultiValue<FilterOption>) => void;
-  selectedDate: Date | null;
-  setSelectedDate: (date: Date | null) => void;
+  selectedDateRange: DateFilterRange;
+  setSelectedDateRange: (dateRange: DateFilterRange) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }
@@ -105,8 +106,8 @@ function TopFilterBar({
   courseOptions,
   selectedCourses,
   setSelectedCourses,
-  selectedDate,
-  setSelectedDate,
+  selectedDateRange,
+  setSelectedDateRange,
   searchQuery,
   setSearchQuery,
 }: TopFilterBarProps) {
@@ -140,12 +141,14 @@ function TopFilterBar({
           <div className="filter-date-control">
             <CalendarDays className="filter-date-icon" size={17} />
             <DatePicker
-              selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
+              selectsRange
+              startDate={selectedDateRange[0] ?? undefined}
+              endDate={selectedDateRange[1] ?? undefined}
+              onChange={(dateRange) => setSelectedDateRange(dateRange)}
               customInput={<input />}
               popperClassName="custom-popper"
               wrapperClassName="filter-date-wrapper"
-              placeholderText="Any date"
+              placeholderText="Any date or range"
               className="filter-date-input"
             />
           </div>

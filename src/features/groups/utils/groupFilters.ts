@@ -1,9 +1,9 @@
 import { isInThePast } from "~/helpers/date_helper";
-import type { StudyGroup } from "~/types";
+import type { DateFilterRange, StudyGroup } from "~/types";
 
 type GroupFilterInput = {
   group: StudyGroup;
-  selectedDate?: Date | null;
+  selectedDateRange?: DateFilterRange;
   selectedCourseValues?: string[];
 };
 
@@ -21,6 +21,29 @@ function isSameCalendarDate(firstDate: Date, secondDate: Date) {
   );
 }
 
+function isCalendarDateInRange(date: Date, startDate: Date, endDate: Date) {
+  const calendarDate = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  );
+  const firstCalendarDate = new Date(
+    startDate.getFullYear(),
+    startDate.getMonth(),
+    startDate.getDate(),
+  );
+  const lastCalendarDate = new Date(
+    endDate.getFullYear(),
+    endDate.getMonth(),
+    endDate.getDate(),
+  );
+
+  return (
+    calendarDate.getTime() >= firstCalendarDate.getTime() &&
+    calendarDate.getTime() <= lastCalendarDate.getTime()
+  );
+}
+
 function hasSelectedValue(selectedValues: string[] | undefined, value: string) {
   return !selectedValues?.length || selectedValues.includes(value);
 }
@@ -35,12 +58,19 @@ function hasBlockedParticipant(group: StudyGroup, blockedUsers: string[] = []) {
 
 export function shouldHideBySharedFilters({
   group,
-  selectedDate,
+  selectedDateRange,
   selectedCourseValues,
 }: GroupFilterInput) {
   if (isInThePast(group.startTime)) return true;
 
-  if (selectedDate && !isSameCalendarDate(group.startTime, selectedDate)) {
+  const [startDate, endDate] = selectedDateRange ?? [];
+  const matchesDate =
+    !startDate ||
+    (endDate
+      ? isCalendarDateInRange(group.startTime, startDate, endDate)
+      : isSameCalendarDate(group.startTime, startDate));
+
+  if (!matchesDate) {
     return true;
   }
 
@@ -56,7 +86,7 @@ export function shouldHideFeedGroup({
   joinedGroups,
   blockedUsers,
   showFullFilter,
-  selectedDate,
+  selectedDateRange,
   selectedCourseValues,
 }: FeedGroupFilterInput) {
   const isFull = group.participantDetails.length >= group.totalSeats;
@@ -72,7 +102,7 @@ export function shouldHideFeedGroup({
 
   return shouldHideBySharedFilters({
     group,
-    selectedDate,
+    selectedDateRange,
     selectedCourseValues,
   });
 }
