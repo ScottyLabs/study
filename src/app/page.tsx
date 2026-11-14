@@ -65,23 +65,6 @@ function HomePageContent() {
           <Link href="/" className="landing-brand">
             <span>CMU</span> Study
           </Link>
-          <nav className="landing-nav-actions">
-            <SignInButton forceRedirectUrl={loginUrl}>
-              <button type="button" className="landing-signin">
-                Sign in
-              </button>
-            </SignInButton>
-            <SignInButton forceRedirectUrl={loginUrl}>
-              <button type="button" className="button-primary">
-                Create account
-              </button>
-            </SignInButton>
-          </nav>
-          <SignInButton forceRedirectUrl={loginUrl}>
-            <button type="button" className="landing-mobile-signin">
-              Sign in
-            </button>
-          </SignInButton>
         </header>
 
         <main className="landing-main">
@@ -95,14 +78,6 @@ function HomePageContent() {
             <div className="landing-actions">
               <SignInButton forceRedirectUrl={loginUrl}>
                 <button type="button" className="button-large">
-                  Find a study group
-                </button>
-              </SignInButton>
-              <SignInButton forceRedirectUrl={loginUrl}>
-                <button
-                  type="button"
-                  className="button-outline landing-secondary"
-                >
                   Get started
                 </button>
               </SignInButton>
