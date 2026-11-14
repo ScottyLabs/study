@@ -31,14 +31,13 @@ vi.mock("~/lib/hooks", () => ({
   useAppSelector: () => undefined,
 }));
 vi.mock("posthog-js/react", () => ({ usePostHog: () => ({ capture: vi.fn() }) }));
-vi.mock("~/features/groups/hooks/useStudyGroups", () => ({
-  useStudyGroups: () => [group],
-}));
-vi.mock("~/features/groups/hooks/useUserGroupState", () => ({
-  useUserGroupState: () => ({
+vi.mock("~/features/groups/GroupDataContext", () => ({
+  useGroupData: () => ({
+    groups: [group],
     joinedGroups: [],
     setJoinedGroups: vi.fn(),
     blockedUsers: [],
+    loading: false,
   }),
 }));
 vi.mock("~/features/profile/hooks/useUserCourses", () => ({

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { requireContentAccess } from "~/lib/require-content-access";
 import { AuthenticatedShell } from "~/components/layout/AuthenticatedShell";
+import { GroupDataProvider } from "~/features/groups/GroupDataContext";
 
 export const metadata = {
   title: "CMU Study",
@@ -15,5 +16,9 @@ export default async function ContentLayout({
 }) {
   await requireContentAccess();
 
-  return <AuthenticatedShell>{children}</AuthenticatedShell>;
+  return (
+    <GroupDataProvider>
+      <AuthenticatedShell>{children}</AuthenticatedShell>
+    </GroupDataProvider>
+  );
 }

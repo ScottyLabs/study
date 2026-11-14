@@ -7,8 +7,7 @@ import { formatDateTime } from "~/helpers/date_helper";
 import type { MultiValue } from "react-select";
 import TopFilterBar from "~/features/groups/components/FilterBar";
 import Card from "~/features/groups/components/Card";
-import { useStudyGroups } from "~/features/groups/hooks/useStudyGroups";
-import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
+import { useGroupData } from "~/features/groups/GroupDataContext";
 import { shouldHideBySharedFilters } from "~/features/groups/utils/groupFilters";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { CalendarCheck, Search } from "lucide-react";
@@ -19,13 +18,12 @@ import CardSkeletonGroup from "~/features/groups/components/CardSkeletonGroup";
 export default function MyGroupsPage() {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
-  const groups = useStudyGroups(Boolean(user));
+  const { groups, joinedGroups, setJoinedGroups, loading } = useGroupData();
   const { classes: userClasses } = useUserCourses(userId);
   const classOptions = userClasses.map((course) => ({
     value: course.courseID,
     label: course.courseID,
   }));
-  const { joinedGroups, setJoinedGroups, loading } = useUserGroupState(userId);
   const [selectedCourses, setSelectedCourses] = useState<
     MultiValue<{ value: string; label: string }>
   >([]);
@@ -43,6 +41,7 @@ export default function MyGroupsPage() {
     setShowDetails(null);
     setSelectedGroup(null);
   };
+  
   const visibleGroups = groups.filter((group) => {
     const isParticipant = joinedGroups?.includes(group.id);
     if (!isParticipant) return false;

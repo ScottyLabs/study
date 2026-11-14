@@ -7,7 +7,7 @@ import { MOBILE_LAYOUT_QUERY } from "~/lib/responsive";
 import type { StudyGroup } from "~/types";
 const mocks = vi.hoisted(() => ({
   fetch: vi.fn(),
-  fetchAll: vi.fn(),
+  groupData: vi.fn(),
   blocking: vi.fn(),
   push: vi.fn(),
   join: vi.fn(),
@@ -40,7 +40,6 @@ vi.mock("~/features/profile/components/CreateProfilePopUp", () => ({
 }));
 vi.mock("../services/groupApi", () => ({
   fetchGroup: mocks.fetch,
-  fetchGroups: mocks.fetchAll,
   subscribeToGroupChanges: () => vi.fn(),
   joinGroup: mocks.join,
 }));
@@ -61,10 +60,25 @@ const group: StudyGroup = {
   totalSeats: 2,
   participantDetails: [{ name: "Owner", email: "owner@cmu.edu", url: null }],
 };
+
+vi.mock("~/features/groups/GroupDataContext", () => ({
+  useGroupData: () => mocks.groupData(),
+}));
+
+function groupData(groups: StudyGroup[]) {
+  return {
+    groups,
+    joinedGroups: [],
+    setJoinedGroups: vi.fn(),
+    blockedUsers: [],
+    loading: false,
+  };
+}
+
 beforeEach(() => {
   mocks.sessionReady = true;
   mocks.fetch.mockResolvedValue(group);
-  mocks.fetchAll.mockResolvedValue([group]);
+  mocks.groupData.mockReturnValue(groupData([group]));
   mocks.blocking.mockResolvedValue({
     blockedByMe: [],
     blockedByThem: [],
@@ -74,6 +88,7 @@ beforeEach(() => {
   mocks.addCalendar.mockResolvedValue("calendar-event");
   mocks.join.mockResolvedValue(undefined);
 });
+
 test("opens a specific group without joining, then uses existing join/calendar flow", async () => {
   const userEventInstance = userEvent.setup();
   render(<SharedGroupPage groupId="abc" />);
@@ -194,10 +209,11 @@ test("closing the shared group's overlay returns to the feed", async () => {
 test("the shared link shows the normal group cards beside the selected details", async () => {
   const u = userEvent.setup();
   const otherGroup = { ...group, id: "other", title: "Another session" };
-  mocks.fetchAll.mockResolvedValue([group, otherGroup]);
+  mocks.groupData.mockReturnValue(groupData([group, otherGroup]));
   mocks.fetch.mockImplementation(async (id: string) =>
     id === "other" ? otherGroup : group,
   );
+  
   render(<SharedGroupPage groupId="abc" />);
   expect(
     await screen.findByRole("dialog", { name: "Systems session details" }),

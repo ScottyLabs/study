@@ -11,8 +11,7 @@ import { setIsCreateGroupModalOpen } from "~/lib/features/uiSlice";
 import { usePostHog } from "posthog-js/react";
 
 import Card from "~/features/groups/components/Card";
-import { useStudyGroups } from "~/features/groups/hooks/useStudyGroups";
-import { useUserGroupState } from "~/features/groups/hooks/useUserGroupState";
+import { useGroupData } from "~/features/groups/GroupDataContext";
 import { shouldHideFeedGroup } from "~/features/groups/utils/groupFilters";
 import { useUserCourses } from "~/features/profile/hooks/useUserCourses";
 import { Plus, Search } from "lucide-react";
@@ -32,14 +31,13 @@ export function GroupFinder({
 }: GroupFinderProps) {
   const { user } = useUser();
   const userId = user?.emailAddresses[0]?.emailAddress;
-  const groups = useStudyGroups(Boolean(user));
+  const { groups, joinedGroups, setJoinedGroups, blockedUsers, loading } =
+    useGroupData();
   const { classes: userClasses } = useUserCourses(userId);
   const classOptions = userClasses.map((course) => ({
     value: course.courseID,
     label: course.courseID,
   }));
-  const { joinedGroups, setJoinedGroups, blockedUsers, loading } =
-    useUserGroupState(userId);
   const [selectedCourses, setSelectedCourses] = useState<
     MultiValue<{ value: string; label: string }>
   >([]);
