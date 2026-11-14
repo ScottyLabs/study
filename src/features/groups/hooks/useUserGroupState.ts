@@ -13,8 +13,9 @@ export function useUserGroupState(userId?: string) {
 
     let cancelled = false;
     let requestVersion = 0;
+    setLoading(true);
+    
     const loadState = () => {
-      setLoading(true);
       const currentRequest = ++requestVersion;
       void fetchBlockingState()
         .then(({ joinedGroups, blockedByMe, blockedByThem }) => {
